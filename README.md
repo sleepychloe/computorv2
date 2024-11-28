@@ -39,15 +39,12 @@ make it possible to:
 ### How to enable non-canonical mode
 
 ```
-	#include <termios.h>
-	#include <unistd.h>
-
-	void	enable_raw_mode(void)
+	void	ReadLine::enable_raw_mode(void)
 	{
 		struct termios	t;
 
 		tcgetattr(STDIN_FILENO, &t);
-		t.c_lfalg &= ~(ICANON | ECHO);
+		t.c_lflag &= ~(ICANON | ECHO);
 		tcsetattr(STDIN_FILENO, TCSANOW, &t);
 	}
 ```
@@ -63,10 +60,12 @@ make it possible to:
 ### How to disable non-canoncial mode
 
 ```
-	void	disable_raw_mode(void)
+	void	ReadLine::disable_raw_mode(void)
 	{
 		struct termios	t;
+
 		tcgetattr(STDIN_FILENO, &t);
+
 		t.c_lflag |= (ICANON | ECHO);
 		tcsetattr(STDIN_FILENO, TCSANOW, &t);
 	}
@@ -92,44 +91,18 @@ make it possible to:
 	- non-canonial mode doesn't handle backspace automatically
 	- need to be processed manually by detecting `127` or `\b`, and removing the last character from the input buffer
 	```
-		#include <iostream>
-		#include <unistd.h>
-
-		int	main(void)
+		void	ReadLine::handle_backspace(std::string &input)
 		{
-			enable_raw_mode();
-
-			std::string	input;
-			char		c;
-
-			while (1)
+			if (!input.empty() && input.length() >= 1)
 			{
-				read(STDIN_FILENO, &c, 1);	// Read one character
-
-				if (c == 127 || c == '\b')	// Detect Backspace
-				{
-					if (!input.empty())
-					{
-						input.pop_back();	// Remove last character from buffer
-						std::cout << "\b \b";	// Erase character from terminal
-						std::cout.flush();
-					}
-				}
-				else if (c == '\n')		// Enter key
-					break;
-				else
-				{
-					input += c;			// Add character to input
-					std::cout << c;			// Echo character
-					std::cout.flush();
-				}
+				input.pop_back();	// Remove last character 
+				std::cout << "\b \b";	// Erase character from 
+				std::cout.flush();
 			}
-
-			disable_raw_mode();
-			std::cout << "\ninput: " << input << std::endl;
-			return 0;
 		}
 	```
-3. special keys
-	- arraw keys and function keys send escape sequence.
-	- need to be handled these explicitly in the program
+3. escape sequence handling
+	- in raw mode, the terminal sends raw input data directly to the program including multi-character escape sequence for special keys
+	- without handling these sequences:
+		+ special keys will not work
+		+ the terminal may behave unpredictably, waiting for sequences to complete or misinterpreting input.

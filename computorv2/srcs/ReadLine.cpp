@@ -6,13 +6,38 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 16:40:38 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/28 18:49:30 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/29 00:15:09 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/ReadLine.hpp"
 
-void	enable_raw_mode(void)
+ReadLine::ReadLine()
+{
+}
+
+ReadLine::ReadLine(int fd): _fd(fd)
+{
+}
+
+ReadLine::ReadLine(const ReadLine& readline)
+{
+	*this = readline;
+}
+
+ReadLine&	ReadLine::operator=(const ReadLine& readline)
+{
+	if (this == &readline)
+		return (*this);
+	this->_fd = readline._fd;
+	return (*this);
+}
+
+ReadLine::~ReadLine()
+{
+}
+
+void	ReadLine::enable_raw_mode(void)
 {
 	struct termios	t;
 
@@ -21,7 +46,7 @@ void	enable_raw_mode(void)
 	tcsetattr(STDIN_FILENO, TCSANOW, &t);
 }
 
-void	disable_raw_mode(void)
+void	ReadLine::disable_raw_mode(void)
 {
 	struct termios	t;
 
@@ -31,12 +56,12 @@ void	disable_raw_mode(void)
 	tcsetattr(STDIN_FILENO, TCSANOW, &t);
 }
 
-int	is_escape_sequence(int fd, char c)
+int	ReadLine::is_escape_sequence(char c)
 {
-	char		seq[2];
+	char		seq;
 	std::string	escape_sequence(1, c);
 
-	std::vector<std::string>	vec_sequence({ESCAPE_UP_ARROW, ESCAPE_DOWN_ARROW,
+	std::vector<std::string>	vec_seq({ESCAPE_UP_ARROW, ESCAPE_DOWN_ARROW,
 						ESCAPE_RIGHT_ARROW, ESCAPE_LEFT_ARROW,
 						ESCAPE_F1, ESCAPE_F2, ESCAPE_F3, ESCAPE_F4,
 						ESCAPE_F5, ESCAPE_F6, ESCAPE_F7, ESCAPE_F8,
@@ -44,21 +69,26 @@ int	is_escape_sequence(int fd, char c)
 						ESCAPE_INSERT, ESCAPE_DELETE,
 						ESCAPE_HOME, ESCAPE_END,
 						ESCAPE_PAGE_UP, ESCAPE_PAGE_DOWN,
-						ESCAPE_ALT_A, ESCAPE_ALT_B,
-						ESCAPE_ALT_C, ESCAPE_ALT_D});
+						// ESCAPE_ALT_A, ESCAPE_ALT_B,
+						// ESCAPE_ALT_C, ESCAPE_ALT_D
+						});
 	if (c == '\033')
 	{
-		if (read(fd, seq, 2) == 2)
+		while (read(this->_fd, &seq, 1) == 1)
 		{
-			escape_sequence += std::string(seq);
-			if (std::find(vec_sequence.begin(), vec_sequence.end(), escape_sequence) == vec_sequence.end())
-				return (1);
+			escape_sequence += std::string(1, seq);
+			if (seq == '~' || seq == 'P' || seq == 'Q' || seq == 'R'
+				|| seq == 'S' || seq == 'H' || seq == 'F'
+				|| seq == 'A' || seq == 'B' || seq == 'C' || seq == 'D')
+				break ;
 		}
+		if (std::find(vec_seq.begin(), vec_seq.end(), escape_sequence) == vec_seq.end())
+			return (1);
 	}
 	return (0);
 }
 
-void	handle_backspace(std::string &input)
+void	ReadLine::handle_backspace(std::string &input)
 {
 	if (!input.empty() && input.length() >= 1)
 	{
@@ -68,14 +98,14 @@ void	handle_backspace(std::string &input)
 	}
 }
 
-int	is_printable(char c)
+int	ReadLine::is_printable(char c)
 {
 	if (32 <= c && c <= 126)
 		return (c);
 	return (0);
 }
 
-void	read_line(int fd, std::string &input)
+void	ReadLine::read_line( std::string &input)
 {
 	char		c;
 
@@ -84,23 +114,25 @@ void	read_line(int fd, std::string &input)
 
 	while (1)
 	{
-		read(fd, &c, 1);
+		read(this->_fd, &c, 1);
 
-		if (is_escape_sequence(fd, c))
+		if (is_escape_sequence(c))
 			continue ;
-		if (c == 127 || c == '\b')
+		else if (c == 127 || c == '\b')
 		{
 			handle_backspace(input);
 			continue ;
 		}
-		if (c == '\n')
+		else if (c == '\n')
 			break ;
-		if (!is_printable(c))
+		else if (!is_printable(c))
 			continue ;
-
-		input += c;
-		std::cout << c;
-		std::cout.flush();
+		else
+		{
+			input += c;
+			std::cout << c;
+			std::cout.flush();
+		}
 	}
 	disable_raw_mode();
 	std::cout << std::endl;

@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 14:54:13 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/28 18:51:49 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/29 00:11:20 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,16 +30,16 @@
 #define ESCAPE_F8		"\033[19~"
 #define ESCAPE_F9		"\033[20~"
 #define ESCAPE_F10		"\033[21~"
-#define ESCAPE_F11		"\033[23~"
+#define ESCAPE_F11		"\033[25~"
 #define ESCAPE_F12		"\033[24~"
 
 /* Navigation Keys */
 #define ESCAPE_INSERT		"\033[2~"
 #define ESCAPE_DELETE		"\033[3~"
-#define ESCAPE_HOME		"\033[1~"
-#define ESCAPE_END		"\033[4~"
 #define ESCAPE_PAGE_UP		"\033[5~"
 #define ESCAPE_PAGE_DOWN	"\033[6~"
+#define ESCAPE_HOME		"\033[H"
+#define ESCAPE_END		"\033[F"
 
 /* Alt (Meta) Keys */
 #define ESCAPE_ALT_A		"\033a"

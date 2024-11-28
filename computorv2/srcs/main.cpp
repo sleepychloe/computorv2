@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:09:01 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/28 18:52:04 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/28 23:11:36 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,14 +43,15 @@ int	main(int argc, char **argv)
 	}
 
 	std::string	input;
+	ReadLine	rl(STDIN_FILENO);
 
 	ignore_all_signal();
 	print_msg(CYAN, "🐣 Welcom to the computorv2 🐣");
-	print_msg(CYAN, "type 'exit' or press ESC to quit !\n");
+	print_msg(CYAN, "type 'exit' to quit !\n");
 	while (1)
 	{
 		show_prompt('>');
-		read_line(STDIN_FILENO, input);
+		rl.read_line(input);
 
 		/* check empty string */
 		if (input == "" || input.empty())

@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 16:40:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/28 18:27:19 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/29 00:12:06 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,26 @@
 
 # define BLACK			"\x1b[0m"
 
-void	enable_raw_mode(void);
-void	disable_raw_mode(void);
-int	is_escape_sequence(int fd, char c);
-void	handle_backspace(std::string &input);
-void	read_line(int fd, std::string &input);
+class	ReadLine
+{
+public:
+	ReadLine(int fd);
+	ReadLine(const ReadLine& readline);
+	ReadLine& operator=(const ReadLine& readline);
+	~ReadLine();
+
+	void		enable_raw_mode(void);
+	void		disable_raw_mode(void);
+	void		read_line(std::string &input);
+
+private:
+	ReadLine();
+
+	int		is_escape_sequence(char c);
+	void		handle_backspace(std::string &input);
+	int		is_printable(char c);
+
+	int		_fd;
+};
 
 # endif
