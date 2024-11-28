@@ -6,12 +6,21 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:09:01 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/28 11:10:38 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/28 18:52:04 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../incs/ReadLine.hpp"
 #include "../incs/Parse.hpp"
 #include "../incs/Color.hpp"
+
+void	ignore_all_signal(void)
+{
+	sigset_t	mask;
+
+	sigfillset(&mask);
+	sigprocmask(SIG_SETMASK, &mask, NULL);
+}
 
 void	print_msg(std::string color, std::string msg)
 {
@@ -20,7 +29,8 @@ void	print_msg(std::string color, std::string msg)
 
 void	show_prompt(char c)
 {
-	std::cout << CYAN << " " << c << ' '; 
+	std::cout << CYAN << " " << c << ' ';
+	std::cout.flush();
 }
 
 int	main(int argc, char **argv)
@@ -33,23 +43,17 @@ int	main(int argc, char **argv)
 	}
 
 	std::string	input;
-	std::string	exit;
 
+	ignore_all_signal();
 	print_msg(CYAN, "🐣 Welcom to the computorv2 🐣");
-	print_msg(CYAN, "Type your input or type 'exit' to quit !\n");
+	print_msg(CYAN, "type 'exit' or press ESC to quit !\n");
 	while (1)
 	{
 		show_prompt('>');
-		std::getline(std::cin, input);
+		read_line(STDIN_FILENO, input);
 
-		/* check eof */
-		if (std::cin.eof())
-		{
-			std::cout << "^D" << std::endl;
-			break ;
-		}
 		/* check empty string */
-		else if (input == "")
+		if (input == "" || input.empty())
 		{
 			print_msg(RED, "Warning: the input is empty");
 			continue ;
@@ -63,6 +67,7 @@ int	main(int argc, char **argv)
 		else
 		{
 			std::cout << BLACK << "input: " << input << std::endl;
+			std::cout.flush();
 			//parse start
 			continue ;
 		}
