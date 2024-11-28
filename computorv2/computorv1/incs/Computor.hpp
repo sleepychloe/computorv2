@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 00:59:37 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/24 23:20:04 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/28 11:10:19 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,12 @@
 # define COMPUTOR_HPP
 
 #include "./Parse.hpp"
+
+# define BLACK			"\x1b[0m"
+# define RED			"\x1b[31m"
+# define CYAN			"\x1b[36m"
+# define YELLOW			"\x1b[33m"
+# define MAGENTA		"\x1b[35m"
 
 # define TYPE_CONSTANT			0
 # define TYPE_LINEAR			1
