@@ -6,15 +6,15 @@
 #    By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/28 09:51:42 by yhwang            #+#    #+#              #
-#    Updated: 2024/11/28 10:29:42 by yhwang           ###   ########.fr        #
+#    Updated: 2024/11/28 11:07:10 by yhwang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = computor
+NAME = computorv2
 CPP = c++
 
-SRC_DIR = ./computorv2/srcs/
-INCS_DIR = ./computorv2/incs/
+SRC_DIR = ./srcs/
+INCS_DIR = ./incs/
 
 CPPFLAGS = -Wall -Wextra -Werror -std=c++17 -g3
 
