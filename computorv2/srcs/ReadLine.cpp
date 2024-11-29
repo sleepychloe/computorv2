@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 16:40:38 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/29 12:00:22 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/29 19:41:05 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,30 +30,44 @@ ReadLine&	ReadLine::operator=(const ReadLine& readline)
 	if (this == &readline)
 		return (*this);
 	this->_fd = readline._fd;
+	this->_prompt = readline._prompt;
+	this->_original_termios = readline._original_termios;
 	return (*this);
 }
 
 ReadLine::~ReadLine()
 {
+	disable_raw_mode();
 }
 
-void	ReadLine::enable_raw_mode(void)
+int	ReadLine::enable_raw_mode(void)
 {
-	struct termios	t;
+	struct termios	raw;
 
-	tcgetattr(STDIN_FILENO, &t);
-	t.c_lflag &= ~(ICANON | ECHO);
-	tcsetattr(STDIN_FILENO, TCSANOW, &t);
+	if (tcgetattr(STDIN_FILENO, &this->_original_termios) == -1)
+	{
+		perror("tcgetattr failed");
+		return (-1);
+	}
+
+	raw = this->_original_termios;
+	raw.c_lflag &= ~(ICANON | ECHO);
+	if (tcsetattr(STDIN_FILENO, TCSANOW, &raw) == -1)
+	{
+		perror("tcsetattr failed");
+		return (-1);
+	}
+	return (0);
 }
 
-void	ReadLine::disable_raw_mode(void)
+int	ReadLine::disable_raw_mode(void)
 {
-	struct termios	t;
-
-	tcgetattr(STDIN_FILENO, &t);
-
-	t.c_lflag |= (ICANON | ECHO);
-	tcsetattr(STDIN_FILENO, TCSANOW, &t);
+	if (tcsetattr(STDIN_FILENO, TCSANOW, &this->_original_termios) == -1)
+	{
+		perror("tcsetattr failed");
+		return (-1);
+	}
+	return (0);
 }
 
 int	ReadLine::is_escape_sequence(std::string &input, char c)
@@ -147,42 +161,45 @@ void	ReadLine::handle_arrow(std::string &input, size_t &cursor)
 	std::cout.flush();
 }
 
+void	ReadLine::handle_delete(std::string &input, size_t &cursor)
+{
+	if (!input.empty() && cursor < input.length())
+		input.erase(cursor, 1);
+	update_display(input, cursor);
+}
+
 void	ReadLine::handle_backspace(std::string &input, size_t &cursor)
 {
-	if (!input.empty() && input.length() >= 1)
+	if (!input.empty() && 0 < cursor)
 	{
 		input.erase(cursor - 1, 1);
 		cursor--;
 	}
+	update_display(input, cursor);
 }
 
-int	ReadLine::is_printable(char c)
-{
-	if (32 <= c && c <= 126)
-		return (c);
-	return (0);
-}
-
-void	ReadLine::update_display(std::string prompt, std::string &input, size_t cursor)
+void	ReadLine::update_display(std::string &input, size_t cursor)
 {
 	std::cout << "\033[2K\r"; // clear current line
-	std::cout << prompt << input;
-	std::cout << "\033[" << (cursor + prompt.length() + 1) << "G"; // move cursor
+	std::cout << this->_prompt << input;
+	std::cout << "\033[" << (cursor + this->_prompt.length() + 1) << "G"; // move cursor
 	std::cout.flush();
 }
 
-void	ReadLine::read_line(std::string prompt, std::string &input)
+int	ReadLine::read_line(std::string prompt, std::string &input)
 {
 	char		c;
 	int		type_seq;
 	size_t		cursor = 0;
 
+	this->_prompt = prompt;
 	input.clear();
-	enable_raw_mode();
 
+	if (enable_raw_mode() == -1)
+		return (-1);
+	
 	std::cout << prompt;
 	std::cout.flush();
-
 	while (1)
 	{
 		read(this->_fd, &c, 1);
@@ -193,34 +210,31 @@ void	ReadLine::read_line(std::string prompt, std::string &input)
 			if (type_seq == SEQUENCE_ARROW)
 				handle_arrow(input, cursor);
 			if (type_seq == SEQUENCE_DELETE)
-			{
-				if (!input.empty() && cursor < input.length())
-					input.erase(cursor, 1);
-				update_display(prompt, input, cursor);
-			}
+				handle_delete(input, cursor);
 			continue ;
 		}
 		else if (c == 127)
 		{
 			handle_backspace(input, cursor);
-			update_display(prompt, input, cursor);
 			continue ;
 		}
 		else if (c == '\n')
 			break ;
-		else if (!is_printable(c))
+		else if (!std::isprint(c))
 			continue ;
 
 		input.insert(cursor, 1, c);
 		cursor++;
-		update_display(prompt, input, cursor);
+		update_display(input, cursor);
 	}
-	disable_raw_mode();
+	if (disable_raw_mode() == -1)
+		return (-1);
 	std::cout << std::endl;
+	return (input.length());
 }
 
-void	ReadLine::read_line(std::string prompt, std::string color, std::string &input)
+int	ReadLine::read_line(std::string prompt, std::string color, std::string &input)
 {
 	std::cout << color;
-	read_line(prompt, input);
+	return (read_line(prompt, input));
 }

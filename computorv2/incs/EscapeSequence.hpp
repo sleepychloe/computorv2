@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 14:54:13 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/29 08:00:24 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/29 19:18:25 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,5 @@
 #define ESCAPE_ALT_X		"\033x"
 #define ESCAPE_ALT_Y		"\033y"
 #define ESCAPE_ALT_Z		"\033z"
-
 
 #endif

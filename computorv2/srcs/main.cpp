@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:09:01 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/29 11:42:37 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/29 19:16:46 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,12 @@ int	main(int argc, char **argv)
 	print_msg(CYAN, "type 'exit' to quit !\n");
 	while (1)
 	{
-		rl.read_line("> ", CYAN, input);
+		if (rl.read_line("> ", CYAN, input) == -1)
+		{
+			std::cerr << RED << "Error: unexpected error from ReadLine::read_line()"
+				<< BLACK << std::endl;
+			return (1);
+		}
 
 		/* check empty string */
 		if (input == "" || input.empty())
