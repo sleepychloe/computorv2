@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 14:54:13 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/29 00:11:20 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/29 08:00:24 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,5 +46,28 @@
 #define ESCAPE_ALT_B		"\033b"
 #define ESCAPE_ALT_C		"\033c"
 #define ESCAPE_ALT_D		"\033d"
+#define ESCAPE_ALT_E		"\033e"
+#define ESCAPE_ALT_F		"\033f"
+#define ESCAPE_ALT_G		"\033g"
+#define ESCAPE_ALT_H		"\033h"
+#define ESCAPE_ALT_I		"\033i"
+#define ESCAPE_ALT_J		"\033j"
+#define ESCAPE_ALT_K		"\033k"
+#define ESCAPE_ALT_L		"\033l"
+#define ESCAPE_ALT_M		"\033m"
+#define ESCAPE_ALT_N		"\033n"
+#define ESCAPE_ALT_O		"\033o"
+#define ESCAPE_ALT_P		"\033p"
+#define ESCAPE_ALT_Q		"\033q"
+#define ESCAPE_ALT_R		"\033r"
+#define ESCAPE_ALT_S		"\033s"
+#define ESCAPE_ALT_T		"\033t"
+#define ESCAPE_ALT_U		"\033u"
+#define ESCAPE_ALT_V		"\033v"
+#define ESCAPE_ALT_W		"\033w"
+#define ESCAPE_ALT_X		"\033x"
+#define ESCAPE_ALT_Y		"\033y"
+#define ESCAPE_ALT_Z		"\033z"
+
 
 #endif

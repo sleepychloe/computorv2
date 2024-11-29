@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 16:40:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/29 00:12:06 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/29 11:05:24 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,18 @@
 #include <unistd.h>
 #include <csignal>
 #include <termios.h>
-#include <vector>
+#include <unordered_set>
 #include <algorithm>
 #include "./EscapeSequence.hpp"
 
-# define BLACK			"\x1b[0m"
+# define BLACK					"\x1b[0m"
+
+# define NONE					0
+# define SEQUENCE_ALT				1
+# define SEQUENCE_ARROW				2
+# define SEQUENCE_FUNCTION_NAVIGATION		3
+# define UNRECOGNIZED_SEQUENCE			4
+# define SEQUENCE_DELETE			5
 
 class	ReadLine
 {
@@ -38,8 +45,9 @@ public:
 private:
 	ReadLine();
 
-	int		is_escape_sequence(char c);
-	void		handle_backspace(std::string &input);
+	int		is_escape_sequence(std::string &input, char c);
+	void		handle_arrow(std::string &input, size_t &cursor);
+	void		handle_backspace(std::string &input, size_t &cursor);
 	int		is_printable(char c);
 
 	int		_fd;
