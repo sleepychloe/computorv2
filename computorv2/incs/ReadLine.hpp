@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 16:40:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/29 11:05:24 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/29 11:57:37 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,8 @@ public:
 
 	void		enable_raw_mode(void);
 	void		disable_raw_mode(void);
-	void		read_line(std::string &input);
+	void		read_line(std::string prompt, std::string &input);
+	void		read_line(std::string prompt, std::string color, std::string &input);
 
 private:
 	ReadLine();
@@ -49,6 +50,7 @@ private:
 	void		handle_arrow(std::string &input, size_t &cursor);
 	void		handle_backspace(std::string &input, size_t &cursor);
 	int		is_printable(char c);
+	void		update_display(std::string prompt, std::string &input, size_t cursor);
 
 	int		_fd;
 };

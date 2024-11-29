@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:09:01 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/29 11:14:06 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/29 11:42:37 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,6 @@ void	print_msg(std::string color, std::string msg)
 	std::cout << color << msg << BLACK << std::endl;
 }
 
-void	show_prompt(char c)
-{
-	std::cout << CYAN << " " << c << ' ';
-	std::cout.flush();
-}
-
 int	main(int argc, char **argv)
 {
 	(void)argv;
@@ -50,8 +44,7 @@ int	main(int argc, char **argv)
 	print_msg(CYAN, "type 'exit' to quit !\n");
 	while (1)
 	{
-		show_prompt('>');
-		rl.read_line(input);
+		rl.read_line("> ", CYAN, input);
 
 		/* check empty string */
 		if (input == "" || input.empty())
@@ -68,7 +61,6 @@ int	main(int argc, char **argv)
 		else
 		{
 			std::cout << BLACK << "input: " << input << std::endl;
-			std::cout.flush();
 			//parse start
 			continue ;
 		}

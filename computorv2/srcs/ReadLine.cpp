@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 16:40:38 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/29 11:14:13 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/29 12:00:22 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,8 +100,6 @@ int	ReadLine::is_escape_sequence(std::string &input, char c)
 				{
 					if (sequence.find(escape_sequence) != sequence.end())
 					{
-						if (escape_sequence == ESCAPE_DELETE)
-							return (SEQUENCE_DELETE);
 						input += escape_sequence;
 						return (SEQUENCE_ARROW);
 					}
@@ -110,6 +108,8 @@ int	ReadLine::is_escape_sequence(std::string &input, char c)
 				if (seq == '~' || ('P' <= seq && seq <= 'S')
 					|| seq == 'H' || seq == 'F')
 				{
+					if (escape_sequence == ESCAPE_DELETE)
+						return (SEQUENCE_DELETE);
 					if (sequence.find(escape_sequence) != sequence.end())
 						return (SEQUENCE_FUNCTION_NAVIGATION);
 					break ;
@@ -144,14 +144,6 @@ void	ReadLine::handle_arrow(std::string &input, size_t &cursor)
 			std::cout << arrow;
 		}
 	}
-	else if (arrow == ESCAPE_UP_ARROW)
-	{
-		std::cout << "\nup" << std::endl;
-	}
-	else if (arrow == ESCAPE_DOWN_ARROW)
-	{
-		std::cout << "\ndown" << std::endl;
-	}
 	std::cout.flush();
 }
 
@@ -161,7 +153,6 @@ void	ReadLine::handle_backspace(std::string &input, size_t &cursor)
 	{
 		input.erase(cursor - 1, 1);
 		cursor--;
-		std::cout.flush();
 	}
 }
 
@@ -172,7 +163,15 @@ int	ReadLine::is_printable(char c)
 	return (0);
 }
 
-void	ReadLine::read_line(std::string &input)
+void	ReadLine::update_display(std::string prompt, std::string &input, size_t cursor)
+{
+	std::cout << "\033[2K\r"; // clear current line
+	std::cout << prompt << input;
+	std::cout << "\033[" << (cursor + prompt.length() + 1) << "G"; // move cursor
+	std::cout.flush();
+}
+
+void	ReadLine::read_line(std::string prompt, std::string &input)
 {
 	char		c;
 	int		type_seq;
@@ -180,6 +179,9 @@ void	ReadLine::read_line(std::string &input)
 
 	input.clear();
 	enable_raw_mode();
+
+	std::cout << prompt;
+	std::cout.flush();
 
 	while (1)
 	{
@@ -190,18 +192,18 @@ void	ReadLine::read_line(std::string &input)
 		{
 			if (type_seq == SEQUENCE_ARROW)
 				handle_arrow(input, cursor);
-			// if (type_seq == SEQUENCE_DELETE)
-			// 	handle_backspace(input, cursor_pos);
+			if (type_seq == SEQUENCE_DELETE)
+			{
+				if (!input.empty() && cursor < input.length())
+					input.erase(cursor, 1);
+				update_display(prompt, input, cursor);
+			}
 			continue ;
 		}
 		else if (c == 127)
 		{
 			handle_backspace(input, cursor);
-
-			std::cout << "\033[2K\r"; // Clear the current line
-			std::cout << " > " << input; // Reprint input
-			std::cout << "\033[" << (cursor + 4) << "G"; // Move cursor to the correct position
-			std::cout.flush();
+			update_display(prompt, input, cursor);
 			continue ;
 		}
 		else if (c == '\n')
@@ -211,12 +213,14 @@ void	ReadLine::read_line(std::string &input)
 
 		input.insert(cursor, 1, c);
 		cursor++;
-
-		std::cout << "\033[2K\r"; // Clear the current line
-		std::cout << " > " << input; // Reprint input
-		std::cout << "\033[" << (cursor + 4) << "G"; // Move cursor to the correct position
-		std::cout.flush();
+		update_display(prompt, input, cursor);
 	}
 	disable_raw_mode();
 	std::cout << std::endl;
+}
+
+void	ReadLine::read_line(std::string prompt, std::string color, std::string &input)
+{
+	std::cout << color;
+	read_line(prompt, input);
 }
