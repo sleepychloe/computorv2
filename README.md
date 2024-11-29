@@ -41,9 +41,7 @@ the interpreter must be robust, ensuring correct results and preventing errors d
 
 ### Parsing with the class ReadLine
 
-To streamline the parsing process and enhance input handling,
-
-computor v2 leverages a custom-built utility class called `ReadLine`.
+To streamline the parsing process and enhance input handling, computor v2 leverages a custom-built utility class called `ReadLine`.
 
 This class was specifically developed to handle user input efficiently, ensuring a smoother and more intuitive parsing.
 
