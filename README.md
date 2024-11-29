@@ -2,6 +2,8 @@ Currently working on the project
 
 ## Class ReadLine
 
+### Introduction
+
 The `ReadLine` class provides a robust mechanism for terminal input handling, leveraging the POSIX termios library.
 
 By leveraging non-canonical mode and handling raw input, it allows for seamless and intuitive user interactions.
@@ -66,6 +68,7 @@ usage example:
 
 ```
 
+<br>
 
 ### Terminal input handling with termios
 
@@ -79,6 +82,7 @@ make it possible to:
 - enable or disable echoing of type characters\
 - control other terminal setting
 
+<br>
 
 ### Canoncial mode and Non-canonical mode
 
@@ -92,6 +96,8 @@ make it possible to:
 	+ no need to press `Enter` for inpuyt to be available
 	+ the program handles special keys(ex. backspace, arrow keys) directly
 
+<br>
+
 ### Why use non-canonical mode?
 
 - real-time input handling
@@ -100,6 +106,8 @@ make it possible to:
 	+ handle special keys like arrow keys, backspace, and Ctrl+C programmatically
 - interactive programs
 	+ useful for creating applications like games, shells, or text editors
+
+<br>
 
 ### How to enable non-canonical mode
 
@@ -134,6 +142,8 @@ make it possible to:
 	+ `TCSANOW` option ensures the settings are applied immediately,
 	without waiting for data to be sent or received
 
+<br>
+
 ### How to disable non-canoncial mode
 
 ```
@@ -148,6 +158,8 @@ make it possible to:
 	}
 ```
 - restores the terminal to its original state, ensuring no unexpected behavior
+
+<br>
 
 ### When to use non-canoncial mode
 
