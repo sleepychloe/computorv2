@@ -1,8 +1,73 @@
 Currently working on the project
 
-## Terminal input handling with termios
+## Class ReadLine
 
-### What is `termios`?
+The `ReadLine` class provides a robust mechanism for terminal input handling, leveraging the POSIX termios library.
+
+By leveraging non-canonical mode and handling raw input, it allows for seamless and intuitive user interactions.
+
+
+Features:
+
+1. Real-time input processing with non-canonical mode
+	- processes input character-by-character instead of waiting for the Enter key.
+	- disables automatic echoing of typed characters.
+2. Handling special keys
+	- supports arrow keys, backspace, delete, function keys, and Alt-key combinations.
+	- recognizes multi-character escape sequences.
+3. Customizing terminal behavior for interactive programs
+	- implements manual backspace, delete, and cursor movement logic.
+	- allows real-time updates to terminal display.
+
+
+usage example:
+
+```
+	#include "ReadLine.hpp"
+	#include <iostream>
+
+	int	main(void)
+	{
+		std::string	input;
+		ReadLine	rl(STDIN_FILENO);
+
+		std::cout << "Type 'exit' to quit ! << std::endl;
+
+		while (1)
+		{
+			/* Read user input using the ReadLine class */
+			if (rl.read_line("> ", input) == -1)
+			{
+				std::cerr << "Error: unexpected error from ReadLine::read_line()"
+					<< std::endl;
+				return (1);
+			}
+			/* check if the input is empty */
+			if (input == "" || input.empty())
+			{
+				std::cout << "the input is empty" << std::endl;
+				continue ;
+			}
+			/* check exit */
+			else if (input == "exit" || input == "EXIT")
+			{
+				std::cout << "Program terminated" << std::endl;
+				break ;
+			}
+			else
+			{
+				/* display user input */
+				std::cout << "input: " << input << std::endl;
+				continue ;
+			}
+		}
+		return (0);
+	}
+
+```
+
+
+### Terminal input handling with termios
 
 `termios` is a POSIX library used to control terminal I/O behavior.
 
@@ -18,7 +83,7 @@ make it possible to:
 ### Canoncial mode and Non-canonical mode
 
 - canonical mode(default)
-	+ inpyt is line-buffered
+	+ input is line-buffered
 	+ the terminal waits for the user to press `Enter` before processing input
 	+ backspace handling and other input editing features are handled by the terminal
 
@@ -32,52 +97,63 @@ make it possible to:
 - real-time input handling
 	+ process key presses immediately without waiting for `Enter`
 - custom input behavior
-	+ handle special keys like arrow keys, backspace, and Ctrl+C priogrammatically
+	+ handle special keys like arrow keys, backspace, and Ctrl+C programmatically
 - interactive programs
 	+ useful for creating applications like games, shells, or text editors
 
 ### How to enable non-canonical mode
 
 ```
-	void	ReadLine::enable_raw_mode(void)
+	int	ReadLine::enable_raw_mode(void)
 	{
-		struct termios	t;
+		struct termios	raw;
 
-		tcgetattr(STDIN_FILENO, &t);
-		t.c_lflag &= ~(ICANON | ECHO);
-		tcsetattr(STDIN_FILENO, TCSANOW, &t);
+		if (tcgetattr(STDIN_FILENO, &this->_original_termios) == -1)
+		{
+			perror("tcgetattr failed");
+			return (-1);
+		}
+
+		raw = this->_original_termios;
+		raw.c_lflag &= ~(ICANON | ECHO);
+		if (tcsetattr(STDIN_FILENO, TCSANOW, &raw) == -1)
+		{
+			perror("tcsetattr failed");
+			return (-1);
+		}
+		return (0);
 	}
 ```
-- `tcgetattr(STDIN_FILENO, &t)`
-	+ fetches the current terminal attributes for standard input
-- `t.c_lfalg &= ~(ICANON | ECHO)`
+- `tcgetattr(STDIN_FILENO, &this->_original_termios)`
+	+ saves the current terminal settings
+- `raw.c_lflag &= ~(ICANON | ECHO)`
 	+ `~(ICANON | ECHO)` clears the `ICANON`(canonical mode) and `ECHO`(echo mode) bits
 	+ disabling `ICANON` processes input character-by-character
-	+ disableing `ECHO` prevents typed characters from being displayed automatically
-- `tcsetattr(STDIN_FILENO, TCSANOW, &t)`
-	+ applies the modified settings immediately
+	+ disabling `ECHO` prevents typed characters from being displayed automatically
+- `tcsetattr(STDIN_FILENO, TCSANOW, &raw)`
+	+ `TCSANOW` option ensures the settings are applied immediately,
+	without waiting for data to be sent or received
 
 ### How to disable non-canoncial mode
 
 ```
-	void	ReadLine::disable_raw_mode(void)
+	int	ReadLine::disable_raw_mode(void)
 	{
-		struct termios	t;
-
-		tcgetattr(STDIN_FILENO, &t);
-
-		t.c_lflag |= (ICANON | ECHO);
-		tcsetattr(STDIN_FILENO, TCSANOW, &t);
+		if (tcsetattr(STDIN_FILENO, TCSANOW, &this->_original_termios) == -1)
+		{
+			perror("tcsetattr failed");
+			return (-1);
+		}
+		return (0);
 	}
 ```
-- `t.c_lflag |= (ICANON | ECHO)`
-	+ enabling `ICANON` and `ECHO`
+- restores the terminal to its original state, ensuring no unexpected behavior
 
 ### When to use non-canoncial mode
 
 1. always restore terminal setting
 	- ensure `disable_raw_mode()` is called when the program exits
-	- use `atexit()` or signal handlers(`SIGINT`) to guarantee cleansup:
+	- use `atexit()` or signal handlers(`SIGINT`) to guarantee cleanup:
 
 	```
 		#include <cstdlib>
@@ -87,18 +163,28 @@ make it possible to:
 		+ characters not being echoed when typed
 		+ input being processed character-by-character instead of line-by-line
 		+ backspace andf enter not working as expected
-2. backspace handling
+2. delete and backspace handling
 	- non-canonial mode doesn't handle backspace automatically
 	- need to be processed manually by detecting `127` or `\b`, and removing the last character from the input buffer
 	```
-		void	ReadLine::handle_backspace(std::string &input)
+		/* removes the character at the cursor position */
+		void	ReadLine::handle_delete(std::string &input, size_t &cursor)
 		{
-			if (!input.empty() && input.length() >= 1)
+			if (!input.empty() && cursor < input.length())
+				input.erase(cursor, 1);
+			update_display(input, cursor);
+		}
+	```
+	```
+		/* removes the character before the cursor */
+		void	ReadLine::handle_backspace(std::string &input, size_t &cursor)
+		{
+			if (!input.empty() && 0 < cursor)
 			{
-				input.pop_back();	// Remove last character 
-				std::cout << "\b \b";	// Erase character from 
-				std::cout.flush();
+				input.erase(cursor - 1, 1);
+				cursor--;
 			}
+			update_display(input, cursor);
 		}
 	```
 3. escape sequence handling
@@ -152,13 +238,19 @@ make it possible to:
 						{
 							/* arrow keys */
 							if (sequence.find(escape_sequence) != sequence.end())
+							{
+								input += escape_sequence;
 								return (SEQUENCE_ARROW);
+							}
 							/* unrecognized sequence */
 							break ;
 						}
 						if (seq == '~' || ('P' <= seq && seq <= 'S')
 							|| seq == 'H' || seq == 'F')
 						{
+							/* navigation key: delete */
+							if (escape_sequence == ESCAPE_DELETE)
+								return (SEQUENCE_DELETE);
 							/* function keys, navigation keys */
 							if (sequence.find(escape_sequence) != sequence.end())
 								return (SEQUENCE_FUNCTION_NAVIGATION);

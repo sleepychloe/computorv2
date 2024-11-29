@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 16:40:38 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/29 19:41:05 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/29 20:11:48 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,7 +229,7 @@ int	ReadLine::read_line(std::string prompt, std::string &input)
 	}
 	if (disable_raw_mode() == -1)
 		return (-1);
-	std::cout << std::endl;
+	std::cout << BLACK << std::endl;
 	return (input.length());
 }
 
