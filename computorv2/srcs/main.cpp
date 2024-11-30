@@ -6,11 +6,11 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:09:01 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/29 21:24:22 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/11/30 19:58:47 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../incs/ReadLine.hpp"
+#include "../ReadLine/incs/ReadLine.hpp"
 #include "../incs/Parse.hpp"
 #include "../incs/Color.hpp"
 
@@ -65,9 +65,18 @@ int	main(int argc, char **argv)
 		}
 		else
 		{
-			std::cout << "input: " << input << std::endl;
-			//parse start
-			continue ;
+			try
+			{
+				Parse	p;
+
+				p.parse_start(input);
+				std::cout << "input: " << input << std::endl;
+			}
+			catch(std::string err_msg)
+			{
+				std::cerr << RED << "error: invalid input: " << err_msg << BLACK << std::endl;
+				continue ;
+			}
 		}
 	}
 	return (0);

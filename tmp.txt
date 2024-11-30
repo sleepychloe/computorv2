@@ -129,9 +129,7 @@ syntax:
 		18
 		> varC =2 * varB
 		36
-		> varD
-		=
-		2 *(2 + 4 *varC -4 /3)
+		> varD    =    2 *(2 + 4 *varC -4 /3)
 		289.333333333
 		>
 	4. 2 ∗ xx does not mean 2 ∗ x2 nor 2 ∗ x, xx here is considered as a variable
@@ -151,3 +149,15 @@ syntax:
 
 
 * every input should contain =
+
+' ',
+'a' to 'z', 'A' to 'Z',
+'0' to '9', '.', '(', ')', '[', ']', ';', ',', '=', '?', '+', '-', '*', '/', '%', '^'
+
+
+
+-----------------------------------------------------------------------
+
+1. check equal(=) sign
+2. check number, check float point
+3. remove space
