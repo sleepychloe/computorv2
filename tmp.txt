@@ -150,14 +150,17 @@ syntax:
 
 * every input should contain =
 
-' ',
+' ','\t',
 'a' to 'z', 'A' to 'Z',
 '0' to '9', '.', '(', ')', '[', ']', ';', ',', '=', '?', '+', '-', '*', '/', '%', '^'
-
 
 
 -----------------------------------------------------------------------
 
 1. check equal(=) sign
-2. check number, check float point
-3. remove space
+2. check invalidf character
+3. check number, check float point
+4. remove space
+5. check syntax
+	- round bracket(left, right term seperately)
+	- square bracket(left, right term seperately)

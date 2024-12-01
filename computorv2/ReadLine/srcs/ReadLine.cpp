@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 16:40:38 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/30 20:14:59 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/01 03:30:23 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -277,8 +277,11 @@ int	ReadLine::read_line(std::string prompt, std::string &input)
 		}
 		else if (c == '\n')
 		{
-			this->_history.push_back(input);
-			this->_history_index = this->_history.size();
+			if (input != "")
+			{
+				this->_history.push_back(input);
+				this->_history_index = this->_history.size();
+			}
 			this->_cursor = 0;
 			break ;
 		}

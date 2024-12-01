@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/30 23:20:58 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/01 03:19:17 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,12 @@
 #include <map>
 #include <variant>
 #include <iterator>
+#include "./Color.hpp"
 
 using V = std::variant<float, Complex<float>, Matrix<float>, Matrix<Complex<float>>, Vector<float>, Vector<Complex<float>>>;
 
-# define TYPE_VARIABLE		0
-# define TYPE_FUNCTION		1
-# define TYPE_CALCULATE		2
+# define ROUND_BRACKET		0
+# define SQUARE_BRACKET		1
 
 class	Parse
 {
@@ -37,18 +37,22 @@ public:
 	Parse& operator=(const Parse& parse);
 	~Parse();
 
-	void				parse_start(std::string &str);
+	void			parse_start(std::string &str);
 
 private:
-	int				check_keyword(std::string str);
+	void			print_variant_value(V value);
+	int			check_keyword(std::string str);
 
-	int				is_equation_form(std::string str);
-	int				check_float_point(std::string str);
-	int				check_number(std::string str);
-	void				remove_space(std::string &str);
+	int			is_equation_form(std::string str);
+	int			check_invalid_character(std::string str);
+	int			check_float_point(std::string str);
+	int			check_number(std::string str);
+	void			remove_space(std::string &str);
 
-	// void				check_type(std::string &str);
-	int				check_str(std::string &str);
+	int			check_brackets(int type, std::string str);
+	int			check_syntax(std::string &str);
+
+	int			check_str(std::string &str);
 
 	std::map<std::string, V>		_var;
 	std::map<std::string, V>		_func;
