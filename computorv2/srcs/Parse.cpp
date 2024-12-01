@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/01 20:04:16 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/02 00:33:04 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -288,21 +288,48 @@ void	Parse::remove_space(std::string &str)
 	str = new_str;
 }
 
-int	Parse::skip_square_brackets(std::string str, std::string &new_str, size_t i)
+int	Parse::check_square_brackets(std::string str, std::string &new_str, size_t i)
 {
 	if (str[i] != '[')
 		return (i);
 
-	if (str[i + 1] && str[i + 1] == '[')//matrix
-	{
-		//edit here, change ]] and [[
-		new_str += str.substr(i, str.find("]]", i) - i + 2);
-		i = str.find("]]", i) + 2;
-	}
-	else//vector
+	/* vector */
+	if (str.find("[", i + 1) == std::string::npos
+		|| str.find("]", i + 1) < str.find("[", i + 1))
 	{
 		new_str += str.substr(i, str.find("]", i) - i + 1);
+		// vector form check here
 		i = str.find("]", i) + 1;
+	}
+	/* matrix */
+	else if (str.find("[", i + 1) != std::string::npos)
+	{	
+		size_t	j = str.find("[", i + 1);
+		size_t	cnt = 1;
+
+		while (0 < cnt && cnt <= 2 && j < str.length())
+		{
+			if (str[j] == '[')
+				cnt++;
+			else if (str[j] == ']')
+				cnt--;
+			if (cnt == 0)
+				break ;
+			j++;
+		}
+		if (cnt < 0 || cnt > 2)
+		{
+			this->_err_msg = "invalid syntax: matrix form";
+			throw (this->_err_msg);
+		}
+		new_str += str.substr(i, j - i + 1);
+		// matrix form check here
+		i = j + 1;
+	}
+	else
+	{
+		this->_err_msg = "invalid syntax: matrix form";
+		throw (this->_err_msg);
 	}
 	return (i);
 }
@@ -314,7 +341,7 @@ void	Parse::convert_operator(std::string &str)
 
 	while (i < str.size())
 	{
-		i = skip_square_brackets(str, new_str, i);
+		i = check_square_brackets(str, new_str, i);
 		if (str[i] == '+' || str[i] == '-')
 		{
 			if (i == 0 || (str[i - 1] && (str[i - 1] == '(' 
@@ -349,234 +376,88 @@ void	Parse::convert_operator(std::string &str)
 		i++;
 	}
 	str = new_str;
-	// std::cout << "converted str: ";
-	// i = 0;
-	// while (i < str.length())
-	// {
-	// 	if (str[i] == OP_ADD)
-	// 		std::cout << "\"+\"";
-	// 	else if (str[i] == OP_SUB)
-	// 		std::cout << "\"-\"";
-	// 	else if (str[i] == OP_MUL)
-	// 		std::cout << "\"*\"";
-	// 	else if (str[i] == OP_DIV)
-	// 		std::cout << "\"/\"";
-	// 	else if (str[i] == OP_MODULO)
-	// 		std::cout << "\"%\"";
-	// 	else if (str[i] == OP_MAT_MUL)
-	// 		std::cout << "\"**\"";
-	// 	else
-	// 		std::cout << str[i];
-	// 	i++;
-	// }
-	// std::cout << std::endl;
 }
 
-// int	Parse::check_bracket_pair(char *bracket, std::string str)
-// {
-// 	size_t	open = 0;
-// 	size_t	close = 0;
-// 	size_t	i = 0;
+int	Parse::check_bracket_pair(char *bracket, std::string str)
+{
+	size_t	open = 0;
+	size_t	close = 0;
+	size_t	i = 0;
 
-// 	while (i < str.length())
-// 	{
-// 		if (str.find(std::string(1, bracket[CLOSE])) == std::string::npos)
-// 		{
-// 			if (str.find(std::string(1, bracket[OPEN])) != std::string::npos)
-// 			{
-// 				this->_err_msg = "invalid syntax: brackets";
-// 				throw (this->_err_msg);
-// 			}
-// 			return (1);
-// 		}
-// 		if (str[i] == bracket[CLOSE])
-// 		{
-// 			close = i;
-// 			if (str.substr(0, close).find(std::string(1, bracket[OPEN])) == std::string::npos)
-// 			{
-// 				this->_err_msg = "invalid syntax: brackets";
-// 				throw (this->_err_msg);
-// 			}
-// 			while (str[i] != bracket[OPEN] && i > 0)
-// 				i--;
-// 			open = i;
-// 			if (open + 1 == close)
-// 			{
-// 				this->_err_msg = "invalid syntax: brackets";
-// 				throw (this->_err_msg);
-// 			}
-// 			str = str.substr(0, open)
-// 				+ str.substr(open + 1, close - open - 1)
-// 				+ str.substr(close + 1, std::string::npos);
-// 			i = 0;
-// 		}
-// 		i++;
-// 	}
-// 	return (1);
-// }
+	while (i < str.length())
+	{
+		if (str.find(std::string(1, bracket[CLOSE])) == std::string::npos)
+		{
+			if (str.find(std::string(1, bracket[OPEN])) != std::string::npos)
+			{
+				if (bracket[OPEN] == '(')
+					this->_err_msg = "invalid syntax: round brackets";
+				else
+					this->_err_msg = "invalid syntax: square brackets";
+				throw (this->_err_msg);
+			}
+			return (1);
+		}
+		if (str[i] == bracket[CLOSE])
+		{
+			close = i;
+			if (str.substr(0, close).find(std::string(1, bracket[OPEN])) == std::string::npos)
+			{
+				if (bracket[OPEN] == '(')
+					this->_err_msg = "invalid syntax: round brackets";
+				else
+					this->_err_msg = "invalid syntax: square brackets";
+				throw (this->_err_msg);
+			}
+			while (str[i] != bracket[OPEN] && i > 0)
+				i--;
+			open = i;
+			if (open + 1 == close)
+			{
+				if (bracket[OPEN] == '(')
+					this->_err_msg = "invalid syntax: round brackets";
+				else
+					this->_err_msg = "invalid syntax: square brackets";
+				throw (this->_err_msg);
+			}
+			str = str.substr(0, open)
+				+ str.substr(open + 1, close - open - 1)
+				+ str.substr(close + 1, std::string::npos);
+			i = 0;
+		}
+		i++;
+	}
+	return (1);
+}
 
-// // int	Parse::check_vector_form(std::string vector)
-// // {
-// // 	return (1);
-// // }
+int	Parse::check_brackets(int type, std::string str)
+{
+	char	bracket[2];
 
-// int	Parse::check_row(std::string matrix)
-// {
-// 	size_t	i = 1;
+	if (type == ROUND_BRACKET)
+	{
+		bracket[OPEN] = '(';
+		bracket[CLOSE] = ')';
+	}
+	else
+	{
+		bracket[OPEN] = '[';
+		bracket[CLOSE] = ']';
+	}
 
-// 	std::cout << "matrix: " << matrix << std::endl;
-
-// 	if (matrix[0] != '[' || matrix[1] != '[')
-// 	{
-// 		this->_err_msg = "invalid syntax: matrix form3";
-// 		throw (this->_err_msg);
-// 	}
-// 	while (i < matrix.length())
-// 	{
-// 		while (matrix[i] != ']')
-// 			i++;
-// 		std::cout << "str[i]: " << matrix[i - 1] << matrix[i] << std::endl;
-// 		i++;
-// 		if (i != matrix.length() - 2)
-// 		{
-// 			if (matrix[i] != ';')
-// 			{
-// 				this->_err_msg = "invalid syntax: matrix form2";
-// 				throw (this->_err_msg);
-// 			}
-// 			i++;
-// 			if (matrix[i] != '[')
-// 			{
-// 				this->_err_msg = "invalid syntax: matrix form3";
-// 				throw (this->_err_msg);
-// 			}	
-// 		}
-// 		else
-// 		{
-// 			if (matrix[i] != ']')
-// 			{
-// 				this->_err_msg = "invalid syntax: matrix form4";
-// 				throw (this->_err_msg);
-// 			}
-// 			break ;
-// 		}
-// 	}
-
-// 	if (i != matrix.length())
-// 	{
-// 		if (matrix[i] != ']')
-// 		{
-// 			this->_err_msg = "invalid syntax: matrix form5";
-// 			throw (this->_err_msg);
-// 		}
-// 	}
-// 	return (1);
-// }
-
-// int	Parse::check_matrix_form(std::string matrix, size_t row)
-// {
-// 	std::vector<std::string>	split_row(row, "");
-// 	size_t	i = 0;
-// 	size_t	start = 0;
-// 	size_t	end = 0;
-
-// 	if (!check_row(matrix))
-// 		return (0);
-// 	matrix = matrix.substr(1, matrix.length() - 3);
-// 	std::cout << "matrix: " << matrix << std::endl;
-// 	while (i < row)
-// 	{
-// 		start = matrix.find("[", start);
-// 		end = matrix.find("]", start);
-// 		if (i == row - 1)
-// 			end =  matrix.length();
-// 		split_row[i] = matrix.substr(start, end - start + 1);
-// 		split_row[i] = split_row[i].substr(1, split_row[i].length() - 2);
-// 		start = end + 2;
-// 		i++;
-// 	}
-
-// 	// i = 0;
-// 	// size_t	j;
-// 	// std::vector<size_t>		col(row, 0);
-// 	//column check
-// 	return (1);
-// }
-
-// int	Parse::check_bracket_form(std::string str)
-// {
-// 	size_t	open = 0;
-// 	size_t	close = 0;
-// 	size_t	row;
-// 	size_t	i = 0;
-
-// 	while (i < str.length())
-// 	{
-// 		row = 0;
-// 		if (str[i] == '[')
-// 		{
-// 			open = i;
-// 			/* matrix */
-// 			if (str[i + 1] && str[i + 1] == '[')
-// 			{
-// 				i++;
-// 				while (str[i] == '[')
-// 				{
-// 					row++;
-// 					i = str.find("]", i + 1) + 1;
-// 					if (str[i] == ';')
-// 						i++;
-// 				}
-// 				close = i + 1;
-// 				if (!check_matrix_form(str.substr(open, close - open + 1), row))
-// 					return (0);
-// 				i = close + 1;
-// 			}
-// 			/* vector */
-// 			else
-// 			{
-// 				std::cout << "handle on vector function" << std::endl;
-// 				close = str.find("]", i);
-// 				//check_vector_form(str.substr(open, close - open + 1));
-// 				i = close + 1;
-// 			}
-// 		}
-// 		else
-// 			i++;
-// 	}
-// 	return (1);
-// }
-
-// int	Parse::check_brackets(int type, std::string str)
-// {
-// 	char	bracket[2];
-
-// 	if (type == ROUND_BRACKET)
-// 	{
-// 		bracket[OPEN] = '(';
-// 		bracket[CLOSE] = ')';
-// 	}
-// 	else
-// 	{
-// 		bracket[OPEN] = '[';
-// 		bracket[CLOSE] = ']';
-// 	}
-
-// 	if (!check_bracket_pair(bracket, str))
-// 		return (0);
-
-// 	if (type == SQUARE_BRACKET)
-// 	{
-// 		if (!check_bracket_form(str))
-// 			return (0);
-// 	}
-// 	return (1);
-// }
+	if (!check_bracket_pair(bracket, str))
+		return (0);
+	return (1);
+}
 
 int	Parse::check_syntax(std::string &str)
 {
 	std::string	left_str = str.substr(0, str.find("="));
 	std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
+
+	convert_operator(left_str);
+	convert_operator(right_str);
+	str = left_str + "=" + right_str;
 
 	if (!(check_brackets(ROUND_BRACKET, left_str)
 		&& check_brackets(ROUND_BRACKET, right_str)
@@ -596,9 +477,6 @@ int	Parse::check_str(std::string &str)
 	std::string	left_str = str.substr(0, str.find("="));
 	std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
 
-	convert_operator(left_str);
-	convert_operator(right_str);
-	str = left_str + "=" + right_str;
 	if (!check_syntax(str))
 		return (0);
 	return (1);

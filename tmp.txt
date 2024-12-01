@@ -179,6 +179,7 @@ in c, c++: result has same sign as the dividend
 3. check number, check float point
 4. remove space
 5. convert operator
+	- skip square brackets(check later)
 6. check syntax
 	- round bracket(left, right term seperately)
 	- square bracket(left, right term seperately)
