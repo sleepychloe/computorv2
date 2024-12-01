@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/01 13:44:10 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/01 20:03:55 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,9 @@ using V = std::variant<float, Complex<float>, Matrix<float>, Matrix<Complex<floa
 
 # define ROUND_BRACKET		0
 # define SQUARE_BRACKET		1
+
+# define OPEN			0
+# define CLOSE			1
 
 # define OP_ADD			1 /* + */
 # define OP_SUB			2 /* - */
@@ -61,8 +64,14 @@ private:
 	int			skip_square_brackets(std::string str, std::string &new_str, size_t i);
 	void			convert_operator(std::string &str);
 
+	int			check_bracket_pair(char *bracket, std::string str);
+	int			check_vector_form(std::string vector);
+	int			check_row(std::string matrix);
+	int			check_matrix_form(std::string matrix, size_t row);
+	
+	int			check_bracket_form(std::string str);
 	int			check_brackets(int type, std::string str);
-	id_t			check_sign(std::string str);
+	
 	int			check_syntax(std::string &str);
 
 	int			check_str(std::string &str);

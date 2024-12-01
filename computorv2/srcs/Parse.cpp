@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/01 13:55:57 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/01 20:04:16 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,20 +295,9 @@ int	Parse::skip_square_brackets(std::string str, std::string &new_str, size_t i)
 
 	if (str[i + 1] && str[i + 1] == '[')//matrix
 	{
-		new_str += '[';
-		i++;
-		while (str[i] == '[')
-		{
-			new_str += str.substr(i, str.find("]", i) - i + 1);
-			i = str.find("]", i) + 1;
-			if (str[i] == ';')
-			{
-				new_str += str[i];
-				i++;
-			}
-		}
-		new_str += ']';
-		i++;
+		//edit here, change ]] and [[
+		new_str += str.substr(i, str.find("]]", i) - i + 2);
+		i = str.find("]]", i) + 2;
 	}
 	else//vector
 	{
@@ -383,106 +372,206 @@ void	Parse::convert_operator(std::string &str)
 	// std::cout << std::endl;
 }
 
-int	Parse::check_brackets(int type, std::string str)
-{
-	int	open = 0;
-	int	close = 0;
-	char	open_bracket;
-	char	close_bracket;
+// int	Parse::check_bracket_pair(char *bracket, std::string str)
+// {
+// 	size_t	open = 0;
+// 	size_t	close = 0;
+// 	size_t	i = 0;
 
-	if (type == ROUND_BRACKET)
-	{
-		open_bracket = '(';
-		close_bracket = ')';
-	}
-	else if (type == SQUARE_BRACKET)
-	{
-		open_bracket = '[';
-		close_bracket = ']';
-	}
+// 	while (i < str.length())
+// 	{
+// 		if (str.find(std::string(1, bracket[CLOSE])) == std::string::npos)
+// 		{
+// 			if (str.find(std::string(1, bracket[OPEN])) != std::string::npos)
+// 			{
+// 				this->_err_msg = "invalid syntax: brackets";
+// 				throw (this->_err_msg);
+// 			}
+// 			return (1);
+// 		}
+// 		if (str[i] == bracket[CLOSE])
+// 		{
+// 			close = i;
+// 			if (str.substr(0, close).find(std::string(1, bracket[OPEN])) == std::string::npos)
+// 			{
+// 				this->_err_msg = "invalid syntax: brackets";
+// 				throw (this->_err_msg);
+// 			}
+// 			while (str[i] != bracket[OPEN] && i > 0)
+// 				i--;
+// 			open = i;
+// 			if (open + 1 == close)
+// 			{
+// 				this->_err_msg = "invalid syntax: brackets";
+// 				throw (this->_err_msg);
+// 			}
+// 			str = str.substr(0, open)
+// 				+ str.substr(open + 1, close - open - 1)
+// 				+ str.substr(close + 1, std::string::npos);
+// 			i = 0;
+// 		}
+// 		i++;
+// 	}
+// 	return (1);
+// }
 
-	size_t	i = 0;
-	while (i < str.length())
-	{
-		if (str[i] == open_bracket)
-			open++;
-		if (str[i] == close_bracket)
-			close++;
-		i++;
-	}
-	if (open != close)
-	{
-		this->_err_msg = "invalid syntax: brackets";
-		throw (this->_err_msg);
-	}
+// // int	Parse::check_vector_form(std::string vector)
+// // {
+// // 	return (1);
+// // }
 
-	std::string	str_cpy = str;
-	i = 0;
-	while (i < str.length())
-	{
-		if (str.find(std::string(1, close_bracket)) == std::string::npos)
-			break ;
-		if (str[i] == close_bracket)
-		{
-			close = i;
-			if (str.substr(0, close).find(std::string(1, open_bracket)) == std::string::npos)
-				break ;
-			while (str[i] != open_bracket && i > 0)
-				i--;
-			open = i;
-			str = str.substr(0, open)
-				+ str.substr(open + 1, close - open - 1)
-				+ str.substr(close + 1, std::string::npos);
-			i = 0;
-		}
-		i++;
-	}
+// int	Parse::check_row(std::string matrix)
+// {
+// 	size_t	i = 1;
 
-	str = str_cpy;
-	if (type == ROUND_BRACKET)
-	{
-		i = 0;
-		while (i < str.length())
-		{
-			if (str[i] == '(' || str[i] == ')')
-			{
-				this->_err_msg = "invalid syntax: brackets";
-				throw (this->_err_msg);
-			}
-			i++;
-		}
-	}
-	if (type == SQUARE_BRACKET)//check form
-	{
-		i = str.find("[");
-		
-		// if (str[i + 1] && str[i + 1] == '[')//matrix
-		// {
-		// 	new_str += '[';
-		// 	i++;
-		// 	while (str[i] == '[')
-		// 	{
-		// 		new_str += str.substr(i, str.find("]", i) - i + 1);
-		// 		i = str.find("]", i) + 1;
-		// 		if (str[i] == ';')
-		// 		{
-		// 			new_str += str[i];
-		// 			i++;
-		// 		}
-		// 	}
-		// 	new_str += ']';
-		// 	i++;
-		// }
-		// else//vector
-		// {
-		// 	new_str += str.substr(i, str.find("]", i) - i + 1);
-		// 	i = str.find("]", i) + 1;
-		// }
-	}
-	return (1);
-}
+// 	std::cout << "matrix: " << matrix << std::endl;
 
+// 	if (matrix[0] != '[' || matrix[1] != '[')
+// 	{
+// 		this->_err_msg = "invalid syntax: matrix form3";
+// 		throw (this->_err_msg);
+// 	}
+// 	while (i < matrix.length())
+// 	{
+// 		while (matrix[i] != ']')
+// 			i++;
+// 		std::cout << "str[i]: " << matrix[i - 1] << matrix[i] << std::endl;
+// 		i++;
+// 		if (i != matrix.length() - 2)
+// 		{
+// 			if (matrix[i] != ';')
+// 			{
+// 				this->_err_msg = "invalid syntax: matrix form2";
+// 				throw (this->_err_msg);
+// 			}
+// 			i++;
+// 			if (matrix[i] != '[')
+// 			{
+// 				this->_err_msg = "invalid syntax: matrix form3";
+// 				throw (this->_err_msg);
+// 			}	
+// 		}
+// 		else
+// 		{
+// 			if (matrix[i] != ']')
+// 			{
+// 				this->_err_msg = "invalid syntax: matrix form4";
+// 				throw (this->_err_msg);
+// 			}
+// 			break ;
+// 		}
+// 	}
 
+// 	if (i != matrix.length())
+// 	{
+// 		if (matrix[i] != ']')
+// 		{
+// 			this->_err_msg = "invalid syntax: matrix form5";
+// 			throw (this->_err_msg);
+// 		}
+// 	}
+// 	return (1);
+// }
+
+// int	Parse::check_matrix_form(std::string matrix, size_t row)
+// {
+// 	std::vector<std::string>	split_row(row, "");
+// 	size_t	i = 0;
+// 	size_t	start = 0;
+// 	size_t	end = 0;
+
+// 	if (!check_row(matrix))
+// 		return (0);
+// 	matrix = matrix.substr(1, matrix.length() - 3);
+// 	std::cout << "matrix: " << matrix << std::endl;
+// 	while (i < row)
+// 	{
+// 		start = matrix.find("[", start);
+// 		end = matrix.find("]", start);
+// 		if (i == row - 1)
+// 			end =  matrix.length();
+// 		split_row[i] = matrix.substr(start, end - start + 1);
+// 		split_row[i] = split_row[i].substr(1, split_row[i].length() - 2);
+// 		start = end + 2;
+// 		i++;
+// 	}
+
+// 	// i = 0;
+// 	// size_t	j;
+// 	// std::vector<size_t>		col(row, 0);
+// 	//column check
+// 	return (1);
+// }
+
+// int	Parse::check_bracket_form(std::string str)
+// {
+// 	size_t	open = 0;
+// 	size_t	close = 0;
+// 	size_t	row;
+// 	size_t	i = 0;
+
+// 	while (i < str.length())
+// 	{
+// 		row = 0;
+// 		if (str[i] == '[')
+// 		{
+// 			open = i;
+// 			/* matrix */
+// 			if (str[i + 1] && str[i + 1] == '[')
+// 			{
+// 				i++;
+// 				while (str[i] == '[')
+// 				{
+// 					row++;
+// 					i = str.find("]", i + 1) + 1;
+// 					if (str[i] == ';')
+// 						i++;
+// 				}
+// 				close = i + 1;
+// 				if (!check_matrix_form(str.substr(open, close - open + 1), row))
+// 					return (0);
+// 				i = close + 1;
+// 			}
+// 			/* vector */
+// 			else
+// 			{
+// 				std::cout << "handle on vector function" << std::endl;
+// 				close = str.find("]", i);
+// 				//check_vector_form(str.substr(open, close - open + 1));
+// 				i = close + 1;
+// 			}
+// 		}
+// 		else
+// 			i++;
+// 	}
+// 	return (1);
+// }
+
+// int	Parse::check_brackets(int type, std::string str)
+// {
+// 	char	bracket[2];
+
+// 	if (type == ROUND_BRACKET)
+// 	{
+// 		bracket[OPEN] = '(';
+// 		bracket[CLOSE] = ')';
+// 	}
+// 	else
+// 	{
+// 		bracket[OPEN] = '[';
+// 		bracket[CLOSE] = ']';
+// 	}
+
+// 	if (!check_bracket_pair(bracket, str))
+// 		return (0);
+
+// 	if (type == SQUARE_BRACKET)
+// 	{
+// 		if (!check_bracket_form(str))
+// 			return (0);
+// 	}
+// 	return (1);
+// }
 
 int	Parse::check_syntax(std::string &str)
 {
@@ -492,88 +581,10 @@ int	Parse::check_syntax(std::string &str)
 	if (!(check_brackets(ROUND_BRACKET, left_str)
 		&& check_brackets(ROUND_BRACKET, right_str)
 		&& check_brackets(SQUARE_BRACKET, left_str)
-		&& check_brackets(SQUARE_BRACKET, right_str)
-		// && check_sign(left_str) && check_sign(right_str)))
-		))
+		&& check_brackets(SQUARE_BRACKET, right_str)))
 		return (0);
 	return (1);
 }
-
-// int	Parse::check_sign(std::string str)
-// {
-// 	size_t	i = 0;
-
-// 	while (i < str.length())
-// 	{
-// 		if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/' || str[i] == '%')
-// 		{
-// 			i++;
-// 			if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/')
-// 			{
-// 				this->_err_msg = "invalid syntax: operator";
-// 				throw (this->_err_msg);
-// 			}
-// 		}
-// 		i++;
-// 	}
-// 	if (str[0] == '*' || str[0] == '/'
-// 		|| str[str.length() - 1] == '+' || str[str.length() - 1] == '-'
-// 		|| str[str.length() - 1] == '*' || str[str.length() - 1] == '/')
-// 	{
-// 		this->_err_msg = "invalid syntax: operator";
-// 			throw (this->_err_msg);
-// 	}
-
-// 	i = 0;
-// 	while (str[i] == '+' || str[i] == '-' || str[i] == '(')
-// 		i++;
-// 	while (i < str.length())
-// 	{
-// 		if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/')
-// 		{
-// 			i++;
-// 			while (str[i] == this->_variable || str[i] == '^'
-// 				|| ('0' <= str[i] && str[i] <= '9') || str[i] == '.'
-// 				|| str[i] == '+' || str[i] == '-'
-// 				|| str[i] == '(' || str[i] == ')')
-// 				i++;
-// 			if (!(str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/'
-// 				|| str[i] == '\0'))
-// 			{
-// 				this->_err_msg = "invalid syntax: operator";
-// 				throw (this->_err_msg);
-// 			}
-// 		}
-// 		i++;
-// 	}
-
-// 	i = 0;
-// 	while (i < str.length())
-// 	{
-// 		if (str[i] == this->_variable)
-// 		{
-// 			i++;
-// 			if (str[i] == this->_variable)
-// 			{
-// 				this->_err_msg = "invalid syntax: operator";
-// 				throw (this->_err_msg);
-// 			}
-// 		}
-// 		i++;
-// 	}
-
-// 	i = 0;
-// 	while (i < str.length())
-// 	{
-// 		if (str[i] == ')' && str[i + 1] && str[i + 1] == '(')
-// 		{
-// 			this->_err_msg = "invalid syntax: operator";
-// 				throw (this->_err_msg);
-// 		}
-// 		i++;
-// 	}
-// 	return (1);
-// }
 
 int	Parse::check_str(std::string &str)
 {
@@ -582,14 +593,12 @@ int	Parse::check_str(std::string &str)
 	if (!(is_equation_form(str) && check_invalid_character(str) && check_number(str)))
 		return (0);
 	remove_space(str);
-
 	std::string	left_str = str.substr(0, str.find("="));
 	std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
 
 	convert_operator(left_str);
 	convert_operator(right_str);
 	str = left_str + "=" + right_str;
-
 	if (!check_syntax(str))
 		return (0);
 	return (1);
