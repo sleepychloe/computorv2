@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/01 03:27:33 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/01 13:55:57 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,16 @@
 
 Parse::Parse(): _err_msg("")
 {
+	this->_valid_character = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j','k',
+				'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+				'w', 'x', 'y', 'z',
+				'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+				'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+				'W', 'X', 'Y', 'Z',
+				'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.',
+				'(', ')', '[', ']', ',', ';', '=', '?',
+				'+', '-', '*', '/', '%', '^', ' ', '\t'};
+	this->_operation = {OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_MODULO, OP_MAT_MUL};
 }
 
 Parse::Parse(const Parse& parse)
@@ -25,6 +35,10 @@ Parse&	Parse::operator=(const Parse& parse)
 {
 	if (this == &parse)
 		return (*this);
+	this->_valid_character = parse._valid_character;
+	this->_operation = parse._operation;
+	this->_var = parse._var;
+	this->_operation = parse._operation;
 	this->_err_msg = parse._err_msg;
 	return (*this);
 }
@@ -165,20 +179,22 @@ int	Parse::is_equation_form(std::string str)
 	return (1);
 }
 
+int	Parse::is_element_of_set(std::unordered_set<char> set, char c)
+{
+	if (set.find(c) != set.end())
+		return (1);
+	return (0);
+}
+
 int	Parse::check_invalid_character(std::string str)
 {
 	size_t	i = 0;
 
 	while (i < str.length())
 	{
-		if (!(('a' <= str[i] && str[i] <= 'z') || ('A' <= str[i] && str[i] <= 'Z')
-			|| ('0' <= str[i] && str[i] <= '9') || str[i] == '.'
-			|| str[i] == '(' || str[i] == ')' || str[i] == '[' || str[i] == ']'
-			|| str[i] == ',' || str[i] == ';' || str[i] == '=' || str[i] == '?'
-			|| str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/'
-			|| str[i] == '%' || str[i] == '^' || str[i] == ' ' || str[i] == '\t'))
+		if (!is_element_of_set(this->_valid_character, str[i]))
 		{
-			this->_err_msg = "cannot determine the variable";
+			this->_err_msg = "invalid character exists";
 			throw (this->_err_msg);
 		}
 		i++;
@@ -263,10 +279,6 @@ void	Parse::remove_space(std::string &str)
 	size_t		i = 0;
 	std::string	new_str = "";
 
-	while (str[i] == ' ' || str[i] == '\t')
-		i++;
-	if (str[i] == '+')
-		i++;
 	while (i < str.size())
 	{
 		if (str[i] != ' ' && str[i] != '\t')
@@ -274,6 +286,101 @@ void	Parse::remove_space(std::string &str)
 		i++;
 	}
 	str = new_str;
+}
+
+int	Parse::skip_square_brackets(std::string str, std::string &new_str, size_t i)
+{
+	if (str[i] != '[')
+		return (i);
+
+	if (str[i + 1] && str[i + 1] == '[')//matrix
+	{
+		new_str += '[';
+		i++;
+		while (str[i] == '[')
+		{
+			new_str += str.substr(i, str.find("]", i) - i + 1);
+			i = str.find("]", i) + 1;
+			if (str[i] == ';')
+			{
+				new_str += str[i];
+				i++;
+			}
+		}
+		new_str += ']';
+		i++;
+	}
+	else//vector
+	{
+		new_str += str.substr(i, str.find("]", i) - i + 1);
+		i = str.find("]", i) + 1;
+	}
+	return (i);
+}
+
+void	Parse::convert_operator(std::string &str)
+{
+	std::string	new_str = "";
+	size_t		i = 0;
+
+	while (i < str.size())
+	{
+		i = skip_square_brackets(str, new_str, i);
+		if (str[i] == '+' || str[i] == '-')
+		{
+			if (i == 0 || (str[i - 1] && (str[i - 1] == '(' 
+					||str[i - 1] == '+' || str[i - 1] == '-'
+					|| str[i - 1] == '*' || str[i - 1] == '/'
+					|| str[i - 1] == '%')))
+				new_str += str[i];
+			else
+			{
+				if (str[i] == '+')
+					new_str += OP_ADD;
+				else
+					new_str += OP_SUB;
+			}
+		}
+		else if (str[i] == '*')
+		{
+			if (str[i + 1] && str[i + 1] == '*')
+			{
+				new_str += OP_MAT_MUL;
+				i++;
+			}
+			else
+				new_str += OP_MUL;
+		}
+		else if (str[i] == '/')
+			new_str += OP_DIV;
+		else if (str[i] == '%')
+			new_str += OP_MODULO;
+		else
+			new_str += str[i];
+		i++;
+	}
+	str = new_str;
+	// std::cout << "converted str: ";
+	// i = 0;
+	// while (i < str.length())
+	// {
+	// 	if (str[i] == OP_ADD)
+	// 		std::cout << "\"+\"";
+	// 	else if (str[i] == OP_SUB)
+	// 		std::cout << "\"-\"";
+	// 	else if (str[i] == OP_MUL)
+	// 		std::cout << "\"*\"";
+	// 	else if (str[i] == OP_DIV)
+	// 		std::cout << "\"/\"";
+	// 	else if (str[i] == OP_MODULO)
+	// 		std::cout << "\"%\"";
+	// 	else if (str[i] == OP_MAT_MUL)
+	// 		std::cout << "\"**\"";
+	// 	else
+	// 		std::cout << str[i];
+	// 	i++;
+	// }
+	// std::cout << std::endl;
 }
 
 int	Parse::check_brackets(int type, std::string str)
@@ -309,6 +416,7 @@ int	Parse::check_brackets(int type, std::string str)
 		throw (this->_err_msg);
 	}
 
+	std::string	str_cpy = str;
 	i = 0;
 	while (i < str.length())
 	{
@@ -330,6 +438,7 @@ int	Parse::check_brackets(int type, std::string str)
 		i++;
 	}
 
+	str = str_cpy;
 	if (type == ROUND_BRACKET)
 	{
 		i = 0;
@@ -343,8 +452,37 @@ int	Parse::check_brackets(int type, std::string str)
 			i++;
 		}
 	}
+	if (type == SQUARE_BRACKET)//check form
+	{
+		i = str.find("[");
+		
+		// if (str[i + 1] && str[i + 1] == '[')//matrix
+		// {
+		// 	new_str += '[';
+		// 	i++;
+		// 	while (str[i] == '[')
+		// 	{
+		// 		new_str += str.substr(i, str.find("]", i) - i + 1);
+		// 		i = str.find("]", i) + 1;
+		// 		if (str[i] == ';')
+		// 		{
+		// 			new_str += str[i];
+		// 			i++;
+		// 		}
+		// 	}
+		// 	new_str += ']';
+		// 	i++;
+		// }
+		// else//vector
+		// {
+		// 	new_str += str.substr(i, str.find("]", i) - i + 1);
+		// 	i = str.find("]", i) + 1;
+		// }
+	}
 	return (1);
 }
+
+
 
 int	Parse::check_syntax(std::string &str)
 {
@@ -354,10 +492,88 @@ int	Parse::check_syntax(std::string &str)
 	if (!(check_brackets(ROUND_BRACKET, left_str)
 		&& check_brackets(ROUND_BRACKET, right_str)
 		&& check_brackets(SQUARE_BRACKET, left_str)
-		&& check_brackets(SQUARE_BRACKET, right_str))) //here
+		&& check_brackets(SQUARE_BRACKET, right_str)
+		// && check_sign(left_str) && check_sign(right_str)))
+		))
 		return (0);
 	return (1);
 }
+
+// int	Parse::check_sign(std::string str)
+// {
+// 	size_t	i = 0;
+
+// 	while (i < str.length())
+// 	{
+// 		if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/' || str[i] == '%')
+// 		{
+// 			i++;
+// 			if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/')
+// 			{
+// 				this->_err_msg = "invalid syntax: operator";
+// 				throw (this->_err_msg);
+// 			}
+// 		}
+// 		i++;
+// 	}
+// 	if (str[0] == '*' || str[0] == '/'
+// 		|| str[str.length() - 1] == '+' || str[str.length() - 1] == '-'
+// 		|| str[str.length() - 1] == '*' || str[str.length() - 1] == '/')
+// 	{
+// 		this->_err_msg = "invalid syntax: operator";
+// 			throw (this->_err_msg);
+// 	}
+
+// 	i = 0;
+// 	while (str[i] == '+' || str[i] == '-' || str[i] == '(')
+// 		i++;
+// 	while (i < str.length())
+// 	{
+// 		if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/')
+// 		{
+// 			i++;
+// 			while (str[i] == this->_variable || str[i] == '^'
+// 				|| ('0' <= str[i] && str[i] <= '9') || str[i] == '.'
+// 				|| str[i] == '+' || str[i] == '-'
+// 				|| str[i] == '(' || str[i] == ')')
+// 				i++;
+// 			if (!(str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/'
+// 				|| str[i] == '\0'))
+// 			{
+// 				this->_err_msg = "invalid syntax: operator";
+// 				throw (this->_err_msg);
+// 			}
+// 		}
+// 		i++;
+// 	}
+
+// 	i = 0;
+// 	while (i < str.length())
+// 	{
+// 		if (str[i] == this->_variable)
+// 		{
+// 			i++;
+// 			if (str[i] == this->_variable)
+// 			{
+// 				this->_err_msg = "invalid syntax: operator";
+// 				throw (this->_err_msg);
+// 			}
+// 		}
+// 		i++;
+// 	}
+
+// 	i = 0;
+// 	while (i < str.length())
+// 	{
+// 		if (str[i] == ')' && str[i + 1] && str[i + 1] == '(')
+// 		{
+// 			this->_err_msg = "invalid syntax: operator";
+// 				throw (this->_err_msg);
+// 		}
+// 		i++;
+// 	}
+// 	return (1);
+// }
 
 int	Parse::check_str(std::string &str)
 {
@@ -366,6 +582,13 @@ int	Parse::check_str(std::string &str)
 	if (!(is_equation_form(str) && check_invalid_character(str) && check_number(str)))
 		return (0);
 	remove_space(str);
+
+	std::string	left_str = str.substr(0, str.find("="));
+	std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
+
+	convert_operator(left_str);
+	convert_operator(right_str);
+	str = left_str + "=" + right_str;
 
 	if (!check_syntax(str))
 		return (0);
