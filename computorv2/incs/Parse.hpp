@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/02 19:21:19 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/03 00:42:04 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <string>
 #include <map>
 #include <unordered_set>
+#include <unordered_map>
 #include <variant>
 #include <iterator>
 #include <stack>
@@ -71,7 +72,9 @@ private:
 	std::vector<std::string>	split(std::string str, char delimeter);
 	int				check_vector_form(int type, std::string str);
 	int				check_matrix_form(std::string str);
+	int				skip_bracket(int type, std::string str, size_t i);
 	int				skip_square_brackets(std::string str, std::string &new_str, size_t i);
+	char				do_convert(std::string str, size_t &i);
 	void				convert_operator(std::string &str);
 
 	int				check_operator(std::string str);
@@ -85,7 +88,7 @@ private:
 	std::unordered_set<char>		_set_operation; // '+', '-', '*', '/', '%'
 	std::unordered_set<char>		_set_other; // '(', ')','^', '=', '?'
 	std::unordered_set<char>		_set_space; // ' ', '\t'
-	std::unordered_set<char>		_operation;
+	std::unordered_map<int, std::string>	_operation; // {OP_OPERATOR, "operator"}
 	std::map<std::string, V>		_var;
 	std::map<std::string, V>		_func;
 	std::string 				_err_msg;

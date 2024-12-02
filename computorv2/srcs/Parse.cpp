@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/02 20:15:14 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/03 00:54:54 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ Parse::Parse(): _err_msg("")
 	this->_set_operation = {'+', '-', '*', '/', '%'};
 	this->_set_other = {'(', ')','^', '=', '?'};
 	this->_set_space = {' ', '\t'};
-	this->_operation = {OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_MODULO, OP_MAT_MUL};
+	this->_operation = {{OP_ADD, "+"}, {OP_SUB, "-"}, {OP_MUL, "*"},
+			{OP_DIV, "/"}, {OP_MODULO, "%"}, {OP_MAT_MUL, "**"}};
 }
 
 Parse::Parse(const Parse& parse)
@@ -152,9 +153,9 @@ int	Parse::is_equation_form(std::string str)
 	}
 	if (flag != 1)
 	{
-		this->_err_msg = "equal(=) sign is missing";
+		this->_err_msg = "equal(=) sign is missing: ";
 		if (flag != 0)
-			this->_err_msg = "equal(=) sign used multiple time";
+			this->_err_msg = "equal(=) sign used multiple time: ";
 		throw (this->_err_msg);
 	}
 
@@ -204,7 +205,8 @@ int	Parse::check_invalid_character(std::string str)
 			|| is_element_of_set(this->_set_other, str[i])
 			|| is_element_of_set(this->_set_space, str[i])))
 		{
-			this->_err_msg = "invalid character exists";
+			this->_err_msg = "invalid character exists: ";
+			this->_err_msg += str[i];
 			throw (this->_err_msg);
 		}
 		i++;
@@ -351,9 +353,9 @@ int	Parse::check_brackets(int type, std::string str)
 std::vector<std::string>	Parse::split(std::string str, char delimeter)
 {
 	std::vector<std::string>	res;
-
 	std::string			token;
 	std::stringstream		ss(str);
+
 	while (std::getline(ss, token, delimeter))
 		res.push_back(token);
 	return (res);
@@ -385,8 +387,10 @@ int	Parse::check_vector_form(int type, std::string str)
 
 	for (size_t i = 0; i < column.size(); i++)
 	{
+		convert_operator(column[i]);
 		if (column[i] == ""
-			|| !check_brackets(ROUND_BRACKET, column[i]))
+			|| !check_brackets(ROUND_BRACKET, column[i])
+			|| !check_operator(column[i]))
 		{
 			if (type == VECTOR)
 				this->_err_msg = "invalid syntax: vector form";
@@ -440,32 +444,50 @@ int	Parse::check_matrix_form(std::string str)
 	return (row.size());
 }
 
-int	Parse::skip_square_brackets(std::string str, std::string &new_str, size_t i)
+int	Parse::skip_bracket(int type, std::string str, size_t i)
 {
-	if (str[i] != '[')
-		return (i);
-
+	char			bracket[2];
 	std::stack<char>	stack;
-	std::string		bracket;
-	size_t			start = i;
-	int			cnt = 1;
+
+	bracket[OPEN] = (type == SQUARE_BRACKET) ? '[': '(';
+	bracket[CLOSE] = (type == SQUARE_BRACKET) ? ']': ')';
 
 	stack.push(str[i]);
 	i++;
 	while (i < str.length())
 	{
+		if (str[i] == bracket[OPEN])
+			stack.push(str[i]);
+		if (str[i] == bracket[CLOSE])
+			stack.pop();
 		if (stack.empty())
 			break ;
-		if (str[i] == '[')
-		{
-			cnt++;
-			stack.push(str[i]);
-		}
-		if (str[i] == ']')
-			stack.pop();
 		i++;
 	}
-	bracket = str.substr(start, i - start + 1);
+	return (i);
+}
+
+int	Parse::skip_square_brackets(std::string str, std::string &new_str, size_t i)
+{
+	if (str[i] != '[')
+		return (i);
+
+	std::string		bracket;
+	size_t			start = i;
+	size_t			j = 0;
+	int			cnt = 0;
+
+	i = skip_bracket(SQUARE_BRACKET, str, i);
+	i++;
+	bracket = str.substr(start, i - start);
+
+	while (j < bracket.length())
+	{
+		if (bracket[j] == '[')
+			cnt++;
+		j++;
+	}
+
 	if (cnt == 1)
 	{
 		if (!(check_brackets(SQUARE_BRACKET, bracket)
@@ -483,11 +505,42 @@ int	Parse::skip_square_brackets(std::string str, std::string &new_str, size_t i)
 	return (i++);
 }
 
+char	Parse::do_convert(std::string str, size_t &i)
+{
+	std::unordered_map<char, int> op = {{'+', OP_ADD}, {'-', OP_SUB},
+					{'*', OP_MUL}, {'/', OP_DIV}, {'%', OP_MODULO}};
+	if (str[i] == '+' || str[i] == '-')
+	{
+		if (str[i - 1] && (str[i - 1] == '('
+				&& is_element_of_set(this->_set_operation, str[i - 1])))
+			return (str[i]);
+		else
+			return (op[str[i]]);
+	}
+	else if (str[i] == '*')
+	{
+		if (str[i + 1] && str[i + 1] == '*')
+		{
+			i++;
+			return (OP_MAT_MUL);
+			
+		}
+		else
+			return (op[str[i]]);
+	}
+	return (op[str[i]]);
+}
+
 void	Parse::convert_operator(std::string &str)
 {
 	std::string	new_str = "";
 	size_t		i = 0;
 
+	if (str[0] == '+' || str[0] == '-')
+	{
+		new_str += str[0];
+		i++;
+	}
 	while (i < str.length())
 	{
 		i = skip_square_brackets(str, new_str, i);
@@ -497,43 +550,61 @@ void	Parse::convert_operator(std::string &str)
 			|| is_element_of_set(this->_set_other, str[i])
 			|| str[i] == '\0'))
 		{
-			this->_err_msg = "invalid character exists";
+			this->_err_msg = "invalid character exists: ";
+			this->_err_msg += str[i];
 			throw (this->_err_msg);
 		}
-		if (str[i] == '+' || str[i] == '-')
-		{
-			if (i == 0 || (str[i - 1] && (str[i - 1] == '(' 
-					||str[i - 1] == '+' || str[i - 1] == '-'
-					|| str[i - 1] == '*' || str[i - 1] == '/'
-					|| str[i - 1] == '%')))
-				new_str += str[i];
-			else
-			{
-				if (str[i] == '+')
-					new_str += OP_ADD;
-				else
-					new_str += OP_SUB;
-			}
-		}
-		else if (str[i] == '*')
-		{
-			if (str[i + 1] && str[i + 1] == '*')
-			{
-				new_str += OP_MAT_MUL;
-				i++;
-			}
-			else
-				new_str += OP_MUL;
-		}
-		else if (str[i] == '/')
-			new_str += OP_DIV;
-		else if (str[i] == '%')
-			new_str += OP_MODULO;
+		if (is_element_of_set(this->_set_operation, str[i]))
+			new_str += do_convert(str, i);
 		else
 			new_str += str[i];
 		i++;
 	}
 	str = new_str;
+}
+
+int	Parse::check_operator(std::string str)
+{
+	size_t			i = 0;
+
+	if (this->_operation.count(str[0])
+		|| this->_operation.count(str[str.length() - 1]))
+	{
+		this->_err_msg = "invalid syntax: operator";
+		throw (this->_err_msg);
+	}
+
+	while (i < str.length())
+	{
+		if (this->_operation.count(str[i]))
+		{
+			if (str[i + 1] && this->_operation.count(str[i + 1]))
+			{
+				this->_err_msg = "invalid syntax: operator";
+				throw (this->_err_msg);
+			}
+		}
+		else if (str[i] == '[' || str[i] == '(')
+		{
+			if (i != 0 && !this->_operation.count(str[i - 1]))
+			{
+				this->_err_msg = "invalid syntax: operator";
+				throw (this->_err_msg);
+			}
+			if (str[i] == '[')
+				i = skip_bracket(SQUARE_BRACKET, str, i);
+			else
+				i = skip_bracket(ROUND_BRACKET, str, i);
+			i++;
+			if (i != str.length() - 1 && !this->_operation.count(str[i]))
+			{
+				this->_err_msg = "invalid syntax: operator";
+				throw (this->_err_msg);
+			}
+		}
+		i++;
+	}
+	return (1);
 }
 
 int	Parse::check_syntax(std::string &str)
@@ -549,6 +620,11 @@ int	Parse::check_syntax(std::string &str)
 
 	convert_operator(left_str);
 	convert_operator(right_str);
+
+	if (!(check_operator(left_str) && check_operator(right_str)))
+		return (0);
+	//caret check
+	//check question mark
 	return (1);
 }
 
