@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/02 18:56:01 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/02 19:21:19 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include <unordered_set>
 #include <variant>
 #include <iterator>
+#include <stack>
 #include <sstream>
 #include "./Color.hpp"
 
