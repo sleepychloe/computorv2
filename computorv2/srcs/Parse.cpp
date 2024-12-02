@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/02 00:33:04 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/02 17:41:28 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -288,6 +288,85 @@ void	Parse::remove_space(std::string &str)
 	str = new_str;
 }
 
+std::vector<std::string>	Parse::split(std::string str, char delimeter)
+{
+	std::vector<std::string>	res;
+
+	std::string			token;
+	std::stringstream		ss(str);
+	while (std::getline(ss, token, delimeter))
+		res.push_back(token);
+	return (res);
+}
+
+int	Parse::check_vector_form(int type, std::string str)
+{
+	std::vector<std::string>	column;
+
+	str = str.substr(1, str.length() - 2);
+	if (str[str.length() - 1] == ',')
+	{
+		if (type == VECTOR)
+			this->_err_msg = "invalid syntax: vector form";
+		else
+			this->_err_msg = "invalid syntax: matrix form";
+		throw (this->_err_msg);
+	}
+	column = split(str, ',');
+
+	if (!column.size())
+	{
+		if (type == VECTOR)
+			this->_err_msg = "invalid syntax: vector form";
+		else
+			this->_err_msg = "invalid syntax: matrix form";
+		throw (this->_err_msg);
+	}
+	return (column.size());
+}
+
+int	Parse::check_matrix_form(std::string str)
+{
+	std::vector<std::string>	row;
+	str = str.substr(1, str.length() - 2);
+	if (str[str.length() - 1] == ';')
+	{
+		this->_err_msg = "invalid syntax: matrix form";
+		throw (this->_err_msg);
+	}
+	row = split(str, ';');
+
+	/* check row */
+	if (!row.size())
+	{
+		this->_err_msg = "invalid syntax: matrix form";
+		throw (this->_err_msg);
+	}
+
+	/* check column */
+	int		col_size;
+	for (size_t i = 0; i < row.size();i++)
+	{
+		if (!(row[i][0] == '[' && row[i][row[i].length() - 1] == ']')
+			|| row[i].find("[", 1) != std::string::npos)
+		{
+			this->_err_msg = "invalid syntax: matrix form";
+			throw (this->_err_msg);
+		}
+		if (i == 0)
+			col_size = check_vector_form(MATRIX, row[i]);
+		else
+		{
+			if (col_size != check_vector_form(MATRIX, row[i]))
+			{
+				this->_err_msg = "invalid syntax: matrix form";
+				throw (this->_err_msg);
+			}
+		}
+	}
+	return (row.size());
+}
+
 int	Parse::check_square_brackets(std::string str, std::string &new_str, size_t i)
 {
 	if (str[i] != '[')
@@ -297,8 +376,9 @@ int	Parse::check_square_brackets(std::string str, std::string &new_str, size_t i
 	if (str.find("[", i + 1) == std::string::npos
 		|| str.find("]", i + 1) < str.find("[", i + 1))
 	{
+		if (!check_vector_form(VECTOR, str.substr(i, str.find("]", i) - i + 1)))
+			return (0);
 		new_str += str.substr(i, str.find("]", i) - i + 1);
-		// vector form check here
 		i = str.find("]", i) + 1;
 	}
 	/* matrix */
@@ -322,13 +402,15 @@ int	Parse::check_square_brackets(std::string str, std::string &new_str, size_t i
 			this->_err_msg = "invalid syntax: matrix form";
 			throw (this->_err_msg);
 		}
+
+		if (!check_matrix_form(str.substr(i, j - i + 1)))
+			return (0);
 		new_str += str.substr(i, j - i + 1);
-		// matrix form check here
 		i = j + 1;
 	}
 	else
 	{
-		this->_err_msg = "invalid syntax: matrix form";
+		this->_err_msg = "invalid syntax: square brackets";
 		throw (this->_err_msg);
 	}
 	return (i);
@@ -455,10 +537,6 @@ int	Parse::check_syntax(std::string &str)
 	std::string	left_str = str.substr(0, str.find("="));
 	std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
 
-	convert_operator(left_str);
-	convert_operator(right_str);
-	str = left_str + "=" + right_str;
-
 	if (!(check_brackets(ROUND_BRACKET, left_str)
 		&& check_brackets(ROUND_BRACKET, right_str)
 		&& check_brackets(SQUARE_BRACKET, left_str)
@@ -473,9 +551,15 @@ int	Parse::check_str(std::string &str)
 		return (1);
 	if (!(is_equation_form(str) && check_invalid_character(str) && check_number(str)))
 		return (0);
+
 	remove_space(str);
+
 	std::string	left_str = str.substr(0, str.find("="));
 	std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
+
+	convert_operator(left_str);
+	convert_operator(right_str);
+	str = left_str + "=" + right_str;
 
 	if (!check_syntax(str))
 		return (0);

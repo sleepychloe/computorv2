@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/02 00:32:55 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/02 17:28:02 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include <unordered_set>
 #include <variant>
 #include <iterator>
+#include <sstream>
 #include "./Color.hpp"
 
 using V = std::variant<float, Complex<float>, Matrix<float>, Matrix<Complex<float>>, Vector<float>, Vector<Complex<float>>>;
@@ -32,6 +33,9 @@ using V = std::variant<float, Complex<float>, Matrix<float>, Matrix<Complex<floa
 
 # define OPEN			0
 # define CLOSE			1
+
+# define VECTOR			0
+# define MATRIX			1
 
 # define OP_ADD			1 /* + */
 # define OP_SUB			2 /* - */
@@ -48,26 +52,29 @@ public:
 	Parse& operator=(const Parse& parse);
 	~Parse();
 
-	void			parse_start(std::string &str);
+	void				parse_start(std::string &str);
 
 private:
-	void			print_variant_value(V value);
-	int			check_keyword(std::string str);
+	void				print_variant_value(V value);
+	int				check_keyword(std::string str);
 
-	int			is_equation_form(std::string str);
-	int			is_element_of_set(std::unordered_set<char> set, char c);
-	int			check_invalid_character(std::string str);
-	int			check_float_point(std::string str);
-	int			check_number(std::string str);
-	void			remove_space(std::string &str);
+	int				is_equation_form(std::string str);
+	int				is_element_of_set(std::unordered_set<char> set, char c);
+	int				check_invalid_character(std::string str);
+	int				check_float_point(std::string str);
+	int				check_number(std::string str);
+	void				remove_space(std::string &str);
 
-	int			check_square_brackets(std::string str, std::string &new_str, size_t i);
-	void			convert_operator(std::string &str);
-	int			check_bracket_pair(char *bracket, std::string str);
-	int			check_brackets(int type, std::string str);
-	int			check_syntax(std::string &str);
-
-	int			check_str(std::string &str);
+	std::vector<std::string>	split(std::string str, char delimeter);
+	int				check_vector_form(int type, std::string str);
+	int				check_matrix_form(std::string str);
+	int				check_square_brackets(std::string str, std::string &new_str, size_t i);
+	void				convert_operator(std::string &str);
+	int				check_bracket_pair(char *bracket, std::string str);
+	int				check_brackets(int type, std::string str);
+	int				check_syntax(std::string &str);
+	
+	int				check_str(std::string &str);
 
 	std::unordered_set<char>		_valid_character;
 	std::unordered_set<char>		_operation;
