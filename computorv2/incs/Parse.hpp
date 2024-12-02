@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/02 17:28:02 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/02 18:56:01 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,20 +65,26 @@ private:
 	int				check_number(std::string str);
 	void				remove_space(std::string &str);
 
+	int				check_bracket_pair(char *bracket, std::string str);
+	int				check_brackets(int type, std::string str);
 	std::vector<std::string>	split(std::string str, char delimeter);
 	int				check_vector_form(int type, std::string str);
 	int				check_matrix_form(std::string str);
-	int				check_square_brackets(std::string str, std::string &new_str, size_t i);
+	int				skip_square_brackets(std::string str, std::string &new_str, size_t i);
 	void				convert_operator(std::string &str);
-	int				check_bracket_pair(char *bracket, std::string str);
-	int				check_brackets(int type, std::string str);
+
+	int				check_operator(std::string str);
 	int				check_syntax(std::string &str);
 	
 	int				check_str(std::string &str);
 
-	std::unordered_set<char>		_valid_character;
+	std::unordered_set<char>		_set_alphabet; // 'a' to 'z', 'A' to 'Z'
+	std::unordered_set<char>		_set_number; // '0' to '9', '.'
+	std::unordered_set<char>		_set_vector_matrix; // '[', ']', ',', ';'
+	std::unordered_set<char>		_set_operation; // '+', '-', '*', '/', '%'
+	std::unordered_set<char>		_set_other; // '(', ')','^', '=', '?'
+	std::unordered_set<char>		_set_space; // ' ', '\t'
 	std::unordered_set<char>		_operation;
-
 	std::map<std::string, V>		_var;
 	std::map<std::string, V>		_func;
 	std::string 				_err_msg;
