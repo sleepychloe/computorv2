@@ -192,13 +192,14 @@ in c, c++: result has same sign as the dividend
 	- check question mark
 	- round bracket(left, right term seperately)
 	- square bracket(left, right term seperately)
+	- check caret(left, right term seperately)
 	- check operator(left, right term seperately)
 		-> skip round and square brackets
 
-//todo
-* check caret
-** when round brackets get removed, check operator first
 
+** when round brackets get removed, check operator first
+** when caret is calculated, check again
+	(after var, func -> num)
 
 
 ---------------------------------
@@ -307,6 +308,34 @@ a=[[1,2];[[3];[4]]];
 a=[[1,2];[[3,4]]];
 
 ---------------------------------
+wrong syntax caret
+---------------------------------
+^1=0
+1^=0
+0=^1
+0=1^
+1^^2=0
+1^1.1=0
+^a=0
+a^=0
+0=^a
+0=a^
+1+^2+3=0
+a^^2=0
+a^1.1=0
+^(x+1)=0
+(x+1)^=0
+^1+1=0
+0=^1+1
+1^^2+1=0
+1^1.1+1=0
+^a+1=0
+0=^a+1
+a^^2+1=0
+a^1.1+1=0
+^(x+1)+1=0
+
+---------------------------------
 wrong syntax operator
 ---------------------------------
 x^2++1=0
@@ -383,3 +412,16 @@ a**b=+3332*abcdef+3.22%2+[+1,-2,+3]+[[+1,-2];[+3,-3];[1,-3]]-(-iiiii)*(+2/2)+32
 a=  [ [+1,-2]; [-3,-2]; [-1,-2]] ** -1*[ [+1,-2]; [-1, +2];[-3,-2]; [-1,-2]]
 a=  [ [+1,-1]; [-3,-2]; [-1,-3]] ** -1*[ [+1,-4]; [-1, +5];[-3,-6]; [-1,-7]]
 a=  -1*[+3,-2]-[+12,3]*3+[-1,-2]
+
+1^2=0
+1^+1=0
+1^-1=0
+(1)^2=0
+(1)^+1=0
+(1)^-1=0
+a^1=0
+a^+1=0
+a^-1=0
+a^(1)=0
+a^(+1)=0
+a^(-1)=0

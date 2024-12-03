@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/03 02:19:01 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/03 04:30:26 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -519,22 +519,18 @@ char	Parse::do_convert(std::string str, size_t &i)
 					{'*', OP_MUL}, {'/', OP_DIV}, {'%', OP_MODULO}};
 	if (str[i] == '+' || str[i] == '-')
 	{
-		if (str[i - 1] && (str[i - 1] == '('
-				&& is_element_of_set(this->_set_operation, str[i - 1])))
+		if (str[i - 1] && (str[i - 1] == '(' || str[i - 1] == '^'
+					|| str[i - 1] == OP_MUL || str[i - 1] == OP_MAT_MUL
+					|| str[i - 1] == OP_DIV || str[i - 1] == OP_MODULO))
 			return (str[i]);
-		else
-			return (op[str[i]]);
 	}
 	else if (str[i] == '*')
 	{
 		if (str[i + 1] && str[i + 1] == '*')
 		{
-			i++;
+			i = i + 1;
 			return (OP_MAT_MUL);
-			
 		}
-		else
-			return (op[str[i]]);
 	}
 	return (op[str[i]]);
 }
@@ -594,7 +590,8 @@ int	Parse::check_operator(std::string str)
 		}
 		else if (str[i] == '[' || str[i] == '(')
 		{
-			if (i != 0 && !this->_operation.count(str[i - 1]))
+			if (i != 0 && !this->_operation.count(str[i - 1])
+				&& !(str[i] == '(' && str[i - 1] == '^'))
 			{
 				this->_err_msg = "invalid syntax: operator";
 				throw (this->_err_msg);
@@ -604,10 +601,49 @@ int	Parse::check_operator(std::string str)
 			else
 				i = skip_bracket(ROUND_BRACKET, str, i);
 			i++;
-			if (i != str.length() - 1 && !this->_operation.count(str[i]))
+			if (str[i] != '\0' && !this->_operation.count(str[i])
+				&& !(str[i - 1] == ')' && str[i] == '^'))
 			{
 				this->_err_msg = "invalid syntax: operator";
 				throw (this->_err_msg);
+			}
+		}
+		i++;
+	}
+	return (1);
+}
+
+int	Parse::check_caret(std::string str)
+{
+	size_t	i = 0;
+
+	if (str[0] == '^' || str[str.length() - 1] == '^')
+	{
+		this->_err_msg = "invalid syntax: caret(^)";
+		throw(this->_err_msg);
+	}
+	while (i < str.length())
+	{
+		if (str[i] == '^')
+		{
+			/* base: num or (num) */
+			if (!(std::isdigit(str[i - 1])
+				|| this->_set_alphabet.count(str[i - 1]) || str[i - 1] == ')'))
+			{
+				this->_err_msg = "invalid syntax: caret(^)";
+				throw(this->_err_msg);
+			}
+			i++;
+			/* power: (+-int) */
+			while (str[i] == '(' || str[i] == ')' || str[i] == '+' || str[i] == '-'
+				|| std::isdigit(str[i]) || this->_set_alphabet.count(str[i]))
+				i++;
+			if (str[i] == '\0')
+				return (1);
+			if (str[i - 1] == '^' || str[i] == '^' || !this->_operation.count(str[i]))
+			{
+				this->_err_msg = "invalid syntax: caret(^)";
+				throw(this->_err_msg);
 			}
 		}
 		i++;
@@ -630,9 +666,9 @@ int	Parse::check_syntax(std::string &str)
 	convert_operator(left_str);
 	convert_operator(right_str);
 
-	if (!(check_operator(left_str) && check_operator(right_str)))
+	if (!(check_caret(left_str) && check_caret(right_str)
+		&& check_operator(left_str) && check_operator(right_str)))
 		return (0);
-	//caret check
 	return (1);
 }
 

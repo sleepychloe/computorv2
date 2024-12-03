@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/03 02:11:28 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/03 03:01:44 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 #include <iterator>
 #include <stack>
 #include <sstream>
+#include <cctype>
 #include "./Color.hpp"
 
 using V = std::variant<float, Complex<float>, Matrix<float>, Matrix<Complex<float>>, Vector<float>, Vector<Complex<float>>>;
@@ -80,6 +81,7 @@ private:
 
 	int				check_question_mark(std::string str);
 	int				check_operator(std::string str);
+	int				check_caret(std::string str);
 	int				check_syntax(std::string &str);
 	
 	int				check_str(std::string &str);
