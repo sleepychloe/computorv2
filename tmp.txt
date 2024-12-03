@@ -206,7 +206,7 @@ in c, c++: result has same sign as the dividend
 
 todo:
 7. remove bracket
-8. split term(seperator: OP_OPERATOR)
+8. split term(seperator: OP_OPERATOR) -> done
 9. check variable/function exist and assign/ressign
 10. change variable/function to value if exists
 11. calculate

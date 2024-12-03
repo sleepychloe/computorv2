@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/03 14:10:27 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/03 22:49:01 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ Parse&	Parse::operator=(const Parse& parse)
 	this->_operation = parse._operation;
 	this->_var = parse._var;
 	this->_func = parse._func;
+	this->_left_term_operator = parse._left_term_operator;
+	this->_right_term_operator = parse._right_term_operator;
 	this->_err_msg = parse._err_msg;
 	return (*this);
 }
@@ -58,7 +60,7 @@ void	Parse::parse_start(std::string &str)
 	check_str(str);
 }
 
-void	Parse::print_variant_value(V value)
+void	Parse::print_variant_value(ValueSet value)
 {
 	if (std::get_if<float>(&value))
 		std::cout << *std::get_if<float>(&value);
@@ -105,7 +107,7 @@ int	Parse::check_keyword(std::string str)
 				<< "there is no variable assigned yet" << BLACK << std::endl;
 			return (1);
 		}
-		for (std::map<std::string, V>::iterator it = this->_var.begin();
+		for (std::map<std::string, ValueSet>::iterator it = this->_var.begin();
 			it != this->_var.end(); it++)
 		{
 			std::cout << YELLOW << it->first << BLACK << std::endl;
@@ -127,7 +129,7 @@ int	Parse::check_keyword(std::string str)
 				<< "there is no function assigned yet" << BLACK << std::endl;
 			return (1);
 		}
-		for (std::map<std::string, V>::iterator it = this->_var.begin();
+		for (std::map<std::string, ValueSet>::iterator it = this->_var.begin();
 			it != this->_var.end(); it++)
 		{
 			std::cout << YELLOW << it->first << BLACK << std::endl;
@@ -553,8 +555,8 @@ int	Parse::check_operator(std::string str)
 {
 	size_t			i = 0;
 
-	if (this->_operation.count(str[0])
-		|| this->_operation.count(str[str.length() - 1]))
+	if (is_key_of_map(this->_operation, str[0])
+		|| is_key_of_map(this->_operation, str[str.length() - 1]))
 	{
 		this->_err_msg = "invalid syntax: operator";
 		throw (this->_err_msg);
@@ -562,9 +564,9 @@ int	Parse::check_operator(std::string str)
 
 	while (i < str.length())
 	{
-		if (this->_operation.count(str[i]))
+		if (is_key_of_map(this->_operation, str[i]))
 		{
-			if (str[i + 1] && this->_operation.count(str[i + 1]))
+			if (str[i + 1] && is_key_of_map(this->_operation, str[i + 1]))
 			{
 				this->_err_msg = "invalid syntax: operator";
 				throw (this->_err_msg);
@@ -572,7 +574,7 @@ int	Parse::check_operator(std::string str)
 		}
 		else if (str[i] == '[' || str[i] == '(')
 		{
-			if (i != 0 && !this->_operation.count(str[i - 1])
+			if (i != 0 && !is_key_of_map(this->_operation, str[i - 1])
 				&& !(str[i] == '(' && str[i - 1] == '^'))
 			{
 				this->_err_msg = "invalid syntax: operator";
@@ -583,7 +585,8 @@ int	Parse::check_operator(std::string str)
 			else
 				i = skip_bracket(ROUND_BRACKET, str, i);
 			i++;
-			if (str[i] != '\0' && !this->_operation.count(str[i])
+			
+			if (str[i] != '\0' && !is_key_of_map(this->_operation, str[i])
 				&& !(str[i - 1] == ')' && str[i] == '^'))
 			{
 				this->_err_msg = "invalid syntax: operator";
@@ -610,7 +613,7 @@ int	Parse::check_caret(std::string str)
 		{
 			/* base: num or (num) */
 			if (!(std::isdigit(str[i - 1])
-				|| this->_set_alphabet.count(str[i - 1]) || str[i - 1] == ')'))
+				|| is_element_of_set(this->_set_alphabet, str[i - 1]) || str[i - 1] == ')'))
 			{
 				this->_err_msg = "invalid syntax: caret(^)";
 				throw(this->_err_msg);
@@ -618,11 +621,11 @@ int	Parse::check_caret(std::string str)
 			i++;
 			/* power: (+-int) */
 			while (str[i] == '(' || str[i] == ')' || str[i] == '+' || str[i] == '-'
-				|| std::isdigit(str[i]) || this->_set_alphabet.count(str[i]))
+				|| std::isdigit(str[i]) || is_element_of_set(this->_set_alphabet, str[i]))
 				i++;
 			if (str[i] == '\0')
 				return (1);
-			if (str[i - 1] == '^' || str[i] == '^' || !this->_operation.count(str[i]))
+			if (str[i - 1] == '^' || str[i] == '^' || !is_key_of_map(this->_operation, str[i]))
 			{
 				this->_err_msg = "invalid syntax: caret(^)";
 				throw(this->_err_msg);
@@ -647,11 +650,36 @@ int	Parse::check_syntax(std::string &str)
 
 	convert_operator(left_str);
 	convert_operator(right_str);
+	str = left_str + "=" + right_str;
 
 	if (!(check_caret(left_str) && check_caret(right_str)
 		&& check_operator(left_str) && check_operator(right_str)))
 		return (0);
 	return (1);
+}
+
+void	Parse::split_term(std::string str, VectorStrIntPair &term_op)
+{
+	std::vector<std::string>	term;
+	std::vector<int>		op;
+	size_t				i;
+
+	while (1)
+	{
+		i = 0;
+		while (!is_key_of_map(this->_operation, str[i]) && str[i] != '\0')
+			i++;
+		if (str[i] == '\0')
+			break ;
+		term.push_back(str.substr(0, i));
+		op.push_back(str[i]);
+
+		str = str.substr(i + 1, std::string::npos);
+	}
+	term.push_back(str);
+
+	term_op.first = term;
+	term_op.second = op;
 }
 
 int	Parse::check_str(std::string &str)
@@ -662,8 +690,64 @@ int	Parse::check_str(std::string &str)
 		return (0);
 
 	remove_space(str);
-
 	if (!check_syntax(str))
 		return (0);
+
+	//remove brackets
+
+
+	std::string		left_str = str.substr(0, str.find("="));
+	std::string		right_str = str.substr(str.find("=") + 1, std::string::npos);
+	VectorStrIntPair	left_term_operator;
+	VectorStrIntPair	right_term_operator;
+
+	split_term(left_str, left_term_operator);
+	split_term(right_str, right_term_operator);
+
+
+
+///////////////////
+	std::cout << "left term: " << left_str << std::endl;
+	for (size_t i = 0; i < left_term_operator.first.size(); i++)
+	{
+		std::cout << "term: " << left_term_operator.first[i] << std::endl;
+		if (i != left_term_operator.first.size() - 1)
+		{
+			std::cout << "op: " << std::endl;
+			if (left_term_operator.second[i] == OP_ADD)
+				std::cout << "\"+\"" << std::endl;
+			else if (left_term_operator.second[i] == OP_SUB)
+				std::cout << "\"-\"" << std::endl;
+			else if (left_term_operator.second[i] == OP_MUL)
+				std::cout << "\"*\"" << std::endl;
+			else if (left_term_operator.second[i] == OP_DIV)
+				std::cout << "\"/\"" << std::endl;
+			else if (left_term_operator.second[i] == OP_MODULO)
+				std::cout << "\"%\"" << std::endl;
+			else if (left_term_operator.second[i] == OP_MAT_MUL)
+				std::cout << "\"**\"" << std::endl;
+		}
+	}
+	std::cout << "right term: " << right_str << std::endl;
+	for (size_t i = 0; i < right_term_operator.first.size(); i++)
+	{
+		std::cout << "term: " << right_term_operator.first[i] << std::endl;
+		if (i != right_term_operator.first.size() - 1)
+		{
+			std::cout << "op: " << std::endl;
+			if (right_term_operator.second[i] == OP_ADD)
+				std::cout << "\"+\"" << std::endl;
+			else if (right_term_operator.second[i] == OP_SUB)
+				std::cout << "\"-\"" << std::endl;
+			else if (right_term_operator.second[i] == OP_MUL)
+				std::cout << "\"*\"" << std::endl;
+			else if (right_term_operator.second[i] == OP_DIV)
+				std::cout << "\"/\"" << std::endl;
+			else if (right_term_operator.second[i] == OP_MODULO)
+				std::cout << "\"%\"" << std::endl;
+			else if (right_term_operator.second[i] == OP_MAT_MUL)
+				std::cout << "\"**\"" << std::endl;
+		}
+	}
 	return (1);
 }

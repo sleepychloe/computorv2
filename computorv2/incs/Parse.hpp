@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/03 13:55:29 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/03 22:08:38 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,6 @@
 #include "./Utils.hpp"
 #include "./Color.hpp"
 
-using V = std::variant<float, Complex<float>, Matrix<float>, Matrix<Complex<float>>, Vector<float>, Vector<Complex<float>>>;
-
 # define ROUND_BRACKET		0
 # define SQUARE_BRACKET		1
 
@@ -47,6 +45,15 @@ using V = std::variant<float, Complex<float>, Matrix<float>, Matrix<Complex<floa
 # define OP_MODULO		5 /* % */
 # define OP_MAT_MUL		6 /* ** */
 
+using	ValueSet = std::variant<float,
+				Complex<float>,
+				Matrix<float>,
+				Matrix<Complex<float>>,
+				Vector<float>,
+				Vector<Complex<float>>>;
+using	VectorStrIntPair = std::pair<std::vector<std::string>, std::vector<int>>;
+using	TermOperatorPair = std::pair<std::vector<ValueSet>, std::vector<int>>;
+
 class	Parse
 {
 public:
@@ -58,7 +65,7 @@ public:
 	void				parse_start(std::string &str);
 
 private:
-	void				print_variant_value(V value);
+	void				print_variant_value(ValueSet value);
 	int				check_keyword(std::string str);
 
 	int				is_equation_form(std::string str);
@@ -81,7 +88,9 @@ private:
 	int				check_operator(std::string str);
 	int				check_caret(std::string str);
 	int				check_syntax(std::string &str);
-	
+
+	void				split_term(std::string str, VectorStrIntPair &term_op);
+
 	int				check_str(std::string &str);
 
 	std::unordered_set<char>		_set_alphabet; // 'a' to 'z', 'A' to 'Z'
@@ -92,9 +101,11 @@ private:
 	std::unordered_set<char>		_set_space; // ' ', '\t'
 	std::unordered_map<int, std::string>	_operation; // {OP_OPERATOR, "operator"}
 
-	std::map<std::string, V>		_var;
-	std::map<std::string, V>		_func;
+	std::map<std::string, ValueSet>		_var;
+	std::map<std::string, ValueSet>		_func;
 
+	TermOperatorPair			_left_term_operator;
+	TermOperatorPair			_right_term_operator;
 	std::string 				_err_msg;
 };
 
