@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/03 00:54:54 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/03 02:19:01 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,9 +153,9 @@ int	Parse::is_equation_form(std::string str)
 	}
 	if (flag != 1)
 	{
-		this->_err_msg = "equal(=) sign is missing: ";
+		this->_err_msg = "equal(=) sign is missing";
 		if (flag != 0)
-			this->_err_msg = "equal(=) sign used multiple time: ";
+			this->_err_msg = "equal(=) sign used multiple times";
 		throw (this->_err_msg);
 	}
 
@@ -300,10 +300,29 @@ void	Parse::remove_space(std::string &str)
 	str = new_str;
 }
 
-int	Parse::check_bracket_pair(char *bracket, std::string str)
+int	Parse::check_question_mark(std::string str)
+{
+	if (str.find("?") == std::string::npos)
+		return (1);
+
+	if (str[str.length() - 1] != '?'
+		|| str.find("?") < str.find("=")
+		|| str.find("?") != str.length() - 1)
+	{
+		this->_err_msg = "invalid syntax: question mark";
+		throw (this->_err_msg);
+	}
+	return (1);
+}
+
+int	Parse::check_brackets(int type, std::string str)
 {
 	std::stack<char>	stack;
+	char			bracket[2];
 	size_t			i = 0;
+
+	bracket[OPEN] = (type == ROUND_BRACKET) ? '(' : '[';
+	bracket[CLOSE] = (type == ROUND_BRACKET) ? ')' : ']';
 
 	if (str.find(std::string(1, bracket[CLOSE])) == std::string::npos
 		&& str.find(std::string(1, bracket[OPEN])) == std::string::npos)
@@ -331,22 +350,11 @@ int	Parse::check_bracket_pair(char *bracket, std::string str)
 	if (!stack.empty())
 	{
 		if (bracket[OPEN] == '(')
-				this->_err_msg = "invalid syntax: round brackets";
-			else
-				this->_err_msg = "invalid syntax: square brackets";
-			throw (this->_err_msg);
+			this->_err_msg = "invalid syntax: round brackets";
+		else
+			this->_err_msg = "invalid syntax: square brackets";
+		throw (this->_err_msg);
 	}
-	return (1);
-}
-
-int	Parse::check_brackets(int type, std::string str)
-{
-	char	bracket[2];
-
-	bracket[OPEN] = (type == ROUND_BRACKET) ? '(' : '[';
-	bracket[CLOSE] = (type == ROUND_BRACKET) ? ')' : ']';
-	if (!check_bracket_pair(bracket, str))
-		return (0);
 	return (1);
 }
 
@@ -467,7 +475,7 @@ int	Parse::skip_bracket(int type, std::string str, size_t i)
 	return (i);
 }
 
-int	Parse::skip_square_brackets(std::string str, std::string &new_str, size_t i)
+int	Parse::skip_vector_matrix(std::string str, std::string &new_str, size_t i)
 {
 	if (str[i] != '[')
 		return (i);
@@ -543,7 +551,7 @@ void	Parse::convert_operator(std::string &str)
 	}
 	while (i < str.length())
 	{
-		i = skip_square_brackets(str, new_str, i);
+		i = skip_vector_matrix(str, new_str, i);
 		if (!(is_element_of_set(this->_set_alphabet, str[i])
 			|| is_element_of_set(this->_set_number, str[i])
 			|| is_element_of_set(this->_set_operation, str[i])
@@ -612,7 +620,8 @@ int	Parse::check_syntax(std::string &str)
 	std::string	left_str = str.substr(0, str.find("="));
 	std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
 
-	if (!(check_brackets(ROUND_BRACKET, left_str)
+	if (!(check_question_mark(str) 
+		&& check_brackets(ROUND_BRACKET, left_str)
 		&& check_brackets(ROUND_BRACKET, right_str)
 		&& check_brackets(SQUARE_BRACKET, left_str)
 		&& check_brackets(SQUARE_BRACKET, right_str)))
@@ -624,7 +633,6 @@ int	Parse::check_syntax(std::string &str)
 	if (!(check_operator(left_str) && check_operator(right_str)))
 		return (0);
 	//caret check
-	//check question mark
 	return (1);
 }
 

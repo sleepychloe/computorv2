@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/03 00:42:04 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/03 02:11:28 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,16 +67,18 @@ private:
 	int				check_number(std::string str);
 	void				remove_space(std::string &str);
 
-	int				check_bracket_pair(char *bracket, std::string str);
 	int				check_brackets(int type, std::string str);
+
 	std::vector<std::string>	split(std::string str, char delimeter);
 	int				check_vector_form(int type, std::string str);
 	int				check_matrix_form(std::string str);
+
 	int				skip_bracket(int type, std::string str, size_t i);
-	int				skip_square_brackets(std::string str, std::string &new_str, size_t i);
+	int				skip_vector_matrix(std::string str, std::string &new_str, size_t i);
 	char				do_convert(std::string str, size_t &i);
 	void				convert_operator(std::string &str);
 
+	int				check_question_mark(std::string str);
 	int				check_operator(std::string str);
 	int				check_syntax(std::string &str);
 	
