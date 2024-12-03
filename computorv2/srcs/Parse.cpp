@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/03 04:30:26 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/03 14:10:27 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,13 +185,6 @@ int	Parse::is_equation_form(std::string str)
 	return (1);
 }
 
-int	Parse::is_element_of_set(std::unordered_set<char> set, char c)
-{
-	if (set.find(c) != set.end())
-		return (1);
-	return (0);
-}
-
 int	Parse::check_invalid_character(std::string str)
 {
 	size_t	i = 0;
@@ -356,17 +349,6 @@ int	Parse::check_brackets(int type, std::string str)
 		throw (this->_err_msg);
 	}
 	return (1);
-}
-
-std::vector<std::string>	Parse::split(std::string str, char delimeter)
-{
-	std::vector<std::string>	res;
-	std::string			token;
-	std::stringstream		ss(str);
-
-	while (std::getline(ss, token, delimeter))
-		res.push_back(token);
-	return (res);
 }
 
 int	Parse::check_vector_form(int type, std::string str)

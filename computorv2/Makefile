@@ -6,7 +6,7 @@
 #    By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/28 09:51:42 by yhwang            #+#    #+#              #
-#    Updated: 2024/11/30 20:12:47 by yhwang           ###   ########.fr        #
+#    Updated: 2024/12/03 13:54:04 by yhwang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,8 @@ RM = rm -f
 
 FILES = $(ReadLine_SRC_DIR)ReadLine \
 		$(SRC_DIR)main \
-		$(SRC_DIR)Parse
+		$(SRC_DIR)Parse \
+		$(SRC_DIR)Utils
 
 SRCS = $(addsuffix .cpp, $(FILES))
 OBJS = $(addsuffix .o, $(FILES))

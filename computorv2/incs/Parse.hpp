@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/03 03:01:44 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/03 13:55:29 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@
 #include <variant>
 #include <iterator>
 #include <stack>
-#include <sstream>
 #include <cctype>
+#include "./Utils.hpp"
 #include "./Color.hpp"
 
 using V = std::variant<float, Complex<float>, Matrix<float>, Matrix<Complex<float>>, Vector<float>, Vector<Complex<float>>>;
@@ -62,7 +62,6 @@ private:
 	int				check_keyword(std::string str);
 
 	int				is_equation_form(std::string str);
-	int				is_element_of_set(std::unordered_set<char> set, char c);
 	int				check_invalid_character(std::string str);
 	int				check_float_point(std::string str);
 	int				check_number(std::string str);
@@ -70,7 +69,6 @@ private:
 
 	int				check_brackets(int type, std::string str);
 
-	std::vector<std::string>	split(std::string str, char delimeter);
 	int				check_vector_form(int type, std::string str);
 	int				check_matrix_form(std::string str);
 
@@ -93,8 +91,10 @@ private:
 	std::unordered_set<char>		_set_other; // '(', ')','^', '=', '?'
 	std::unordered_set<char>		_set_space; // ' ', '\t'
 	std::unordered_map<int, std::string>	_operation; // {OP_OPERATOR, "operator"}
+
 	std::map<std::string, V>		_var;
 	std::map<std::string, V>		_func;
+
 	std::string 				_err_msg;
 };
 
