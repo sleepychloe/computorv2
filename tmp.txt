@@ -214,8 +214,9 @@ todo:
 order: 8->9->10->
 
 
-** when round brackets get removed, check operator first
-** when caret is calculated, check again
+** when round brackets get removed, use check_operator() first
+** when caret calculates, check again
+	: don't allow negative power if base is not 0
 	(after var, func -> num)
 
 -----------------------------------------------------------------------

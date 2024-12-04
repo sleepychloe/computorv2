@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/03 22:08:38 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/04 02:11:23 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,11 @@
 # define OP_DIV			4 /* / */
 # define OP_MODULO		5 /* % */
 # define OP_MAT_MUL		6 /* ** */
+
+# define TYPE_NUMBER		1
+# define TYPE_VECTOR		2
+# define TYPE_MATRIX		3
+# define TYPE_QUESTION_MARK	4
 
 using	ValueSet = std::variant<float,
 				Complex<float>,
@@ -90,6 +95,13 @@ private:
 	int				check_syntax(std::string &str);
 
 	void				split_term(std::string str, VectorStrIntPair &term_op);
+
+	int				is_valid_variable_name(std::string term);
+	int				is_valid_function_name(std::string term);
+	int				is_valid_term(std::string &term);
+	void				convert_type_number(std::string &value_str);
+	int				check_value_type(std::string &value_str);
+	void				convert_term(VectorStrIntPair &term_op);
 
 	int				check_str(std::string &str);
 

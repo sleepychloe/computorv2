@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/03 22:49:01 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/04 03:03:01 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ Parse::Parse(): _err_msg("")
 			'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
 			'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
-	this->_set_number = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'};
+	this->_set_number = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', 'i'};
 	this->_set_vector_matrix = { '[', ']', ',', ';'};
 	this->_set_operation = {'+', '-', '*', '/', '%'};
 	this->_set_other = {'(', ')','^', '=', '?'};
@@ -574,24 +574,24 @@ int	Parse::check_operator(std::string str)
 		}
 		else if (str[i] == '[' || str[i] == '(')
 		{
-			if (i != 0 && !is_key_of_map(this->_operation, str[i - 1])
-				&& !(str[i] == '(' && str[i - 1] == '^'))
-			{
-				this->_err_msg = "invalid syntax: operator";
-				throw (this->_err_msg);
-			}
+			// if (i != 0 && !is_key_of_map(this->_operation, str[i - 1])
+			// 	&& !(str[i] == '(' && str[i - 1] == '^'))
+			// {
+			// 	this->_err_msg = "invalid syntax: operator";
+			// 	throw (this->_err_msg);
+			// }
 			if (str[i] == '[')
 				i = skip_bracket(SQUARE_BRACKET, str, i);
 			else
 				i = skip_bracket(ROUND_BRACKET, str, i);
 			i++;
 			
-			if (str[i] != '\0' && !is_key_of_map(this->_operation, str[i])
-				&& !(str[i - 1] == ')' && str[i] == '^'))
-			{
-				this->_err_msg = "invalid syntax: operator";
-				throw (this->_err_msg);
-			}
+			// if (str[i] != '\0' && !is_key_of_map(this->_operation, str[i])
+			// 	&& !(str[i - 1] == ')' && str[i] == '^'))
+			// {
+			// 	this->_err_msg = "invalid syntax: operator";
+			// 	throw (this->_err_msg);
+			// }
 		}
 		i++;
 	}
@@ -667,19 +667,156 @@ void	Parse::split_term(std::string str, VectorStrIntPair &term_op)
 	while (1)
 	{
 		i = 0;
-		while (!is_key_of_map(this->_operation, str[i]) && str[i] != '\0')
+		while (!is_key_of_map(this->_operation, str[i])
+			&& str[i] != '?' && str[i] != '\0')
 			i++;
 		if (str[i] == '\0')
 			break ;
-		term.push_back(str.substr(0, i));
-		op.push_back(str[i]);
-
+		if (str.substr(0, i) != "")
+			term.push_back(str.substr(0, i));
+		if (str[i] != '?')
+			op.push_back(str[i]);
+		else
+			term.push_back(std::string(1, str[i]));
 		str = str.substr(i + 1, std::string::npos);
 	}
-	term.push_back(str);
+	if (str != "")
+		term.push_back(str);
 
 	term_op.first = term;
 	term_op.second = op;
+}
+
+int	Parse::check_value_type(std::string &value_str)
+{
+	if (value_str == "?")
+		return (TYPE_QUESTION_MARK);
+
+	if (value_str.find("[") != std::string::npos
+		&& value_str.find("]") != std::string::npos)
+	{
+		if (value_str.find("[", 1) != std::string::npos)
+			return (TYPE_MATRIX);
+		else
+			return (TYPE_VECTOR);
+	}
+	else
+		return (TYPE_NUMBER);
+	return (0);
+}
+
+int	Parse::is_valid_variable_name(std::string term)
+{
+	size_t	i = 0;
+
+	if (term == "i")
+		return (0);
+	while (i < term.length())
+	{
+		if (!is_element_of_set(this->_set_alphabet, term[i]))
+			return (0);
+		i++;
+	}
+	//check variable name, convert
+	return (1);
+}
+
+int	Parse::is_valid_function_name(std::string term)
+{
+	if (term.find("(") == std::string::npos
+		|| !check_brackets(ROUND_BRACKET, term)
+		|| term.find("(", term.find("(") + 1) != std::string::npos)
+		return (0);
+
+	/* check function name */
+	size_t	i = 0;
+	while (i < term.find("("))
+	{
+		if (!is_element_of_set(this->_set_alphabet, term[i]))
+			return (0);
+		i++;
+	}
+	i++;
+
+	/* check variable */
+	std::string	variable = term.substr(i , term.length() - 1 - i);
+
+	//consider about f(2), not only f(x)
+	//when variable is number -> check number is valid, check function name, convert
+
+	// when variable is letter
+	// if (!is_valid_variable_name(term.substr(i , term.length() - 1 - i)))
+	// 	return (0);
+	return (1);
+}
+
+int	Parse::is_valid_term(std::string &term)
+{
+	size_t	i = 0;
+
+	if (is_element_of_set(this->_set_number, term[0]))
+	{
+		while (i < term.size())
+		{
+			if (!(is_element_of_set(this->_set_number, term[i])
+				|| term[i] == '^'))
+				return (0);
+			i++;
+		}
+		return (1);
+	}
+	if (!(is_valid_function_name(term) || is_valid_variable_name(term)))
+		return (0);
+
+
+	while (i < term.length())
+	{
+		term[i] = std::toupper(term[i]);
+		i++;
+	}
+	return (1);
+}
+
+void	Parse::convert_type_number(std::string &term)
+{
+	if (!is_valid_term(term))
+	{
+		this->_err_msg = "invalid term";
+		throw (this->_err_msg);
+	}
+
+	// check variable, function name -> replace
+}
+
+void	Parse::convert_term(VectorStrIntPair &term_op)
+{
+	int	type;
+	
+	for (size_t i = 0; i < term_op.first.size(); i++)
+	{
+		type = check_value_type(term_op.first[i]);
+		if (!type)
+		{
+			this->_err_msg = "cannot deciede value type";
+			throw (this->_err_msg);
+		}
+		if (type == TYPE_NUMBER)
+		{
+			convert_type_number(term_op.first[i]);
+			std::cout << term_op.first[i] << "\ntype: number" << std::endl;
+		}
+		else if (type == TYPE_VECTOR)
+		{
+			std::cout << term_op.first[i] << "\ntype: vector" << std::endl;
+		}
+		else if (type == TYPE_MATRIX)
+		{
+			std::cout << term_op.first[i] << "\ntype: matrix" << std::endl;
+		}
+		else
+			term_op.first.pop_back();
+	}
+	std::cout << "----------------" << std::endl;
 }
 
 int	Parse::check_str(std::string &str)
@@ -704,14 +841,15 @@ int	Parse::check_str(std::string &str)
 	split_term(left_str, left_term_operator);
 	split_term(right_str, right_term_operator);
 
-
+	convert_term(left_term_operator);
+	convert_term(right_term_operator);
 
 ///////////////////
 	std::cout << "left term: " << left_str << std::endl;
 	for (size_t i = 0; i < left_term_operator.first.size(); i++)
 	{
 		std::cout << "term: " << left_term_operator.first[i] << std::endl;
-		if (i != left_term_operator.first.size() - 1)
+		if (i < left_term_operator.second.size())
 		{
 			std::cout << "op: " << std::endl;
 			if (left_term_operator.second[i] == OP_ADD)
@@ -732,7 +870,7 @@ int	Parse::check_str(std::string &str)
 	for (size_t i = 0; i < right_term_operator.first.size(); i++)
 	{
 		std::cout << "term: " << right_term_operator.first[i] << std::endl;
-		if (i != right_term_operator.first.size() - 1)
+		if (i < right_term_operator.second.size())
 		{
 			std::cout << "op: " << std::endl;
 			if (right_term_operator.second[i] == OP_ADD)
