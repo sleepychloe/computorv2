@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/04 03:03:01 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/04 16:30:27 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,17 +123,17 @@ int	Parse::check_keyword(std::string str)
 		std::cout << MAGENTA << "╔═════════════════════╗" << BLACK << std::endl;
 		std::cout << MAGENTA << "║    FUNCTION LIST    ║" << BLACK << std::endl;
 		std::cout << MAGENTA << "╚═════════════════════╝" << BLACK << std::endl;
-		if (this->_var.size() == 0)
+		if (this->_func.size() == 0)
 		{
 			std::cout << MAGENTA
 				<< "there is no function assigned yet" << BLACK << std::endl;
 			return (1);
 		}
-		for (std::map<std::string, ValueSet>::iterator it = this->_var.begin();
-			it != this->_var.end(); it++)
+		for (std::map<std::string, std::string>::iterator it = this->_func.begin();
+			it != this->_func.end(); it++)
 		{
 			std::cout << YELLOW << it->first << BLACK << std::endl;
-			print_variant_value(it->second);
+			std::cout << it->second;
 			std::cout << std::endl
 				<< MAGENTA << "═══════════════════════" << BLACK << std::endl;
 		}
@@ -574,24 +574,32 @@ int	Parse::check_operator(std::string str)
 		}
 		else if (str[i] == '[' || str[i] == '(')
 		{
-			// if (i != 0 && !is_key_of_map(this->_operation, str[i - 1])
-			// 	&& !(str[i] == '(' && str[i - 1] == '^'))
-			// {
-			// 	this->_err_msg = "invalid syntax: operator";
-			// 	throw (this->_err_msg);
-			// }
+			if (str[i] == '(')
+			{
+				// function name
+				if (i != 0 && is_element_of_set(this->_set_alphabet, str[i - 1]))
+				{
+					i = skip_bracket(ROUND_BRACKET, str, i) + 1;
+					continue ;
+				}
+			}
+			if (i != 0 && !is_key_of_map(this->_operation, str[i - 1])
+				&& !(str[i] == '(' && str[i - 1] == '^'))
+			{
+				this->_err_msg = "invalid syntax: operator";
+				throw (this->_err_msg);
+			}
 			if (str[i] == '[')
-				i = skip_bracket(SQUARE_BRACKET, str, i);
+				i = skip_bracket(SQUARE_BRACKET, str, i) + 1;
 			else
-				i = skip_bracket(ROUND_BRACKET, str, i);
-			i++;
+				i = skip_bracket(ROUND_BRACKET, str, i) + 1;
 			
-			// if (str[i] != '\0' && !is_key_of_map(this->_operation, str[i])
-			// 	&& !(str[i - 1] == ')' && str[i] == '^'))
-			// {
-			// 	this->_err_msg = "invalid syntax: operator";
-			// 	throw (this->_err_msg);
-			// }
+			if (str[i] != '\0' && !is_key_of_map(this->_operation, str[i])
+				&& !(str[i - 1] == ')' && str[i] == '^'))
+			{
+				this->_err_msg = "invalid syntax: operator";
+				throw (this->_err_msg);
+			}
 		}
 		i++;
 	}
@@ -662,7 +670,7 @@ void	Parse::split_term(std::string str, VectorStrIntPair &term_op)
 {
 	std::vector<std::string>	term;
 	std::vector<int>		op;
-	size_t				i;
+	size_t				i = 0;
 
 	while (1)
 	{
@@ -705,20 +713,55 @@ int	Parse::check_value_type(std::string &value_str)
 	return (0);
 }
 
-int	Parse::is_valid_variable_name(std::string term)
+int	Parse::is_number_str(std::string str)
 {
 	size_t	i = 0;
 
-	if (term == "i")
-		return (0);
-	while (i < term.length())
+	while (i < str.length())
 	{
-		if (!is_element_of_set(this->_set_alphabet, term[i]))
+		if (!(is_element_of_set(this->_set_number, str[i])
+			|| str[i] == '+' || str[i] == '-' || str[i] == '^'))
 			return (0);
 		i++;
 	}
-	//check variable name, convert
 	return (1);
+}
+
+int	Parse::is_alpha_str(std::string str)
+{
+	size_t	i = 0;
+
+	while (i < str.length())
+	{
+		if (!is_element_of_set(this->_set_alphabet, str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+int	Parse::is_valid_variable_name(std::string term)
+{
+	if (term == "i")
+	{
+		this->_err_msg = "variable name cannot not be \"i\"";
+		return (0);
+	}
+	if (!is_alpha_str(term))
+	{
+		this->_err_msg = "variable name should be consisted with letter(s)1";
+		return (0);
+	}
+	return (1);
+}
+
+std::string	Parse::is_element_of_func(std::string function_name)
+{
+	std::string	value = "";
+
+	if (this->_func.find(function_name) != this->_func.end())
+		value = this->_func[function_name];
+	return (value);
 }
 
 int	Parse::is_valid_function_name(std::string term)
@@ -728,70 +771,71 @@ int	Parse::is_valid_function_name(std::string term)
 		|| term.find("(", term.find("(") + 1) != std::string::npos)
 		return (0);
 
-	/* check function name */
-	size_t	i = 0;
-	while (i < term.find("("))
+	std::string	function_name = term.substr(0, term.find("("));
+	std::string	variable = term.substr(term.find("(") + 1, term.length() - term.find("(") - 2);
+
+	std::cout << "funtion name: " << function_name << std::endl;
+	std::cout << "variable: " << variable << std::endl;
+
+	// /* check function name */
+	if (!is_alpha_str(function_name))
 	{
-		if (!is_element_of_set(this->_set_alphabet, term[i]))
-			return (0);
-		i++;
+		this->_err_msg = "function name should be consisted with letter(s)";
+		return (0);
 	}
-	i++;
-
-	/* check variable */
-	std::string	variable = term.substr(i , term.length() - 1 - i);
-
-	//consider about f(2), not only f(x)
-	//when variable is number -> check number is valid, check function name, convert
-
-	// when variable is letter
-	// if (!is_valid_variable_name(term.substr(i , term.length() - 1 - i)))
-	// 	return (0);
+	// /* check variable */
+	if (is_number_str(variable) && variable != "i")
+	{
+		if (is_element_of_func(function_name) == "")
+		{
+			this->_err_msg = "function does not exists, cannot assign";
+			return (0);
+		}
+	}
+	else
+	{
+		if (!is_valid_variable_name(variable))
+			return (0);
+	}
 	return (1);
 }
 
 int	Parse::is_valid_term(std::string &term)
 {
-	size_t	i = 0;
-
-	if (is_element_of_set(this->_set_number, term[0]))
-	{
-		while (i < term.size())
-		{
-			if (!(is_element_of_set(this->_set_number, term[i])
-				|| term[i] == '^'))
-				return (0);
-			i++;
-		}
+	if (is_number_str(term))
 		return (1);
-	}
-	if (!(is_valid_function_name(term) || is_valid_variable_name(term)))
-		return (0);
-
-
-	while (i < term.length())
-	{
-		term[i] = std::toupper(term[i]);
-		i++;
-	}
-	return (1);
+	if (is_valid_variable_name(term))
+		return (1);
+	if (is_valid_function_name(term))
+		return (1);
+	return (0);
 }
 
 void	Parse::convert_type_number(std::string &term)
 {
 	if (!is_valid_term(term))
 	{
-		this->_err_msg = "invalid term";
+		if (this->_err_msg != "")
+			this->_err_msg = "invalid term: " + this->_err_msg;
+		else
+			this->_err_msg = "invalid term";
 		throw (this->_err_msg);
 	}
 
-	// check variable, function name -> replace
+	if (is_number_str(term)) // number: set type
+	{
+		std::cout << "need to set type" << std::endl;
+	}
+	else // variable or function
+	{
+		std::cout << "do it later: it's variable, function(variable), or function(number)" << std::endl;
+	}
 }
 
 void	Parse::convert_term(VectorStrIntPair &term_op)
 {
 	int	type;
-	
+
 	for (size_t i = 0; i < term_op.first.size(); i++)
 	{
 		type = check_value_type(term_op.first[i]);

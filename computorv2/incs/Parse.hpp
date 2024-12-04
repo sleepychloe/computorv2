@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/04 02:11:23 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/04 15:11:00 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,11 @@ private:
 
 	void				split_term(std::string str, VectorStrIntPair &term_op);
 
+	int				is_number_str(std::string str);
+	int				is_alpha_str(std::string str);
+
 	int				is_valid_variable_name(std::string term);
+	std::string			is_element_of_func(std::string function_name);
 	int				is_valid_function_name(std::string term);
 	int				is_valid_term(std::string &term);
 	void				convert_type_number(std::string &value_str);
@@ -114,7 +118,7 @@ private:
 	std::unordered_map<int, std::string>	_operation; // {OP_OPERATOR, "operator"}
 
 	std::map<std::string, ValueSet>		_var;
-	std::map<std::string, ValueSet>		_func;
+	std::map<std::string, std::string>	_func;
 
 	TermOperatorPair			_left_term_operator;
 	TermOperatorPair			_right_term_operator;
