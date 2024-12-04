@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/04 16:30:27 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/04 17:43:30 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -663,12 +663,20 @@ int	Parse::check_syntax(std::string &str)
 	if (!(check_caret(left_str) && check_caret(right_str)
 		&& check_operator(left_str) && check_operator(right_str)))
 		return (0);
+
+	size_t	i = 0;
+	while (i < str.length())
+	{
+		str[i] = std::tolower(str[i]);
+		i++;
+	}
 	return (1);
 }
 
-void	Parse::split_term(std::string str, VectorStrIntPair &term_op)
+void	Parse::split_term(std::string str, TermOperatorPair &term_op)
 {
-	std::vector<std::string>	term;
+	VectorTermPair			term_pair;
+	std::vector<std::string>	term_str;
 	std::vector<int>		op;
 	size_t				i = 0;
 
@@ -681,36 +689,23 @@ void	Parse::split_term(std::string str, VectorStrIntPair &term_op)
 		if (str[i] == '\0')
 			break ;
 		if (str.substr(0, i) != "")
-			term.push_back(str.substr(0, i));
+			term_str.push_back(str.substr(0, i));
 		if (str[i] != '?')
 			op.push_back(str[i]);
 		else
-			term.push_back(std::string(1, str[i]));
+			term_str.push_back(std::string(1, str[i]));
 		str = str.substr(i + 1, std::string::npos);
 	}
 	if (str != "")
-		term.push_back(str);
+		term_str.push_back(str);
 
-	term_op.first = term;
+	if (term_str[term_str.size() - 1] == "?")
+		term_str.pop_back();
+
+	term_pair.first = term_str;
+	term_pair.second = std::vector<ValueSet>(term_str.size());
+	term_op.first = term_pair;
 	term_op.second = op;
-}
-
-int	Parse::check_value_type(std::string &value_str)
-{
-	if (value_str == "?")
-		return (TYPE_QUESTION_MARK);
-
-	if (value_str.find("[") != std::string::npos
-		&& value_str.find("]") != std::string::npos)
-	{
-		if (value_str.find("[", 1) != std::string::npos)
-			return (TYPE_MATRIX);
-		else
-			return (TYPE_VECTOR);
-	}
-	else
-		return (TYPE_NUMBER);
-	return (0);
 }
 
 int	Parse::is_number_str(std::string str)
@@ -811,9 +806,9 @@ int	Parse::is_valid_term(std::string &term)
 	return (0);
 }
 
-void	Parse::convert_type_number(std::string &term)
+void	Parse::set_type_number(std::string &term_str, ValueSet &term_value)
 {
-	if (!is_valid_term(term))
+	if (!is_valid_term(term_str))
 	{
 		if (this->_err_msg != "")
 			this->_err_msg = "invalid term: " + this->_err_msg;
@@ -822,23 +817,60 @@ void	Parse::convert_type_number(std::string &term)
 		throw (this->_err_msg);
 	}
 
-	if (is_number_str(term)) // number: set type
+	if (is_number_str(term_str))
 	{
-		std::cout << "need to set type" << std::endl;
+		if (term_str[term_str.length() - 1] != 'i')
+			term_value.emplace<float>(atof(term_str.c_str()));
+		else
+		{
+			std::string	imag = term_str.substr(0, term_str.length() - 1);
+
+			if (term_str == "")
+				term_value.emplace<Complex<float>>(0, 1);
+			else
+				term_value.emplace<Complex<float>>(0, atof(imag.c_str()));
+		}
+
+		std::cout << "converted: value: ";
+		print_variant_value(term_value);
+		std::cout << std::endl;
 	}
-	else // variable or function
+	else // variable or function(ex: a, b, f(x), f(1)..)
 	{
-		std::cout << "do it later: it's variable, function(variable), or function(number)" << std::endl;
+		// variable: convert to value if variable already exists
+		// function:
+		//	- f(x): leave like this
+		//	- f(1): (after making calculating function)
+		//		check which type(number/vector/matrix), set type
+		std::cout << "do it later: it's variable, function(variable), or function(number)"
+			<< std::endl;
+		/* code */
 	}
 }
 
-void	Parse::convert_term(VectorStrIntPair &term_op)
+void	Parse::set_type_of_term(TermOperatorPair &term_op)
 {
-	int	type;
-
-	for (size_t i = 0; i < term_op.first.size(); i++)
+	std::function<int(std::string)>	setValueType = [](std::string term_str)
 	{
-		type = check_value_type(term_op.first[i]);
+		if (term_str.find("[") != std::string::npos
+			&& term_str.find("]") != std::string::npos)
+		{
+			if (term_str.find("[", 1) != std::string::npos)
+				return (TYPE_MATRIX);
+			else
+				return (TYPE_VECTOR);
+		}
+		else
+			return (TYPE_NUMBER);
+		return (0);
+	};
+
+	VectorTermPair	term_pair = term_op.first;
+	int		type;
+
+	for (size_t i = 0; i < term_pair.first.size(); i++)
+	{
+		type = setValueType(term_pair.first[i]);
 		if (!type)
 		{
 			this->_err_msg = "cannot deciede value type";
@@ -846,19 +878,19 @@ void	Parse::convert_term(VectorStrIntPair &term_op)
 		}
 		if (type == TYPE_NUMBER)
 		{
-			convert_type_number(term_op.first[i]);
-			std::cout << term_op.first[i] << "\ntype: number" << std::endl;
+			std::cout << term_pair.first[i] << "\ntype: number" << std::endl;
+			set_type_number(term_pair.first[i], term_pair.second[i]);
 		}
 		else if (type == TYPE_VECTOR)
 		{
-			std::cout << term_op.first[i] << "\ntype: vector" << std::endl;
-		}
-		else if (type == TYPE_MATRIX)
-		{
-			std::cout << term_op.first[i] << "\ntype: matrix" << std::endl;
+			std::cout << term_pair.first[i] << "\ntype: vector" << std::endl;
+			/* code */
 		}
 		else
-			term_op.first.pop_back();
+		{
+			std::cout << term_pair.first[i] << "\ntype: matrix" << std::endl;
+			/* code */
+		}
 	}
 	std::cout << "----------------" << std::endl;
 }
@@ -879,20 +911,21 @@ int	Parse::check_str(std::string &str)
 
 	std::string		left_str = str.substr(0, str.find("="));
 	std::string		right_str = str.substr(str.find("=") + 1, std::string::npos);
-	VectorStrIntPair	left_term_operator;
-	VectorStrIntPair	right_term_operator;
+	TermOperatorPair	left_term_operator;
+	TermOperatorPair	right_term_operator;
 
 	split_term(left_str, left_term_operator);
 	split_term(right_str, right_term_operator);
 
-	convert_term(left_term_operator);
-	convert_term(right_term_operator);
+	set_type_of_term(left_term_operator);
+	set_type_of_term(right_term_operator);
 
 ///////////////////
+	std::cout << "*******************************" << std::endl;
 	std::cout << "left term: " << left_str << std::endl;
-	for (size_t i = 0; i < left_term_operator.first.size(); i++)
+	for (size_t i = 0; i < left_term_operator.first.first.size(); i++)
 	{
-		std::cout << "term: " << left_term_operator.first[i] << std::endl;
+		std::cout << "term: " << left_term_operator.first.first[i] << std::endl;
 		if (i < left_term_operator.second.size())
 		{
 			std::cout << "op: " << std::endl;
@@ -911,9 +944,9 @@ int	Parse::check_str(std::string &str)
 		}
 	}
 	std::cout << "right term: " << right_str << std::endl;
-	for (size_t i = 0; i < right_term_operator.first.size(); i++)
+	for (size_t i = 0; i < right_term_operator.first.first.size(); i++)
 	{
-		std::cout << "term: " << right_term_operator.first[i] << std::endl;
+		std::cout << "term: " << right_term_operator.first.first[i] << std::endl;
 		if (i < right_term_operator.second.size())
 		{
 			std::cout << "op: " << std::endl;

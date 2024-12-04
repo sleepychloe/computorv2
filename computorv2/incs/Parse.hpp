@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/04 15:11:00 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/04 17:19:47 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,8 @@ using	ValueSet = std::variant<float,
 				Matrix<Complex<float>>,
 				Vector<float>,
 				Vector<Complex<float>>>;
-using	VectorStrIntPair = std::pair<std::vector<std::string>, std::vector<int>>;
-using	TermOperatorPair = std::pair<std::vector<ValueSet>, std::vector<int>>;
+using	VectorTermPair = std::pair<std::vector<std::string>, std::vector<ValueSet>>;
+using	TermOperatorPair = std::pair<VectorTermPair, std::vector<int>>;
 
 class	Parse
 {
@@ -94,18 +94,17 @@ private:
 	int				check_caret(std::string str);
 	int				check_syntax(std::string &str);
 
-	void				split_term(std::string str, VectorStrIntPair &term_op);
+	void				split_term(std::string str, TermOperatorPair &term_op);
 
 	int				is_number_str(std::string str);
 	int				is_alpha_str(std::string str);
-
 	int				is_valid_variable_name(std::string term);
 	std::string			is_element_of_func(std::string function_name);
 	int				is_valid_function_name(std::string term);
 	int				is_valid_term(std::string &term);
-	void				convert_type_number(std::string &value_str);
-	int				check_value_type(std::string &value_str);
-	void				convert_term(VectorStrIntPair &term_op);
+
+	void				set_type_number(std::string &term_str, ValueSet &term_value);
+	void				set_type_of_term(TermOperatorPair &term_op);
 
 	int				check_str(std::string &str);
 

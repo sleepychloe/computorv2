@@ -201,18 +201,39 @@ in c, c++: result has same sign as the dividend
 	- check caret(left, right term seperately)
 	- check operator(left, right term seperately)
 		-> skip round and square brackets
+	- convert every upper case alphabet to lower case
+(later: 7. remove bracket)
+8. split term, seperated by OP_OPERATOR
+9. set type of term
+	- types: TYPE_NUMBER, TYPE_VECTOR, TYPE_MATRIX
+	- TYPE_NUMBER
+	    1) check if it's valid term
+		* number : every character is number('0' to '9', '.', '^', 'i'),
+		* variable : every character is alphabet('a' to 'z'),
+		* function : round bracket pair exists
+			- function name
+				: every character is alphabet('a' to 'z')
+			- variable(inside bracket)
+				: if every character is number,
+				function name should already be saved
+		* else it's not valid term
+	    2) if it's number
+	    	: convert string to ValueSet
+	    3) if it's variable or function
+	    	: later
+	(- TYPE_VECTOR)
+	(- TYPE_MATRIX)
 
 -----------------------------------------------------------------------
 
 todo:
-7. remove bracket
-8. split term(seperator: OP_OPERATOR) -> done
-9. check variable/function exist and assign/ressign
-10. change variable/function to value if exists
-11. calculate
 
-order: 8->9->10->
-
+9.set type of term - TYPE_VECTOR, TYPE_MATRIX
+	: same logic as TYPE_NUMBER
+		- when it's vector: check every element using while loop
+		- when it's matrix: check every element using while loop 2 times
+					(could re-use vector checking function)
+		- convert string to ValueSet
 
 ** when round brackets get removed, use check_operator() first
 ** when caret calculates, check again
