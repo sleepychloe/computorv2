@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/04 17:43:30 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/06 15:23:43 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ Parse::Parse(): _err_msg("")
 			'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
 			'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
-	this->_set_number = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', 'i'};
+	this->_set_number = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', 'i', 'I'};
 	this->_set_vector_matrix = { '[', ']', ',', ';'};
 	this->_set_operation = {'+', '-', '*', '/', '%'};
 	this->_set_other = {'(', ')','^', '=', '?'};
@@ -43,10 +43,6 @@ Parse&	Parse::operator=(const Parse& parse)
 	this->_set_other = parse._set_other;
 	this->_set_space = parse._set_space;
 	this->_operation = parse._operation;
-	this->_var = parse._var;
-	this->_func = parse._func;
-	this->_left_term_operator = parse._left_term_operator;
-	this->_right_term_operator = parse._right_term_operator;
 	this->_err_msg = parse._err_msg;
 	return (*this);
 }
@@ -55,33 +51,9 @@ Parse::~Parse()
 {
 }
 
-void	Parse::parse_start(std::string &str)
+std::string	Parse::parse_start(std::string &str)
 {
-	check_str(str);
-}
-
-void	Parse::print_variant_value(ValueSet value)
-{
-	if (std::get_if<float>(&value))
-		std::cout << *std::get_if<float>(&value);
-	else if (std::get_if<Complex<float>>(&value))
-		std::cout << *std::get_if<Complex<float>>(&value);
-	else if (std::get_if<Matrix<float>>(&value))
-		std::cout << *std::get_if<Matrix<float>>(&value);
-	else if (std::get_if<Matrix<Complex<float>>>(&value))
-		std::cout << *std::get_if<Matrix<Complex<float>>>(&value);
-	else if (std::get_if<Vector<float>>(&value))
-		std::cout << *std::get_if<Vector<float>>(&value);
-	else if (std::get_if<Vector<Complex<float>>>(&value))
-		std::cout << *std::get_if<Vector<Complex<float>>>(&value);
-	else
-	{
-		this->_err_msg = "detected unknown type while printing variable list";
-		this->_err_msg += ": std::map<std::string, V>";
-		this->_err_msg += "(V = std::variant<float, Complex<float>, Matrix<float>, Matrix<Complex<float>>,";
-		this->_err_msg += "Vector<float>, Vector<Complex<float>>>)";
-		throw (this->_err_msg);
-	}
+	return (check_str(str));
 }
 
 int	Parse::check_keyword(std::string str)
@@ -89,54 +61,11 @@ int	Parse::check_keyword(std::string str)
 	if (str == "var" || str == "VAR"
 		|| str == "vriable" || str == "VARIABLE")
 	{
-		// //test
-		// this->_var["a"] = 1.1f;
-		// this->_var["b"] = Complex<float>(1, 1);
-		// this->_var["c"] = Matrix<float>({{1.1, 2.2}, {3.3, 4.4}});
-		// this->_var["d"] = Matrix<Complex<float>>({{Complex<float>(1, 1), Complex<float>(2, 2)},
-		// 					{Complex<float>(3, 3), Complex<float>(4, 4)}});
-		// this->_var["e"] = Vector<float>({1.1, 2.2, 3.3});
-		// this->_var["f"] = Vector<Complex<float>>({Complex<float>(1, 1), Complex<float>(2, 2), Complex<float>(3, 3)});
-
-		std::cout << MAGENTA << "╔═════════════════════╗" << BLACK << std::endl;
-		std::cout << MAGENTA << "║    VARIABLE LIST    ║" << BLACK << std::endl;
-		std::cout << MAGENTA << "╚═════════════════════╝" << BLACK << std::endl;
-		if (this->_var.size() == 0)
-		{
-			std::cout << MAGENTA
-				<< "there is no variable assigned yet" << BLACK << std::endl;
-			return (1);
-		}
-		for (std::map<std::string, ValueSet>::iterator it = this->_var.begin();
-			it != this->_var.end(); it++)
-		{
-			std::cout << YELLOW << it->first << BLACK << std::endl;
-			print_variant_value(it->second);
-			std::cout << std::endl
-				<< MAGENTA << "═══════════════════════" << BLACK << std::endl;
-		}
 		return (1);
 	}
 	else if (str == "func" || str == "FUNC"
 		|| str == "function" || str == "function")
 	{
-		std::cout << MAGENTA << "╔═════════════════════╗" << BLACK << std::endl;
-		std::cout << MAGENTA << "║    FUNCTION LIST    ║" << BLACK << std::endl;
-		std::cout << MAGENTA << "╚═════════════════════╝" << BLACK << std::endl;
-		if (this->_func.size() == 0)
-		{
-			std::cout << MAGENTA
-				<< "there is no function assigned yet" << BLACK << std::endl;
-			return (1);
-		}
-		for (std::map<std::string, std::string>::iterator it = this->_func.begin();
-			it != this->_func.end(); it++)
-		{
-			std::cout << YELLOW << it->first << BLACK << std::endl;
-			std::cout << it->second;
-			std::cout << std::endl
-				<< MAGENTA << "═══════════════════════" << BLACK << std::endl;
-		}
 		return (1);
 	}
 	return (0);
@@ -355,7 +284,7 @@ int	Parse::check_brackets(int type, std::string str)
 
 int	Parse::check_vector_form(int type, std::string str)
 {
-	std::vector<std::string>	column;
+	std::vector<std::string>	vector;
 
 	str = str.substr(1, str.length() - 2);
 	if (str[str.length() - 1] == ',')
@@ -366,9 +295,9 @@ int	Parse::check_vector_form(int type, std::string str)
 			this->_err_msg = "invalid syntax: matrix form";
 		throw (this->_err_msg);
 	}
-	column = split(str, ',');
+	vector = split(str, ',');
 
-	if (!column.size())
+	if (!vector.size())
 	{
 		if (type == VECTOR)
 			this->_err_msg = "invalid syntax: vector form";
@@ -377,12 +306,9 @@ int	Parse::check_vector_form(int type, std::string str)
 		throw (this->_err_msg);
 	}
 
-	for (size_t i = 0; i < column.size(); i++)
+	for (size_t i = 0; i < vector.size(); i++)
 	{
-		convert_operator(column[i]);
-		if (column[i] == ""
-			|| !check_brackets(ROUND_BRACKET, column[i])
-			|| !check_operator(column[i]))
+		if (vector[i] == "")
 		{
 			if (type == VECTOR)
 				this->_err_msg = "invalid syntax: vector form";
@@ -390,8 +316,20 @@ int	Parse::check_vector_form(int type, std::string str)
 				this->_err_msg = "invalid syntax: matrix form";
 			throw (this->_err_msg);
 		}
+		for (size_t j = 0; j < vector[i].size(); j++)
+		{
+			if (!(vector[i][0] == '+' || vector[i][0] == '-'
+				|| is_element_of_set(this->_set_number, vector[i][j])))
+			{
+				if (type == VECTOR)
+					this->_err_msg = "invalid syntax: vector form";
+				else
+					this->_err_msg = "invalid syntax: matrix form";
+				throw (this->_err_msg);
+			}
+		}
 	}
-	return (column.size());
+	return (vector.size());
 }
 
 int	Parse::check_matrix_form(std::string str)
@@ -673,296 +611,15 @@ int	Parse::check_syntax(std::string &str)
 	return (1);
 }
 
-void	Parse::split_term(std::string str, TermOperatorPair &term_op)
-{
-	VectorTermPair			term_pair;
-	std::vector<std::string>	term_str;
-	std::vector<int>		op;
-	size_t				i = 0;
-
-	while (1)
-	{
-		i = 0;
-		while (!is_key_of_map(this->_operation, str[i])
-			&& str[i] != '?' && str[i] != '\0')
-			i++;
-		if (str[i] == '\0')
-			break ;
-		if (str.substr(0, i) != "")
-			term_str.push_back(str.substr(0, i));
-		if (str[i] != '?')
-			op.push_back(str[i]);
-		else
-			term_str.push_back(std::string(1, str[i]));
-		str = str.substr(i + 1, std::string::npos);
-	}
-	if (str != "")
-		term_str.push_back(str);
-
-	if (term_str[term_str.size() - 1] == "?")
-		term_str.pop_back();
-
-	term_pair.first = term_str;
-	term_pair.second = std::vector<ValueSet>(term_str.size());
-	term_op.first = term_pair;
-	term_op.second = op;
-}
-
-int	Parse::is_number_str(std::string str)
-{
-	size_t	i = 0;
-
-	while (i < str.length())
-	{
-		if (!(is_element_of_set(this->_set_number, str[i])
-			|| str[i] == '+' || str[i] == '-' || str[i] == '^'))
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-int	Parse::is_alpha_str(std::string str)
-{
-	size_t	i = 0;
-
-	while (i < str.length())
-	{
-		if (!is_element_of_set(this->_set_alphabet, str[i]))
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-int	Parse::is_valid_variable_name(std::string term)
-{
-	if (term == "i")
-	{
-		this->_err_msg = "variable name cannot not be \"i\"";
-		return (0);
-	}
-	if (!is_alpha_str(term))
-	{
-		this->_err_msg = "variable name should be consisted with letter(s)1";
-		return (0);
-	}
-	return (1);
-}
-
-std::string	Parse::is_element_of_func(std::string function_name)
-{
-	std::string	value = "";
-
-	if (this->_func.find(function_name) != this->_func.end())
-		value = this->_func[function_name];
-	return (value);
-}
-
-int	Parse::is_valid_function_name(std::string term)
-{
-	if (term.find("(") == std::string::npos
-		|| !check_brackets(ROUND_BRACKET, term)
-		|| term.find("(", term.find("(") + 1) != std::string::npos)
-		return (0);
-
-	std::string	function_name = term.substr(0, term.find("("));
-	std::string	variable = term.substr(term.find("(") + 1, term.length() - term.find("(") - 2);
-
-	std::cout << "funtion name: " << function_name << std::endl;
-	std::cout << "variable: " << variable << std::endl;
-
-	// /* check function name */
-	if (!is_alpha_str(function_name))
-	{
-		this->_err_msg = "function name should be consisted with letter(s)";
-		return (0);
-	}
-	// /* check variable */
-	if (is_number_str(variable) && variable != "i")
-	{
-		if (is_element_of_func(function_name) == "")
-		{
-			this->_err_msg = "function does not exists, cannot assign";
-			return (0);
-		}
-	}
-	else
-	{
-		if (!is_valid_variable_name(variable))
-			return (0);
-	}
-	return (1);
-}
-
-int	Parse::is_valid_term(std::string &term)
-{
-	if (is_number_str(term))
-		return (1);
-	if (is_valid_variable_name(term))
-		return (1);
-	if (is_valid_function_name(term))
-		return (1);
-	return (0);
-}
-
-void	Parse::set_type_number(std::string &term_str, ValueSet &term_value)
-{
-	if (!is_valid_term(term_str))
-	{
-		if (this->_err_msg != "")
-			this->_err_msg = "invalid term: " + this->_err_msg;
-		else
-			this->_err_msg = "invalid term";
-		throw (this->_err_msg);
-	}
-
-	if (is_number_str(term_str))
-	{
-		if (term_str[term_str.length() - 1] != 'i')
-			term_value.emplace<float>(atof(term_str.c_str()));
-		else
-		{
-			std::string	imag = term_str.substr(0, term_str.length() - 1);
-
-			if (term_str == "")
-				term_value.emplace<Complex<float>>(0, 1);
-			else
-				term_value.emplace<Complex<float>>(0, atof(imag.c_str()));
-		}
-
-		std::cout << "converted: value: ";
-		print_variant_value(term_value);
-		std::cout << std::endl;
-	}
-	else // variable or function(ex: a, b, f(x), f(1)..)
-	{
-		// variable: convert to value if variable already exists
-		// function:
-		//	- f(x): leave like this
-		//	- f(1): (after making calculating function)
-		//		check which type(number/vector/matrix), set type
-		std::cout << "do it later: it's variable, function(variable), or function(number)"
-			<< std::endl;
-		/* code */
-	}
-}
-
-void	Parse::set_type_of_term(TermOperatorPair &term_op)
-{
-	std::function<int(std::string)>	setValueType = [](std::string term_str)
-	{
-		if (term_str.find("[") != std::string::npos
-			&& term_str.find("]") != std::string::npos)
-		{
-			if (term_str.find("[", 1) != std::string::npos)
-				return (TYPE_MATRIX);
-			else
-				return (TYPE_VECTOR);
-		}
-		else
-			return (TYPE_NUMBER);
-		return (0);
-	};
-
-	VectorTermPair	term_pair = term_op.first;
-	int		type;
-
-	for (size_t i = 0; i < term_pair.first.size(); i++)
-	{
-		type = setValueType(term_pair.first[i]);
-		if (!type)
-		{
-			this->_err_msg = "cannot deciede value type";
-			throw (this->_err_msg);
-		}
-		if (type == TYPE_NUMBER)
-		{
-			std::cout << term_pair.first[i] << "\ntype: number" << std::endl;
-			set_type_number(term_pair.first[i], term_pair.second[i]);
-		}
-		else if (type == TYPE_VECTOR)
-		{
-			std::cout << term_pair.first[i] << "\ntype: vector" << std::endl;
-			/* code */
-		}
-		else
-		{
-			std::cout << term_pair.first[i] << "\ntype: matrix" << std::endl;
-			/* code */
-		}
-	}
-	std::cout << "----------------" << std::endl;
-}
-
-int	Parse::check_str(std::string &str)
+std::string	Parse::check_str(std::string &str)
 {
 	if (check_keyword(str))
-		return (1);
+		return ("");
 	if (!(is_equation_form(str) && check_invalid_character(str) && check_number(str)))
-		return (0);
+		return ("");
 
 	remove_space(str);
 	if (!check_syntax(str))
-		return (0);
-
-	//remove brackets
-
-
-	std::string		left_str = str.substr(0, str.find("="));
-	std::string		right_str = str.substr(str.find("=") + 1, std::string::npos);
-	TermOperatorPair	left_term_operator;
-	TermOperatorPair	right_term_operator;
-
-	split_term(left_str, left_term_operator);
-	split_term(right_str, right_term_operator);
-
-	set_type_of_term(left_term_operator);
-	set_type_of_term(right_term_operator);
-
-///////////////////
-	std::cout << "*******************************" << std::endl;
-	std::cout << "left term: " << left_str << std::endl;
-	for (size_t i = 0; i < left_term_operator.first.first.size(); i++)
-	{
-		std::cout << "term: " << left_term_operator.first.first[i] << std::endl;
-		if (i < left_term_operator.second.size())
-		{
-			std::cout << "op: " << std::endl;
-			if (left_term_operator.second[i] == OP_ADD)
-				std::cout << "\"+\"" << std::endl;
-			else if (left_term_operator.second[i] == OP_SUB)
-				std::cout << "\"-\"" << std::endl;
-			else if (left_term_operator.second[i] == OP_MUL)
-				std::cout << "\"*\"" << std::endl;
-			else if (left_term_operator.second[i] == OP_DIV)
-				std::cout << "\"/\"" << std::endl;
-			else if (left_term_operator.second[i] == OP_MODULO)
-				std::cout << "\"%\"" << std::endl;
-			else if (left_term_operator.second[i] == OP_MAT_MUL)
-				std::cout << "\"**\"" << std::endl;
-		}
-	}
-	std::cout << "right term: " << right_str << std::endl;
-	for (size_t i = 0; i < right_term_operator.first.first.size(); i++)
-	{
-		std::cout << "term: " << right_term_operator.first.first[i] << std::endl;
-		if (i < right_term_operator.second.size())
-		{
-			std::cout << "op: " << std::endl;
-			if (right_term_operator.second[i] == OP_ADD)
-				std::cout << "\"+\"" << std::endl;
-			else if (right_term_operator.second[i] == OP_SUB)
-				std::cout << "\"-\"" << std::endl;
-			else if (right_term_operator.second[i] == OP_MUL)
-				std::cout << "\"*\"" << std::endl;
-			else if (right_term_operator.second[i] == OP_DIV)
-				std::cout << "\"/\"" << std::endl;
-			else if (right_term_operator.second[i] == OP_MODULO)
-				std::cout << "\"%\"" << std::endl;
-			else if (right_term_operator.second[i] == OP_MAT_MUL)
-				std::cout << "\"**\"" << std::endl;
-		}
-	}
-	return (1);
+		return ("");
+	return (str);
 }

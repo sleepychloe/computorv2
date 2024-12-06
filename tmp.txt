@@ -179,7 +179,7 @@ in c, c++: result has same sign as the dividend
 =======================================================================
 
 
-
+<Parse.cpp>
 1. check equal(=) sign
 2. check invalid character
 3. check number, check float point
@@ -202,6 +202,7 @@ in c, c++: result has same sign as the dividend
 	- check operator(left, right term seperately)
 		-> skip round and square brackets
 	- convert every upper case alphabet to lower case
+<AST.cpp>
 (later: 7. remove bracket)
 8. split term, seperated by OP_OPERATOR
 9. set type of term

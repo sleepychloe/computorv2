@@ -199,7 +199,7 @@ int	Parse::check_number(std::string str)
 			if (space && ('0' <= str[i] && str[i] <= '9'))
 			{
 				this->_err_msg = "invalid syntax: no operator between numbers";
-				throw (this->_err_msg);
+				throw (this->_err_msg);1
 			}
 		}
 		i++;

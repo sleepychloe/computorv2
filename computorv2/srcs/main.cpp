@@ -6,12 +6,13 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:09:01 by yhwang            #+#    #+#             */
-/*   Updated: 2024/11/30 22:11:23 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/06 16:41:00 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../ReadLine/incs/ReadLine.hpp"
 #include "../incs/Parse.hpp"
+#include "../incs/AST.hpp"
 #include "../incs/Color.hpp"
 
 void	ignore_all_signal(void)
@@ -69,12 +70,23 @@ int	main(int argc, char **argv)
 			{
 				Parse	p;
 
-				p.parse_start(input);
-				std::cout << "input: " << input << std::endl;
+				input = p.parse_start(input);
+				std::cout << "input: " << input << std::endl;//
 			}
 			catch(std::string err_msg)
 			{
 				std::cerr << RED << "error: invalid input: " << err_msg << BLACK << std::endl;
+				continue ;
+			}
+
+			try
+			{
+				AST	ast;
+				ast.start_syntax_checking(input);
+			}
+			catch(std::string err_msg)
+			{
+				std::cerr << RED << "error: invalid term: " << err_msg << BLACK << std::endl;
 				continue ;
 			}
 		}
