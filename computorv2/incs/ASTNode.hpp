@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 16:42:13 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/06 19:43:48 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/06 22:03:33 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,14 @@
 enum class NodeType
 {
 	OPERATOR = 0,
-	TERM = 1
+	TERM = 1,
+
+	TERM_INVALID,
+	TERM_NUMBER,
+	TERM_VARIABLE,
+	TERM_FUNCTION,
+	TERM_VECTOR,
+	TERM_MATRIX
 };
 
 class ASTNode

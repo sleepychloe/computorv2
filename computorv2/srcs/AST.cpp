@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:22 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/06 20:14:31 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/07 00:40:48 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -345,39 +345,38 @@ int	AST::skip_round_bracket(std::string str, size_t i)
 	return (i);
 }
 
-int	AST::precedence(int op)
+int	AST::precedence(std::string op)
 {
-	if (op == OP_ADD || op == OP_SUB)
+	if (op == "+" || op == "-")
 		return (1);
-	if (op == OP_MUL || op == OP_DIV || op == OP_MODULO)
+	if (op == "*" || op == "/" || op == "%")
 		return (2);
-	if (op == OP_MAT_MUL)
+	if (op == "**")
 		return (3);
 	return (0);
 }
 
 void	AST::build_subtree(std::stack<std::unique_ptr<ASTNode>>& stack_node,
-				std::stack<int>& stack_op)
+				std::stack<std::string>& stack_op)
 {
 	std::unique_ptr<ASTNode>	right;
 	std::unique_ptr<ASTNode>	left;
-	int	op;
+	std::string	op;
 
 	op = stack_op.top();
 	stack_op.pop();
-
 	right = std::move(stack_node.top());
 	stack_node.pop();
 	left = std::move(stack_node.top());
 	stack_node.pop();
 
-	stack_node.push(std::make_unique<ASTNode>(std::string(1, op), std::move(left), std::move(right)));
+	stack_node.push(std::make_unique<ASTNode>(op, std::move(left), std::move(right)));
 }
 
-void	AST::split_term(std::string str, std::unique_ptr<ASTNode> &root)
+void	AST::build_tree(std::string str, std::unique_ptr<ASTNode> &root)
 {
 	std::stack<std::unique_ptr<ASTNode>>	stack_node;
-	std::stack<int>				stack_op;
+	std::stack<std::string>			stack_op;
 
 	size_t		start;
 	size_t		i = 0;
@@ -392,16 +391,16 @@ void	AST::split_term(std::string str, std::unique_ptr<ASTNode> &root)
 			end = skip_round_bracket(str, i);
 			sub_expression = str.substr(i + 1, end - i - 1);
 			std::unique_ptr<ASTNode> sub_root = nullptr;
-			split_term(sub_expression, sub_root);
+			build_tree(sub_expression, sub_root);
 			stack_node.push(std::move(sub_root));
 			i = end + 1;
-			continue ;
 		}
 		else if (is_key_of_map(this->_operation, str[i]))
 		{
-			while (!stack_op.empty() && precedence(stack_op.top()) >= precedence(str[i]))
+			while (!stack_op.empty()
+				&& precedence(stack_op.top()) >= precedence(this->_operation[str[i]]))
 				build_subtree(stack_node, stack_op);
-			stack_op.push(str[i]);
+			stack_op.push(this->_operation[str[i]]);
 			i++;
 		}
 		else
@@ -418,23 +417,22 @@ void	AST::split_term(std::string str, std::unique_ptr<ASTNode> &root)
 		build_subtree(stack_node, stack_op);
 
 	if (!stack_node.empty())
-	{
 		root = std::move(stack_node.top());
-		stack_node.pop();
-	}
 }
 
-// void printAST(const std::unique_ptr<ASTNode>& node, int depth = 0)
-// {
-//     if (!node) return;
+void	AST::visit_ast(std::unique_ptr<ASTNode> &node)
+{
+	if (!node)
+		return ;
 
-//     printAST(node->_right, depth + 1);
+	visit_ast(node->_left);
+	visit_ast(node->_right);
 
-//     std::string nodeType = (node->_type == NodeType::OPERATOR) ? "OPERATOR: " : "TERM: ";
-//     std::cout << std::string(depth * 2, ' ') << nodeType << node->_value << "\n";
-
-//     printAST(node->_left, depth + 1);
-// }
+	if (node->_type == NodeType::TERM)
+		std::cout << "TERM: " << node->_value << std::endl;
+	else if (node->_type == NodeType::OPERATOR)
+		std::cout << "OPERATOR: " << node->_value << std::endl;
+}
 
 int	AST::check_str(std::string str)
 {
@@ -443,10 +441,15 @@ int	AST::check_str(std::string str)
 	TermOperatorPair	left_term_operator;
 	TermOperatorPair	right_term_operator;
 
-	std::unique_ptr<ASTNode> root;
-	split_term(left_str, root);
-	// split_term(right_str);
+	std::unique_ptr<ASTNode> left_root = nullptr;
+	build_tree(left_str, left_root);
 
-	// printAST(root, 0);
+	std::unique_ptr<ASTNode> right_root = nullptr;
+	build_tree(right_str, right_root);
+
+	std::cout << "left AST----------" << std::endl;
+	visit_ast(left_root);
+	std::cout << std::endl << "right AST----------" << std::endl;
+	visit_ast(right_root);
 	return (1);
 }

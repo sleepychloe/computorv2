@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:25 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/06 19:17:29 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/07 00:37:20 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,10 +63,12 @@ private:
 	int				check_keyword(std::string str);
 
 	int				skip_round_bracket(std::string str, size_t i);
-	int				precedence(int op);
+	int				precedence(std::string op);
 	void				build_subtree(std::stack<std::unique_ptr<ASTNode>>& stack_node,
-						std::stack<int>& stack_op);
-	void				split_term(std::string str, std::unique_ptr<ASTNode> &root);
+						std::stack<std::string>& stack_op);
+	void				build_tree(std::string str, std::unique_ptr<ASTNode> &root);
+
+	void				visit_ast(std::unique_ptr<ASTNode> &node);
 
 	// int				is_number_str(std::string str);
 	// int				is_alpha_str(std::string str);
