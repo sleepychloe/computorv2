@@ -38,7 +38,6 @@ the primary goal is to develop a fully functional mathematical interpreter capab
 the interpreter must be robust, ensuring correct results and preventing errors during user interaction.
 
 <br>
-<br>
 
 ### Parsing with the class ReadLine
 
@@ -50,6 +49,7 @@ Click [here](https://github.com/sleepychloe/ReadLine) for more details about the
 
 <br>
 
+
 ### Abstract Syntax Tree(AST): A Core Data Structure
 
 To simplfy the process of parsing and evaluating mathematical expressions, computor v2 employs an Abstract Syntax Tree (AST) as its core data structure.
@@ -57,11 +57,13 @@ To simplfy the process of parsing and evaluating mathematical expressions, compu
 The AST is designed to handle complex expressions efficiently while maintaining a clear, hierarchical representation of operations and operands.
 
 
+
 #### What is Abstract Syntax Tree?
 
 An Abstract Syntax Tree (AST) is a hierarchical representation of the structure of code or expressions.
 
 Each node in the tree represents a construct occurring in the input, such as an operator, operand, or function call.
+
 
 
 #### Why Use an AST?
@@ -78,6 +80,7 @@ Each node in the tree represents a construct occurring in the input, such as an 
 	- easily adaptable to support additional features
 6. debuggability
 	- visualizing the tree structure simplifies debugging and understanding
+
 
 
 #### How the AST works in this code
@@ -100,6 +103,7 @@ this process provides a robust framework for evaluating mathematical and logical
 
 <br>
 
+
 ### `std::unique_ptr` and memory management in ASTNode
 
 #### What is `std::unique_ptr`?
@@ -107,6 +111,7 @@ this process provides a robust framework for evaluating mathematical and logical
 `std::unique_ptr` is a modern C++ smart pointer that ensures exclusive ownership of a dynamically allocated resource.
 
 It automatically deallocates the resource when it goes out of scope, eliminating the need for manual memory management.
+
 
 
 #### Key Characteristics
@@ -121,12 +126,14 @@ It automatically deallocates the resource when it goes out of scope, eliminating
 	+ supports user-defined cleanup logic
 
 
+
 #### Advantages of `std::unique_ptr`
 
 - safety: prevents memory leaks and double-deletion issues
 - simplicity: reduces complexity in destructors and copy constructors
 - modern practice: encourages clear ownership semantics
 - performance: negligible runtime overhead compared to raw pointers
+
 
 
 #### Code1: manual memory management with raw pointers
@@ -178,6 +185,7 @@ private:
 	+ prone to errors (memory leaks, dangling pointers)
 	+ requires explicit delete calls for cleanup
 	+ hard to maintain in larger, complex codebases
+
 
 
 #### Code2: using `std::unique_ptr`
