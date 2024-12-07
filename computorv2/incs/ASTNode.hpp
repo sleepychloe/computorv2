@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 16:42:13 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/06 22:03:33 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/07 19:42:54 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,17 @@
 #include <string>
 #include <memory>
 #include <utility>
+#include <variant>
+#include "../matrix/incs/Complex.hpp"
+#include "../matrix/incs/Vector.hpp"
+#include "../matrix/incs/Matrix.hpp"
+
+using	ValueSet = std::variant<float,
+				Complex<float>,
+				Matrix<float>,
+				Matrix<Complex<float>>,
+				Vector<float>,
+				Vector<Complex<float>>>;
 
 enum class NodeType
 {
@@ -32,21 +43,31 @@ enum class NodeType
 class ASTNode
 {
 public:
-	/* term */
-	ASTNode(std::string term); // term
-	/* operator */
+	ASTNode(std::string term);
 	ASTNode(std::string op, std::unique_ptr<ASTNode> left, std::unique_ptr<ASTNode> right);
 	ASTNode(const ASTNode& astnode);
 	ASTNode& operator=(const ASTNode& astnode);
 	~ASTNode();
 
-	NodeType			_type;
-	std::string			_value;
-	std::unique_ptr<ASTNode>	_left;
-	std::unique_ptr<ASTNode>	_right;
+	NodeType			get_type(void) const;
+	std::string			get_value_str(void) const;
+	ValueSet			get_value(void) const;
+	ASTNode*			get_left(void) const;
+	ASTNode*			get_right(void) const;
+
+	void				set_type(NodeType type);
+	void				set_value(ValueSet value);
+	void				set_left(std::unique_ptr<ASTNode> left);
+	void				set_right(std::unique_ptr<ASTNode> right);
 
 private:
 	ASTNode();
+
+	NodeType			_type;
+	std::string			_value_str;
+	ValueSet			_value;
+	std::unique_ptr<ASTNode>	_left;
+	std::unique_ptr<ASTNode>	_right;
 };
 
 #endif

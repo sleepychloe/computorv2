@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:25 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/07 00:37:20 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/07 19:47:52 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,8 @@ using	ValueSet = std::variant<float,
 				Matrix<Complex<float>>,
 				Vector<float>,
 				Vector<Complex<float>>>;
-using	VectorTermPair = std::pair<std::vector<std::string>, std::vector<ValueSet>>;
-using	TermOperatorPair = std::pair<VectorTermPair, std::vector<int>>;
+// using	VectorTermPair = std::pair<std::vector<std::string>, std::vector<ValueSet>>;
+// using	TermOperatorPair = std::pair<VectorTermPair, std::vector<int>>;
 
 class AST
 {
@@ -68,7 +68,8 @@ private:
 						std::stack<std::string>& stack_op);
 	void				build_tree(std::string str, std::unique_ptr<ASTNode> &root);
 
-	void				visit_ast(std::unique_ptr<ASTNode> &node);
+	void				visit_ast(ASTNode *node);
+	// float				calculate_ast(ASTNode *node);
 
 	// int				is_number_str(std::string str);
 	// int				is_alpha_str(std::string str);
@@ -93,8 +94,6 @@ private:
 	std::map<std::string, ValueSet>		_var;
 	std::map<std::string, std::string>	_func;
 
-	// TermOperatorPair			_left_term_operator;
-	// TermOperatorPair			_right_term_operator;
 	std::string				_err_msg;
 };
 

@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:22 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/07 00:40:48 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/07 19:48:32 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -359,46 +359,47 @@ int	AST::precedence(std::string op)
 void	AST::build_subtree(std::stack<std::unique_ptr<ASTNode>>& stack_node,
 				std::stack<std::string>& stack_op)
 {
-	std::unique_ptr<ASTNode>	right;
-	std::unique_ptr<ASTNode>	left;
-	std::string	op;
-
-	op = stack_op.top();
+	std::string	op = stack_op.top();
 	stack_op.pop();
-	right = std::move(stack_node.top());
+
+	std::unique_ptr<ASTNode>	right = std::move(stack_node.top());
 	stack_node.pop();
-	left = std::move(stack_node.top());
+	std::unique_ptr<ASTNode>	left = std::move(stack_node.top());
 	stack_node.pop();
 
 	stack_node.push(std::make_unique<ASTNode>(op, std::move(left), std::move(right)));
 }
 
-void	AST::build_tree(std::string str, std::unique_ptr<ASTNode> &root)
+void	AST::build_tree(std::string str, std::unique_ptr<ASTNode> &node)
 {
 	std::stack<std::unique_ptr<ASTNode>>	stack_node;
 	std::stack<std::string>			stack_op;
 
-	size_t		start;
-	size_t		i = 0;
+	std::string				sub_str;
+	std::unique_ptr<ASTNode>		sub_root;
 
-	size_t		end;
-	std::string	sub_expression;
-
+	size_t	start;
+	size_t	i = 0;
 	while (i < str.length())
 	{
 		if (str[i] == '(')
 		{
-			end = skip_round_bracket(str, i);
-			sub_expression = str.substr(i + 1, end - i - 1);
-			std::unique_ptr<ASTNode> sub_root = nullptr;
-			build_tree(sub_expression, sub_root);
+			start = i;
+			i = skip_round_bracket(str, i);
+			sub_str = str.substr(start + 1, i - start - 1);
+			sub_root = nullptr;
+			build_tree(sub_str, sub_root);
 			stack_node.push(std::move(sub_root));
-			i = end + 1;
+			i++;
 		}
 		else if (is_key_of_map(this->_operation, str[i]))
 		{
-			while (!stack_op.empty()
-				&& precedence(stack_op.top()) >= precedence(this->_operation[str[i]]))
+			if (!precedence(this->_operation[str[i]]))
+			{
+				this->_err_msg = "cannot set precedence of operation";
+				throw (this->_err_msg);
+			}
+			while (!stack_op.empty() && precedence(stack_op.top()) >= precedence(this->_operation[str[i]]))
 				build_subtree(stack_node, stack_op);
 			stack_op.push(this->_operation[str[i]]);
 			i++;
@@ -406,50 +407,91 @@ void	AST::build_tree(std::string str, std::unique_ptr<ASTNode> &root)
 		else
 		{
 			start = i;
-			while (i < str.length() && !is_key_of_map(this->_operation, str[i])
-				&& str[i] != '(' && str[i] != ')' && str[i] != '?')
+			while (str[i] != '\0' && str[i] != '?'
+				&& str[i] != '(' && !is_key_of_map(this->_operation, str[i]))
 				i++;
 			if (str.substr(start, i - start) != "" && str.substr(start, i - start) != "?")
-				stack_node.push(std::make_unique<ASTNode>(str.substr(start, i - start)));
+				stack_node.push(std::make_unique<ASTNode>(ASTNode(str.substr(start, i - start))));
 		}
 	}
+
 	while (!stack_op.empty())
 		build_subtree(stack_node, stack_op);
 
 	if (!stack_node.empty())
-		root = std::move(stack_node.top());
+		node = std::move(stack_node.top());
 }
 
-void	AST::visit_ast(std::unique_ptr<ASTNode> &node)
+void	AST::visit_ast(ASTNode *node)
 {
-	if (!node)
+	if (node == nullptr)
 		return ;
 
-	visit_ast(node->_left);
-	visit_ast(node->_right);
+	visit_ast(node->get_left());
+	visit_ast(node->get_right());
 
-	if (node->_type == NodeType::TERM)
-		std::cout << "TERM: " << node->_value << std::endl;
-	else if (node->_type == NodeType::OPERATOR)
-		std::cout << "OPERATOR: " << node->_value << std::endl;
+	if (node->get_type() == NodeType::TERM)
+		std::cout << "TERM: ";
+	else if (node->get_type() == NodeType::OPERATOR)
+		std::cout << "OP: ";
+	
+	std::cout << node->get_value_str() << std::endl;
 }
+
+// float AST::calculate_ast(ASTNode* node)
+// {
+//     if (!node)
+//         throw std::runtime_error("Invalid node in calculation");
+
+//     // If it's a TERM node (operand), convert its value_str to a float
+//     if (node->get_type() == NodeType::TERM) {
+//         try {
+//             return std::stof(node->get_value_str());
+//         } catch (...) {
+//             throw std::runtime_error("Invalid term value: " + node->get_value_str());
+//         }
+//     }
+
+//     // If it's an OPERATOR node, evaluate left and right children
+//     float left_value = calculate_ast(node->get_left());
+//     float right_value = calculate_ast(node->get_right());
+
+//     // Apply the operation based on value_str
+//     std::string op = node->get_value_str();
+//     if (op == "+")
+//         return left_value + right_value;
+//     else if (op == "-")
+//         return left_value - right_value;
+//     else if (op == "*")
+//         return left_value * right_value;
+//     else if (op == "/") {
+//         if (std::fabs(right_value) < 1e-6) // Check for near-zero values
+//             throw std::runtime_error("Division by zero");
+//         return left_value / right_value;
+//     } else if (op == "**")
+//         return std::pow(left_value, right_value);
+//     else
+//         throw std::runtime_error("Unsupported operation: " + op);
+// }
 
 int	AST::check_str(std::string str)
 {
 	std::string		left_str = str.substr(0, str.find("="));
 	std::string		right_str = str.substr(str.find("=") + 1, std::string::npos);
-	TermOperatorPair	left_term_operator;
-	TermOperatorPair	right_term_operator;
 
-	std::unique_ptr<ASTNode> left_root = nullptr;
+	std::unique_ptr<ASTNode>	left_root = nullptr;
+	std::unique_ptr<ASTNode>	right_root = nullptr;
+
 	build_tree(left_str, left_root);
-
-	std::unique_ptr<ASTNode> right_root = nullptr;
 	build_tree(right_str, right_root);
 
 	std::cout << "left AST----------" << std::endl;
-	visit_ast(left_root);
+	visit_ast(left_root.get());
 	std::cout << std::endl << "right AST----------" << std::endl;
-	visit_ast(right_root);
+	visit_ast(right_root.get());
+
+	// std::cout << std::endl << "calc----------" << std::endl;
+	// float left_value = calculate_ast(left_root.get());
+	// std::cout << "calc: " << left_value << std::endl;
 	return (1);
 }
