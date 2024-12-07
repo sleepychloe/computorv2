@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/06 15:23:43 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/08 00:11:24 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -489,61 +489,6 @@ void	Parse::convert_operator(std::string &str)
 	str = new_str;
 }
 
-int	Parse::check_operator(std::string str)
-{
-	size_t			i = 0;
-
-	if (is_key_of_map(this->_operation, str[0])
-		|| is_key_of_map(this->_operation, str[str.length() - 1]))
-	{
-		this->_err_msg = "invalid syntax: operator";
-		throw (this->_err_msg);
-	}
-
-	while (i < str.length())
-	{
-		if (is_key_of_map(this->_operation, str[i]))
-		{
-			if (str[i + 1] && is_key_of_map(this->_operation, str[i + 1]))
-			{
-				this->_err_msg = "invalid syntax: operator";
-				throw (this->_err_msg);
-			}
-		}
-		else if (str[i] == '[' || str[i] == '(')
-		{
-			if (str[i] == '(')
-			{
-				// function name
-				if (i != 0 && is_element_of_set(this->_set_alphabet, str[i - 1]))
-				{
-					i = skip_bracket(ROUND_BRACKET, str, i) + 1;
-					continue ;
-				}
-			}
-			if (i != 0 && !is_key_of_map(this->_operation, str[i - 1])
-				&& !(str[i] == '(' && str[i - 1] == '^'))
-			{
-				this->_err_msg = "invalid syntax: operator";
-				throw (this->_err_msg);
-			}
-			if (str[i] == '[')
-				i = skip_bracket(SQUARE_BRACKET, str, i) + 1;
-			else
-				i = skip_bracket(ROUND_BRACKET, str, i) + 1;
-			
-			if (str[i] != '\0' && !is_key_of_map(this->_operation, str[i])
-				&& !(str[i - 1] == ')' && str[i] == '^'))
-			{
-				this->_err_msg = "invalid syntax: operator";
-				throw (this->_err_msg);
-			}
-		}
-		i++;
-	}
-	return (1);
-}
-
 int	Parse::check_caret(std::string str)
 {
 	size_t	i = 0;
@@ -582,6 +527,126 @@ int	Parse::check_caret(std::string str)
 	return (1);
 }
 
+int	Parse::check_operator(std::string str)
+{
+	std::string	sub_str = "";
+	size_t		i = 0;
+
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (is_key_of_map(this->_operation, str[i])
+		|| is_key_of_map(this->_operation, str[str.length() - 1]))
+	{
+		this->_err_msg = "invalid syntax: operator";
+		throw (this->_err_msg);
+	}
+	while (i < str.length())
+	{
+		if (str[i] == '(')
+		{
+			std::string sub_str = str.substr(i + 1, skip_bracket(ROUND_BRACKET, str, i) - i - 1);
+			if (!check_operator(sub_str))
+			{
+				this->_err_msg = "invalid syntax: operator";
+				throw (this->_err_msg);
+			}
+			i = skip_bracket(ROUND_BRACKET, str, i) + 1;
+		}
+		else if (is_key_of_map(this->_operation, str[i]))
+		{
+			if (str[i + 1] && is_key_of_map(this->_operation, str[i + 1]))
+			{
+				this->_err_msg = "invalid syntax: operator";
+				throw (this->_err_msg);
+			}
+		}
+		i++;
+	}
+	return (1);
+}
+
+int	Parse::check_operator_round_brackets(std::string str)
+{
+	std::string	front;
+	std::string	back;
+	size_t		start;
+	size_t		end;
+	size_t		i;
+
+	while (1)
+	{
+		if (str.find(")") == std::string::npos)
+			return (1);
+		i = 0;
+		while (str[i] != ')')
+			i++;
+		end = i;
+		while (str[i] != '(')
+			i--;
+		start = i;
+
+		front = str.substr(0, start);
+		back = str.substr(end + 1, std::string::npos);
+		if ((front != "" && front[front.length() - 1] != '\0')
+			&& !(front[front.length() - 1] == '('
+				|| is_key_of_map(this->_operation, front[front.length() - 1])
+				|| front[front.length() - 1] == '^'
+				|| is_element_of_set(this->_set_alphabet, front[front.length() - 1])))
+		{
+			this->_err_msg = "invalid syntax: operator near round brackets";
+			throw (this->_err_msg);
+		}
+		if ((back != "" && back[0] != '\0')
+			&& !(back[0] == ')' || is_key_of_map(this->_operation, back[0]) || back[0] == '^'))
+		{
+			this->_err_msg = "invalid syntax: operator near round brackets";
+			throw (this->_err_msg);
+		}
+		str = front + "1" + back;
+		continue ;
+	}
+	return (1);
+}
+
+int	Parse::check_operator_square_brackets(std::string str)
+{
+	std::string	front;
+	std::string	back;
+	size_t		start;
+	size_t		end;
+	size_t		i;
+
+	while (1)
+	{
+		if (str.find("[") == std::string::npos)
+			return (1);
+		i = 0;
+		while (str[i] != '[')
+			i++;
+		start = i--;
+		end = skip_bracket(SQUARE_BRACKET, str, i + 1);
+
+		front = str.substr(0, start);
+		back = str.substr(end + 1, std::string::npos);
+		if ((front != "" && front[front.length() - 1] != '\0')
+			&& !(front[front.length() - 1] == '('
+				|| is_key_of_map(this->_operation, front[front.length() - 1])))
+		{
+			this->_err_msg = "invalid syntax: operator near square brackets";
+			throw (this->_err_msg);
+		}
+		if ((back != "" && back[0] != '\0')
+			&& !(back[0] == ')' || is_key_of_map(this->_operation, back[0])))
+		{
+			this->_err_msg = "invalid syntax: operator near square brackets";
+			throw (this->_err_msg);
+		}
+		str = front + "1" + back;
+		continue ;
+	}
+	return (1);
+}
+
 int	Parse::check_syntax(std::string &str)
 {
 	std::string	left_str = str.substr(0, str.find("="));
@@ -599,7 +664,11 @@ int	Parse::check_syntax(std::string &str)
 	str = left_str + "=" + right_str;
 
 	if (!(check_caret(left_str) && check_caret(right_str)
-		&& check_operator(left_str) && check_operator(right_str)))
+		&& check_operator(left_str) && check_operator(right_str)
+		&& check_operator_round_brackets(left_str)
+		&& check_operator_round_brackets(right_str)
+		&& check_operator_square_brackets(left_str)
+		&& check_operator_square_brackets(right_str)))
 		return (0);
 
 	size_t	i = 0;

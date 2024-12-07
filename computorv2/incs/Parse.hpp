@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/06 14:13:09 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/07 23:19:45 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,10 @@ private:
 	void				convert_operator(std::string &str);
 
 	int				check_question_mark(std::string str);
-	int				check_operator(std::string str);
 	int				check_caret(std::string str);
+	int				check_operator(std::string str);
+	int				check_operator_round_brackets(std::string str);
+	int				check_operator_square_brackets(std::string str);
 	int				check_syntax(std::string &str);
 
 	std::string			check_str(std::string &str);
