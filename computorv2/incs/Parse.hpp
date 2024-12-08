@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/07 23:19:45 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/08 09:29:26 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@
 # define OP_MUL			3 /* * */
 # define OP_DIV			4 /* / */
 # define OP_MODULO		5 /* % */
-# define OP_MAT_MUL		6 /* ** */
+# define OP_POWER		6 /* ^ */
+# define OP_MAT_MUL		7 /* ** */
 
 class	Parse
 {
@@ -59,6 +60,9 @@ private:
 	int				check_number(std::string str);
 	void				remove_space(std::string &str);
 
+	int				check_question_mark(std::string str);
+	int				check_caret(std::string str);
+
 	int				check_brackets(int type, std::string str);
 
 	int				check_vector_form(int type, std::string str);
@@ -69,8 +73,6 @@ private:
 	char				do_convert(std::string str, size_t &i);
 	void				convert_operator(std::string &str);
 
-	int				check_question_mark(std::string str);
-	int				check_caret(std::string str);
 	int				check_operator(std::string str);
 	int				check_operator_round_brackets(std::string str);
 	int				check_operator_square_brackets(std::string str);
@@ -81,7 +83,7 @@ private:
 	std::unordered_set<char>		_set_alphabet; // 'a' to 'z', 'A' to 'Z'
 	std::unordered_set<char>		_set_number; // '0' to '9', '.', 'i', 'I'
 	std::unordered_set<char>		_set_vector_matrix; // '[', ']', ',', ';'
-	std::unordered_set<char>		_set_operation; // '+', '-', '*', '/', '%'
+	std::unordered_set<char>		_set_operation; // '+', '-', '*', '/', '%', '^'
 	std::unordered_set<char>		_set_other; // '(', ')','^', '=', '?'
 	std::unordered_set<char>		_set_space; // ' ', '\t'
 	std::unordered_map<int, std::string>	_operation; // {OP_OPERATOR, "operator"}

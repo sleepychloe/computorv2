@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/08 00:11:24 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/08 09:13:22 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,11 @@ Parse::Parse(): _err_msg("")
 			'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 	this->_set_number = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', 'i', 'I'};
 	this->_set_vector_matrix = { '[', ']', ',', ';'};
-	this->_set_operation = {'+', '-', '*', '/', '%'};
+	this->_set_operation = {'+', '-', '*', '/', '%', '^'};
 	this->_set_other = {'(', ')','^', '=', '?'};
 	this->_set_space = {' ', '\t'};
-	this->_operation = {{OP_ADD, "+"}, {OP_SUB, "-"}, {OP_MUL, "*"},
-			{OP_DIV, "/"}, {OP_MODULO, "%"}, {OP_MAT_MUL, "**"}};
+	this->_operation = {{OP_ADD, "+"}, {OP_SUB, "-"}, {OP_MUL, "*"}, {OP_DIV, "/"},
+				{OP_MODULO, "%"}, {OP_POWER, "^"}, {OP_MAT_MUL, "**"}};
 }
 
 Parse::Parse(const Parse& parse)
@@ -239,6 +239,51 @@ int	Parse::check_question_mark(std::string str)
 	return (1);
 }
 
+int	Parse::check_caret(std::string str)
+{
+	size_t	i = 0;
+
+	if (str[0] == '^' || str[str.length() - 1] == '^')
+	{
+		this->_err_msg = "invalid syntax: caret(^)";
+		throw(this->_err_msg);
+	}
+	while (i < str.length())
+	{
+		if (str[i] == '^')
+		{
+			/* base: num or (num) */
+			if (!(std::isdigit(str[i - 1])
+				|| is_element_of_set(this->_set_alphabet, str[i - 1]) || str[i - 1] == ')'))
+			{
+				this->_err_msg = "invalid syntax: caret(^)";
+				throw(this->_err_msg);
+			}
+			i++;
+			/* power: (+-int) */
+			if (str[i] == '(')
+			{
+				i++;
+				if (str[i] == '+' || str[i] == '-')
+					i++;
+			}
+			while (str[i] == '('
+				|| std::isdigit(str[i]) || is_element_of_set(this->_set_alphabet, str[i])
+				|| str[i] == ')')
+				i++;
+			if (str[i] == '\0')
+				return (1);
+			if (str[i - 1] == '^' || str[i] == '^' || !is_element_of_set(this->_set_operation, str[i]))
+			{
+				this->_err_msg = "invalid syntax: caret(^)";
+				throw(this->_err_msg);
+			}
+		}
+		i++;
+	}
+	return (1);
+}
+
 int	Parse::check_brackets(int type, std::string str)
 {
 	std::stack<char>	stack;
@@ -438,7 +483,8 @@ int	Parse::skip_vector_matrix(std::string str, std::string &new_str, size_t i)
 char	Parse::do_convert(std::string str, size_t &i)
 {
 	std::unordered_map<char, int> op = {{'+', OP_ADD}, {'-', OP_SUB},
-					{'*', OP_MUL}, {'/', OP_DIV}, {'%', OP_MODULO}};
+					{'*', OP_MUL}, {'/', OP_DIV},
+					{'%', OP_MODULO}, {'^', OP_POWER}};
 	if (str[i] == '+' || str[i] == '-')
 	{
 		if (str[i - 1] && (str[i - 1] == '(' || str[i - 1] == '^'
@@ -487,44 +533,6 @@ void	Parse::convert_operator(std::string &str)
 		i++;
 	}
 	str = new_str;
-}
-
-int	Parse::check_caret(std::string str)
-{
-	size_t	i = 0;
-
-	if (str[0] == '^' || str[str.length() - 1] == '^')
-	{
-		this->_err_msg = "invalid syntax: caret(^)";
-		throw(this->_err_msg);
-	}
-	while (i < str.length())
-	{
-		if (str[i] == '^')
-		{
-			/* base: num or (num) */
-			if (!(std::isdigit(str[i - 1])
-				|| is_element_of_set(this->_set_alphabet, str[i - 1]) || str[i - 1] == ')'))
-			{
-				this->_err_msg = "invalid syntax: caret(^)";
-				throw(this->_err_msg);
-			}
-			i++;
-			/* power: (+-int) */
-			while (str[i] == '(' || str[i] == ')' || str[i] == '+' || str[i] == '-'
-				|| std::isdigit(str[i]) || is_element_of_set(this->_set_alphabet, str[i]))
-				i++;
-			if (str[i] == '\0')
-				return (1);
-			if (str[i - 1] == '^' || str[i] == '^' || !is_key_of_map(this->_operation, str[i]))
-			{
-				this->_err_msg = "invalid syntax: caret(^)";
-				throw(this->_err_msg);
-			}
-		}
-		i++;
-	}
-	return (1);
 }
 
 int	Parse::check_operator(std::string str)
@@ -590,14 +598,13 @@ int	Parse::check_operator_round_brackets(std::string str)
 		if ((front != "" && front[front.length() - 1] != '\0')
 			&& !(front[front.length() - 1] == '('
 				|| is_key_of_map(this->_operation, front[front.length() - 1])
-				|| front[front.length() - 1] == '^'
 				|| is_element_of_set(this->_set_alphabet, front[front.length() - 1])))
 		{
 			this->_err_msg = "invalid syntax: operator near round brackets";
 			throw (this->_err_msg);
 		}
 		if ((back != "" && back[0] != '\0')
-			&& !(back[0] == ')' || is_key_of_map(this->_operation, back[0]) || back[0] == '^'))
+			&& !(back[0] == ')' || is_key_of_map(this->_operation, back[0])))
 		{
 			this->_err_msg = "invalid syntax: operator near round brackets";
 			throw (this->_err_msg);
@@ -653,6 +660,7 @@ int	Parse::check_syntax(std::string &str)
 	std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
 
 	if (!(check_question_mark(str) 
+		&& check_caret(left_str) && check_caret(right_str)
 		&& check_brackets(ROUND_BRACKET, left_str)
 		&& check_brackets(ROUND_BRACKET, right_str)
 		&& check_brackets(SQUARE_BRACKET, left_str)
@@ -663,8 +671,7 @@ int	Parse::check_syntax(std::string &str)
 	convert_operator(right_str);
 	str = left_str + "=" + right_str;
 
-	if (!(check_caret(left_str) && check_caret(right_str)
-		&& check_operator(left_str) && check_operator(right_str)
+	if (!(check_operator(left_str) && check_operator(right_str)
 		&& check_operator_round_brackets(left_str)
 		&& check_operator_round_brackets(right_str)
 		&& check_operator_square_brackets(left_str)

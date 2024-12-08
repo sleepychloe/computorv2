@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:25 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/07 19:47:52 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/08 08:46:01 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@
 # define OP_MUL			3 /* * */
 # define OP_DIV			4 /* / */
 # define OP_MODULO		5 /* % */
-# define OP_MAT_MUL		6 /* ** */
+# define OP_POWER		6 /* ^ */
+# define OP_MAT_MUL		7 /* ** */
 
 # define TERM_INVALID		0
 # define TERM_NUMBER		1
@@ -45,8 +46,6 @@ using	ValueSet = std::variant<float,
 				Matrix<Complex<float>>,
 				Vector<float>,
 				Vector<Complex<float>>>;
-// using	VectorTermPair = std::pair<std::vector<std::string>, std::vector<ValueSet>>;
-// using	TermOperatorPair = std::pair<VectorTermPair, std::vector<int>>;
 
 class AST
 {
@@ -93,6 +92,9 @@ private:
 
 	std::map<std::string, ValueSet>		_var;
 	std::map<std::string, std::string>	_func;
+
+	std::unique_ptr<ASTNode>		_left_root;
+	std::unique_ptr<ASTNode>		_right_root;
 
 	std::string				_err_msg;
 };
