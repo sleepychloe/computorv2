@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:25 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/08 08:46:01 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/08 16:54:31 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,9 @@ private:
 	int				precedence(std::string op);
 	void				build_subtree(std::stack<std::unique_ptr<ASTNode>>& stack_node,
 						std::stack<std::string>& stack_op);
+
+	int				is_part_of_function_expression(std::string str, int i);
+	std::unique_ptr<ASTNode>	handle_brackets(std::string str, size_t &i);
 	void				build_tree(std::string str, std::unique_ptr<ASTNode> &root);
 
 	void				visit_ast(ASTNode *node);
