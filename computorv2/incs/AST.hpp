@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:25 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/08 16:54:31 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/08 17:57:50 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,16 @@ private:
 
 	int				skip_round_bracket(std::string str, size_t i);
 	int				precedence(std::string op);
-	void				build_subtree(std::stack<std::unique_ptr<ASTNode>>& stack_node,
-						std::stack<std::string>& stack_op);
+	void				build_subtree(std::stack<std::unique_ptr<ASTNode>> &stack_node,
+							std::stack<std::string> &stack_op);
 
-	int				is_part_of_function_expression(std::string str, int i);
-	std::unique_ptr<ASTNode>	handle_brackets(std::string str, size_t &i);
+	int				is_part_of_function_expression(std::string str, size_t i);
+	int				handle_brackets(std::stack<std::unique_ptr<ASTNode>> &stack_node,
+							std::string str, size_t i);
+	int				handle_operator(std::stack<std::unique_ptr<ASTNode>> &stack_node,
+							std::stack<std::string> &stack_op,
+							char c, size_t i);
+	std::string			get_term(std::string str, size_t &i);
 	void				build_tree(std::string str, std::unique_ptr<ASTNode> &root);
 
 	void				visit_ast(ASTNode *node);

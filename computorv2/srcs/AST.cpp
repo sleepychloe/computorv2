@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:22 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/08 16:55:04 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/08 17:58:07 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -360,8 +360,8 @@ int	AST::precedence(std::string op)
 	return (0);
 }
 
-void	AST::build_subtree(std::stack<std::unique_ptr<ASTNode>>& stack_node,
-				std::stack<std::string>& stack_op)
+void	AST::build_subtree(std::stack<std::unique_ptr<ASTNode>> &stack_node,
+				std::stack<std::string> &stack_op)
 {
 	std::string	op = stack_op.top();
 	stack_op.pop();
@@ -374,68 +374,83 @@ void	AST::build_subtree(std::stack<std::unique_ptr<ASTNode>>& stack_node,
 	stack_node.push(std::make_unique<ASTNode>(op, std::move(left), std::move(right)));
 }
 
-int	AST::is_part_of_function_expression(std::string str, int i)
+int	AST::is_part_of_function_expression(std::string str, size_t i)
 {
 	if (i > 0 && is_element_of_set(this->_set_alphabet, str[i - 1]))
 		return (1);
 	return (0);
 }
 
-std::unique_ptr<ASTNode>	AST::handle_brackets(std::string str, size_t &i)
+int	AST::handle_brackets(std::stack<std::unique_ptr<ASTNode>> &stack_node,
+				std::string str, size_t i)
 {
-	std::string			sub_str;
+	std::string			str_bracket;
 	std::unique_ptr<ASTNode>	sub_root = nullptr;
-	size_t		start;
 	size_t		end;
 
-	start = i;
 	end = skip_round_bracket(str, i);
-	sub_str = str.substr(start + 1, end - start - 1);
-	build_tree(sub_str, sub_root);
-	i = end + 1;
-	return (sub_root);
+	str_bracket = str.substr(i + 1, end - i - 1);
+	build_tree(str_bracket, sub_root);
+	stack_node.push(std::move(sub_root));
+	return (end + 1);
+}
+
+int	AST::handle_operator(std::stack<std::unique_ptr<ASTNode>> &stack_node,
+				std::stack<std::string> &stack_op, char c, size_t i)
+{
+	std::string	op = this->_operation[c];
+
+	if (!precedence(op))
+	{
+		this->_err_msg = "cannot set precedence of operation";
+		throw (this->_err_msg);
+	}
+	while (!stack_op.empty() && precedence(stack_op.top()) >= precedence(op))
+		build_subtree(stack_node, stack_op);
+	stack_op.push(op);
+	std::cout << "op: " << op << std::endl;//
+	return (i + 1);
+}
+
+std::string	AST::get_term(std::string str, size_t &i)
+{
+	size_t		start = i;
+	std::string	term;
+
+	while (!(str[i] == '\0' || str[i] == '?'
+		|| (str[i] == '(' && !is_part_of_function_expression(str, i))
+		|| is_key_of_map(this->_operation, str[i])))
+		i++;
+	term = str.substr(start, i - start);
+	if (term == "" || term[0] == '\0' || term == "?")
+		return ("");
+	std::cout << "term: " << term << std::endl;//
+	return (term);
 }
 
 void	AST::build_tree(std::string str, std::unique_ptr<ASTNode> &node)
 {
 	std::stack<std::unique_ptr<ASTNode>>	stack_node;
 	std::stack<std::string>			stack_op;
-	size_t	start;
-	size_t	i = 0;
+	std::string	term;
+	size_t		i = 0;
 
 	while (i < str.length())
 	{
 		if (str[i] == '(' && !is_part_of_function_expression(str, i))
-			stack_node.push(handle_brackets(str, i));
+			i = handle_brackets(stack_node, str, i);
 
 		if (is_key_of_map(this->_operation, str[i]))
-		{
-			if (!precedence(this->_operation[str[i]]))
-			{
-				this->_err_msg = "cannot set precedence of operation";
-				throw (this->_err_msg);
-			}
-			while (!stack_op.empty() && precedence(stack_op.top()) >= precedence(this->_operation[str[i]]))
-				build_subtree(stack_node, stack_op);
-			stack_op.push(this->_operation[str[i]]);
-			std::cout << "op: " << this->_operation[str[i]] << std::endl;//
-			i++;
-		}
+			i = handle_operator(stack_node, stack_op, str[i], i);
 		else
 		{
-			start = i;
-			while (!(str[i] == '\0' || str[i] == '?'
-				|| (str[i] == '(' && !is_part_of_function_expression(str, i))
-				|| is_key_of_map(this->_operation, str[i])))
-				i++;
-			if (str.substr(start, i - start) == "" || str.substr(start, i - start)[0] == '\0'
-				|| str.substr(start, i - start) == "?")
+			term = get_term(str, i);
+			if (term == "")
 				break ;
-			stack_node.push(std::make_unique<ASTNode>(ASTNode(str.substr(start, i - start))));
-			std::cout << "term: " << str.substr(start, i - start) << std::endl;
+			//check term here
+			stack_node.push(std::make_unique<ASTNode>(ASTNode(term)));
 		}
 	}
-
 	while (!stack_op.empty())
 		build_subtree(stack_node, stack_op);
 
