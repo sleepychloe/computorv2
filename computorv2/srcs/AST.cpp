@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:22 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/09 15:46:02 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/09 15:49:17 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,95 +131,6 @@ int	AST::check_keyword(std::string str)
 	}
 	return (0);
 }
-
-// ValueSet	AST::convert_to_value_set(std::string term_str)
-// {
-// 	ValueSet	res;
-
-// 	if (term_str[term_str.length() - 1] != 'i')
-// 		res.emplace<float>(atof(term_str.c_str()));
-// 	else
-// 	{
-// 		std::string	imag = term_str.substr(0, term_str.length() - 1);
-
-// 		if (term_str == "")
-// 			res.emplace<Complex<float>>(0, 1);
-// 		else
-// 			res.emplace<Complex<float>>(0, atof(imag.c_str()));
-// 	}
-// 	return (res);
-// }
-
-// // Complex<float>	AST::string_to_complex(std::string nb_str)
-// // {
-	
-// // 	// return ();
-// // }
-
-// void	AST::set_type_vector(std::string &term_str, ValueSet &term_value)
-// {
-// 	std::vector<std::string>	vector = split(term_str, ',');
-
-// 	for (size_t i = 0; i < vector.size(); i++)
-// 	{
-// 		if (!is_number_str(vector[i]))
-// 		{
-// 			this->_err_msg = "invalid term: vector";
-// 			throw (this->_err_msg);
-// 		}
-// 		//string_to_complex()
-// 		(void)term_value;
-// 	}
-// }
-
-// void	AST::set_type_of_term(TermOperatorPair &term_op)
-// {
-// 	VectorTermPair	term_pair = term_op.first;
-// 	int		type;
-
-// 	for (size_t i = 0; i < term_pair.first.size(); i++)
-// 	{
-// 		type = check_valid_term(term_pair.first[i]);
-// 		if (type == TERM_INVALID)
-// 		{
-// 			this->_err_msg = "cannot deciede value type";
-// 			throw (this->_err_msg);
-// 		}
-
-// 		if (type == TERM_NUMBER)
-// 		{
-// 			term_pair.second[i] = convert_to_value_set(term_pair.first[i]);
-// 			std::cout << "converted: value: ";
-// 			print_variant_value(term_pair.second[i]);
-// 			std::cout << std::endl;
-			
-// 		}
-// 		else if (type == TERM_VARIBLE)
-// 		{
-// 			// variable: convert to value if variable already exists
-// 			std::cout << "do it later: it's variable"
-// 				<< std::endl;
-// 		}
-// 		else if (type == TERM_FUNCTION)
-// 		{
-// 			// function:
-// 			//	- f(x): leave like this
-// 			//	- f(1): (after making calculating function)
-// 			//		check which type(number/vector/matrix), set type
-// 			// set value after converting
-// 			std::cout << "do it later: it's function(variable), or function(number)"
-// 				<< std::endl;
-// 		}
-// 		else if (type == TERM_VECTOR)
-// 			set_type_vector(term_pair.first[i], term_pair.second[i]);
-// 		else
-// 		{
-// 			std::cout << term_pair.first[i] << "\ntype: matrix" << std::endl;
-// 			/* code */
-// 		}
-// 	}
-// 	std::cout << "----------------" << std::endl;
-// }
 
 int	AST::skip_round_bracket(std::string str, size_t i)
 {
@@ -504,6 +415,7 @@ void	AST::visit_ast(ASTNode *node)
 	visit_ast(node->get_left());
 	visit_ast(node->get_right());
 
+	//set ValueSet type value in this function
 	if (node->get_type() != NodeType::OPERATOR)
 		std::cout << "TERM: ";
 	else
@@ -511,6 +423,65 @@ void	AST::visit_ast(ASTNode *node)
 	
 	std::cout << node->get_value_str() << std::endl;
 }
+
+int	AST::check_str(std::string str)
+{
+	std::string		left_str = str.substr(0, str.find("="));
+	std::string		right_str = str.substr(str.find("=") + 1, std::string::npos);
+
+	this->_left_root = nullptr;
+	this->_right_root = nullptr;
+
+	build_tree(left_str, this->_left_root);
+	build_tree(right_str, this->_right_root);
+
+	// std::cout << "left AST----------" << std::endl;
+	// visit_ast(this->_left_root.get());
+	// std::cout << std::endl << "right AST----------" << std::endl;
+	// visit_ast(this->_right_root.get());
+	return (1);
+}
+
+//--------------------------------------------------------------------------------
+// ValueSet	AST::convert_to_value_set(std::string term_str)
+// {
+// 	ValueSet	res;
+
+// 	if (term_str[term_str.length() - 1] != 'i')
+// 		res.emplace<float>(atof(term_str.c_str()));
+// 	else
+// 	{
+// 		std::string	imag = term_str.substr(0, term_str.length() - 1);
+
+// 		if (term_str == "")
+// 			res.emplace<Complex<float>>(0, 1);
+// 		else
+// 			res.emplace<Complex<float>>(0, atof(imag.c_str()));
+// 	}
+// 	return (res);
+// }
+
+// // Complex<float>	AST::string_to_complex(std::string nb_str)
+// // {
+	
+// // 	// return ();
+// // }
+
+// void	AST::set_type_vector(std::string &term_str, ValueSet &term_value)
+// {
+// 	std::vector<std::string>	vector = split(term_str, ',');
+
+// 	for (size_t i = 0; i < vector.size(); i++)
+// 	{
+// 		if (!is_number_str(vector[i]))
+// 		{
+// 			this->_err_msg = "invalid term: vector";
+// 			throw (this->_err_msg);
+// 		}
+// 		//string_to_complex()
+// 		(void)term_value;
+// 	}
+// }
 
 // float AST::calculate_ast(ASTNode* node)
 // {
@@ -547,25 +518,3 @@ void	AST::visit_ast(ASTNode *node)
 //     else
 //         throw std::runtime_error("Unsupported operation: " + op);
 // }
-
-int	AST::check_str(std::string str)
-{
-	std::string		left_str = str.substr(0, str.find("="));
-	std::string		right_str = str.substr(str.find("=") + 1, std::string::npos);
-
-	this->_left_root = nullptr;
-	this->_right_root = nullptr;
-
-	build_tree(left_str, this->_left_root);
-	build_tree(right_str, this->_right_root);
-
-	// std::cout << "left AST----------" << std::endl;
-	// visit_ast(this->_left_root.get());
-	// std::cout << std::endl << "right AST----------" << std::endl;
-	// visit_ast(this->_right_root.get());
-
-	// std::cout << std::endl << "calc----------" << std::endl;
-	// float left_value = calculate_ast(left_root.get());
-	// std::cout << "calc: " << left_value << std::endl;
-	return (1);
-}

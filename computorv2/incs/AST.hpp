@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:25 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/09 15:15:32 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/09 15:50:16 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,21 +72,18 @@ private:
 	int				is_valid_variable_name(std::string term);
 	std::string			is_element_of_func(std::string function_name);
 	int				is_valid_function_name(std::string term);
-
 	NodeType			set_type_of_term(std::string str);
 	NodeType			check_term(std::string &term);
+
 	void				build_tree(std::string str, std::unique_ptr<ASTNode> &root);
 
 	void				visit_ast(ASTNode *node);
-	// float				calculate_ast(ASTNode *node);
+	int				check_str(std::string str);
 
-	
 	// ValueSet			convert_to_value_set(std::string term_str);
-	// void				set_type_number(std::string &term_str, ValueSet &term_value);
-
 	// Complex<float>			string_to_complex(std::string nb_str);
 	// void				set_type_vector(std::string &term_str, ValueSet &term_value);
-	int				check_str(std::string str);
+	// float				calculate_ast(ASTNode *node);
 
 	std::unordered_set<char>		_set_alphabet; // 'a' to 'z'
 	std::unordered_set<char>		_set_number; // '0' to '9', '.', 'i'
