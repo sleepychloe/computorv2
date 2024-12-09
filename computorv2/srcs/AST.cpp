@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:22 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/08 17:58:07 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/09 15:45:13 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,113 +131,6 @@ int	AST::check_keyword(std::string str)
 	}
 	return (0);
 }
-
-// int	AST::is_number_str(std::string str)
-// {
-// 	size_t	i = 0;
-
-// 	while (i < str.length())
-// 	{
-// 		if (!(is_element_of_set(this->_set_number, str[i])
-// 			|| str[i] == '+' || str[i] == '-' || str[i] == '^'))
-// 			return (0);
-// 		i++;
-// 	}
-// 	return (1);
-// }
-
-// int	AST::is_alpha_str(std::string str)
-// {
-// 	size_t	i = 0;
-
-// 	while (i < str.length())
-// 	{
-// 		if (!is_element_of_set(this->_set_alphabet, str[i]))
-// 			return (0);
-// 		i++;
-// 	}
-// 	return (1);
-// }
-
-// int	AST::is_valid_variable_name(std::string term)
-// {
-// 	if (term == "i")
-// 	{
-// 		this->_err_msg = "variable name cannot not be \"i\"";
-// 		return (0);
-// 	}
-// 	if (!is_alpha_str(term))
-// 	{
-// 		this->_err_msg = "variable name should be consisted with letter(s)1";
-// 		return (0);
-// 	}
-// 	return (1);
-// }
-
-// std::string	AST::is_element_of_func(std::string function_name)
-// {
-// 	std::string	value = "";
-
-// 	if (this->_func.find(function_name) != this->_func.end())
-// 		value = this->_func[function_name];
-// 	return (value);
-// }
-
-// int	AST::is_valid_function_name(std::string term)
-// {
-// 	if (check_round_brackets(term) != 1)
-// 	{
-// 		this->_err_msg = "invalid function name: brackets";
-// 		return (0);
-// 	}
-
-// 	std::string	function_name = term.substr(0, term.find("("));
-// 	std::string	variable = term.substr(term.find("(") + 1, term.length() - term.find("(") - 2);
-
-// 	std::cout << "funtion name: " << function_name << std::endl;
-// 	std::cout << "variable: " << variable << std::endl;
-
-// 	// /* check function name */
-// 	if (!is_alpha_str(function_name))
-// 	{
-// 		this->_err_msg = "function name should be consisted with letter(s)";
-// 		return (0);
-// 	}
-// 	// /* check variable */
-// 	if (is_number_str(variable) && variable != "i")
-// 	{
-// 		if (is_element_of_func(function_name) == "")
-// 		{
-// 			this->_err_msg = "function does not exists, cannot assign";
-// 			return (0);
-// 		}
-// 	}
-// 	else
-// 	{
-// 		if (!is_valid_variable_name(variable))
-// 			return (0);
-// 	}
-// 	return (1);
-// }
-
-// int	AST::check_valid_term(std::string term_str)
-// {
-// 	if (term_str.find("[") != std::string::npos
-// 			&& term_str.find("]") != std::string::npos)
-// 	{
-// 		if (term_str.find("[", 1) != std::string::npos)
-// 			return (TERM_MATRIX);
-// 		else
-// 			return (TERM_VECTOR);
-// 	}
-// 	if (is_number_str(term_str))
-// 		return (TERM_NUMBER);
-// 	if (is_valid_variable_name(term_str))
-// 		return (TERM_VARIBLE);
-// 	if (is_valid_function_name(term_str))
-// 		return (TERM_FUNCTION);
-// 	return (TERM_INVALID);
-// }
 
 // ValueSet	AST::convert_to_value_set(std::string term_str)
 // {
@@ -428,11 +321,158 @@ std::string	AST::get_term(std::string str, size_t &i)
 	return (term);
 }
 
+int	AST::is_number_str(std::string str)
+{
+	size_t	i = 0;
+
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	while (i < str.length())
+	{
+		if (!is_element_of_set(this->_set_number, str[i]))
+			return (0);
+		i++;
+	}
+	if (str.find("i") != std::string::npos)
+	{
+		if (str.find("i", str.find("i", str.find("i")) + 1) != std::string::npos)
+			return (0);
+	}
+	return (1);
+}
+
+int	AST::is_alpha_str(std::string str)
+{
+	size_t	i = 0;
+
+	while (i < str.length())
+	{
+		if (!is_element_of_set(this->_set_alphabet, str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+int	AST::is_valid_variable_name(std::string term)
+{
+	if (term == "i")
+	{
+		this->_err_msg = "variable name cannot not be \"i\"";
+		return (0);
+	}
+
+	size_t	i = 0;
+
+	if (term[i] == '+' || term[i] == '-')
+		i++;
+	while (is_element_of_set(this->_set_number, term[i]))
+		i++;
+	if (!is_alpha_str(term.substr(i, std::string::npos)))
+	{
+		this->_err_msg = "variable name should be consisted with letter(s)1";
+		return (0);
+	}
+	return (1);
+}
+
+std::string	AST::is_element_of_func(std::string function_name)
+{
+	std::string	value = "";
+
+	if (this->_func.find(function_name) != this->_func.end())
+		value = this->_func[function_name];
+	return (value);
+}
+
+int	AST::is_valid_function_name(std::string term)
+{
+	if (check_round_brackets(term) != 1)
+	{
+		this->_err_msg = "invalid function name: brackets";
+		return (0);
+	}
+
+	std::string	function_name = term.substr(0, term.find("("));
+	std::string	variable = term.substr(term.find("(") + 1, term.length() - term.find("(") - 2);
+
+	std::cout << "funtion name: " << function_name << std::endl;//
+	std::cout << "variable: " << variable << std::endl;//
+
+	// /* check function name */
+	if (!is_alpha_str(function_name))
+	{
+		this->_err_msg = "function name should be consisted with letter(s)";
+		return (0);
+	}
+	// /* check variable */
+	if (is_number_str(variable) && variable != "i")
+	{
+		if (is_element_of_func(function_name) == "")
+		{
+			this->_err_msg = "function does not exists, cannot assign";
+			return (0);
+		}
+	}
+	else
+	{
+		if (!is_valid_variable_name(variable))
+			return (0);
+	}
+	return (1);
+}
+
+NodeType	AST::set_type_of_term(std::string term)
+{
+	if (term.find("[") != std::string::npos
+			&& term.find("]") != std::string::npos)
+	{
+		if (term.find("[", 1) != std::string::npos)
+			return (NodeType::TERM_MATRIX);
+		else
+			return (NodeType::TERM_VECTOR);
+	}
+	if (is_number_str(term))
+		return (NodeType::TERM_NUMBER);
+	if (is_valid_variable_name(term))
+		return (NodeType::TERM_VARIABLE);
+	if (is_valid_function_name(term))
+		return (NodeType::TERM_FUNCTION);
+	return (NodeType::TERM_INVALID);
+}
+
+NodeType	AST::check_term(std::string &term)
+{
+	NodeType	type;
+
+	type = set_type_of_term(term);
+	if (type == NodeType::TERM_INVALID)
+	{
+		if (this->_err_msg == "")
+			this->_err_msg = "invalid term";
+		throw (this->_err_msg);
+	}
+	if (type == NodeType::TERM_NUMBER)
+		std::cout << "type: number" << std::endl;//
+	else if (type == NodeType::TERM_VARIABLE)
+		std::cout << "type: variable" << std::endl;//
+	else if (type == NodeType::TERM_FUNCTION)
+		std::cout << "type: function" << std::endl;//
+	else if (type == NodeType::TERM_VECTOR)
+		std::cout << "type: vector" << std::endl;//
+	else if (type == NodeType::TERM_MATRIX)
+		std::cout << "type: matrix" << std::endl;//
+	else
+		std::cout << "something is wrong" << std::endl;//
+	return (type);
+}
+
 void	AST::build_tree(std::string str, std::unique_ptr<ASTNode> &node)
 {
 	std::stack<std::unique_ptr<ASTNode>>	stack_node;
 	std::stack<std::string>			stack_op;
 	std::string	term;
+	NodeType	type;
 	size_t		i = 0;
 
 	while (i < str.length())
@@ -447,8 +487,8 @@ void	AST::build_tree(std::string str, std::unique_ptr<ASTNode> &node)
 			term = get_term(str, i);
 			if (term == "")
 				break ;
-			//check term here
-			stack_node.push(std::make_unique<ASTNode>(ASTNode(term)));
+			type = check_term(term);
+			stack_node.push(std::make_unique<ASTNode>(ASTNode(term, type)));
 		}
 	}
 	while (!stack_op.empty())
@@ -466,9 +506,9 @@ void	AST::visit_ast(ASTNode *node)
 	visit_ast(node->get_left());
 	visit_ast(node->get_right());
 
-	if (node->get_type() == NodeType::TERM)
+	if (node->get_type() != NodeType::OPERATOR)
 		std::cout << "TERM: ";
-	else if (node->get_type() == NodeType::OPERATOR)
+	else
 		std::cout << "OP: ";
 	
 	std::cout << node->get_value_str() << std::endl;

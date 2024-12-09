@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 16:42:13 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/07 19:42:54 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/09 15:07:54 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,20 +30,19 @@ using	ValueSet = std::variant<float,
 enum class NodeType
 {
 	OPERATOR = 0,
-	TERM = 1,
 
-	TERM_INVALID,
-	TERM_NUMBER,
-	TERM_VARIABLE,
-	TERM_FUNCTION,
-	TERM_VECTOR,
-	TERM_MATRIX
+	TERM_INVALID = 1,
+	TERM_NUMBER = 2,
+	TERM_VARIABLE = 3,
+	TERM_FUNCTION = 4,
+	TERM_VECTOR = 5,
+	TERM_MATRIX = 6
 };
 
 class ASTNode
 {
 public:
-	ASTNode(std::string term);
+	ASTNode(std::string term, NodeType type);
 	ASTNode(std::string op, std::unique_ptr<ASTNode> left, std::unique_ptr<ASTNode> right);
 	ASTNode(const ASTNode& astnode);
 	ASTNode& operator=(const ASTNode& astnode);

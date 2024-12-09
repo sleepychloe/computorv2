@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 16:42:48 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/07 19:42:41 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/09 15:02:48 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ ASTNode::ASTNode()
 {
 }
 
-ASTNode::ASTNode(std::string term): _type(NodeType::TERM), _value_str(term), _value(0.0f),
+ASTNode::ASTNode(std::string term, NodeType type): _type(type), _value_str(term), _value(0.0f),
 				_left(nullptr), _right(nullptr)
 {
 }
