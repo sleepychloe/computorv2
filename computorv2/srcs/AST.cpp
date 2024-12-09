@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:22 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/09 15:45:13 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/09 15:46:02 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -462,8 +462,6 @@ NodeType	AST::check_term(std::string &term)
 		std::cout << "type: vector" << std::endl;//
 	else if (type == NodeType::TERM_MATRIX)
 		std::cout << "type: matrix" << std::endl;//
-	else
-		std::cout << "something is wrong" << std::endl;//
 	return (type);
 }
 
