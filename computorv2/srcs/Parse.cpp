@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/10 01:29:31 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/10 16:06:56 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -363,11 +363,11 @@ int	Parse::check_vector_form(int type, std::string str)
 		}
 		for (size_t j = 0; j < vector[i].size(); j++)
 		{
-			if (!(vector[i][0] == '+' || vector[i][0] == '-'
+			if (!(vector[i][j] == '+' || vector[i][j] == '-'
 				|| is_element_of_set(this->_set_number, vector[i][j])))
 			{
 				if (type == VECTOR)
-					this->_err_msg = "invalid syntax: vector form";
+					this->_err_msg = "invalid syntax: vector form4";
 				else
 					this->_err_msg = "invalid syntax: matrix form";
 				throw (this->_err_msg);

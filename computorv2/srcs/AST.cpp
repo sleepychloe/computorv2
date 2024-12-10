@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:22 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/10 01:54:24 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/10 16:05:23 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,43 +50,18 @@ void	AST::start_syntax_checking(std::string &str)
 	check_str(str);
 }
 
-void	AST::print_variant_value(ValueSet value)
-{
-	if (std::get_if<float>(&value))
-		std::cout << *std::get_if<float>(&value);
-	else if (std::get_if<Complex<float>>(&value))
-		std::cout << *std::get_if<Complex<float>>(&value);
-	else if (std::get_if<Matrix<float>>(&value))
-		std::cout << *std::get_if<Matrix<float>>(&value);
-	else if (std::get_if<Matrix<Complex<float>>>(&value))
-		std::cout << *std::get_if<Matrix<Complex<float>>>(&value);
-	else if (std::get_if<Vector<float>>(&value))
-		std::cout << *std::get_if<Vector<float>>(&value);
-	else if (std::get_if<Vector<Complex<float>>>(&value))
-		std::cout << *std::get_if<Vector<Complex<float>>>(&value);
-	else
-	{
-		this->_err_msg = "detected unknown type while printing variable list";
-		this->_err_msg += ": std::map<std::string, V>";
-		this->_err_msg += "(V = std::variant<float, Complex<float>, Matrix<float>, Matrix<Complex<float>>,";
-		this->_err_msg += "Vector<float>, Vector<Complex<float>>>)";
-		throw (this->_err_msg);
-	}
-}
-
 int	AST::check_keyword(std::string str)
 {
 	// test: variable
-	this->_var["a"] = 1.1f;
-	this->_var["b"] = Complex<float>(1, 1);
-	this->_var["c"] = Matrix<float>({{1.1, 2.2}, {3.3, 4.4}});
-	this->_var["d"] = Matrix<Complex<float>>({{Complex<float>(1, 1), Complex<float>(2, 2)},
-						{Complex<float>(3, 3), Complex<float>(4, 4)}});
-	this->_var["e"] = Vector<float>({1.1, 2.2, 3.3});
-	this->_var["f"] = Vector<Complex<float>>({Complex<float>(1, 1), Complex<float>(2, 2), Complex<float>(3, 3)});
-	// test: function	
+	this->_var["a"] = "1.1";
+	this->_var["b"] = "1+1i";
+	this->_var["c"] = "[[1.1,2.2];[3.3,4.4]]";
+	this->_var["d"] = "[[1+1i,2+2i];[3+3i,4+4i]]";
+	this->_var["e"] = "[1.1,2.2,3.3]";
+	this->_var["f"] = "[1+1i,2+2i,3+3i]";
+	// test: function
 	this->_func["f"] = "x^2+1";
-
+////////////////////////////////////////////
 	if (str == "var" || str == "VAR"
 		|| str == "vriable" || str == "VARIABLE")
 	{
@@ -99,11 +74,11 @@ int	AST::check_keyword(std::string str)
 				<< "there is no variable assigned yet" << BLACK << std::endl;
 			return (1);
 		}
-		for (std::map<std::string, ValueSet>::iterator it = this->_var.begin();
+		for (std::map<std::string, std::string>::iterator it = this->_var.begin();
 			it != this->_var.end(); it++)
 		{
 			std::cout << YELLOW << it->first << BLACK << std::endl;
-			print_variant_value(it->second);
+			std::cout << it->second;
 			std::cout << std::endl
 				<< MAGENTA << "═══════════════════════" << BLACK << std::endl;
 		}
@@ -360,8 +335,6 @@ NodeType	AST::check_term(std::string &term)
 		if (is_existing_variable(term))
 		{
 			std::cout << "existing variable" << std::endl;
-			// change term, change type
-			// make function ValueSet->str
 		}
 		std::cout << "type: variable" << std::endl;//
 	}
@@ -372,8 +345,6 @@ NodeType	AST::check_term(std::string &term)
 			if (is_existing_function_name(get_function_name(term)))
 			{
 				std::cout << "vairbale is number, existing function name" << std::endl;
-				//change term, chagne type
-				//make calculating function(ex: f(1),...)
 			}
 			else
 			{
@@ -442,10 +413,98 @@ void	AST::visit_ast(ASTNode *node)
 	std::cout << node->get_value_str() << std::endl;
 }
 
+void	AST::convert_to_standard_form(std::string &str)
+{
+	std::string	front;
+	std::string	back;
+	size_t		i = 0;
+
+	while (i < str.length())
+	{
+		if (is_element_of_set(this->_set_number, str[i])
+			&& str[i + 1]
+			&& !is_element_of_set(this->_set_number, str[i + 1])
+			&& is_element_of_set(this->_set_alphabet, str[i + 1]))
+		{
+			i++;
+			front = str.substr(0, i);
+			back = str.substr(i, std::string::npos);
+			str = front + std::string(1, OP_MUL) + back;
+		}
+		i++;
+	}
+}
+
+int	AST::skip_square_bracket(std::string str, size_t i)
+{
+	std::stack<char>	stack;
+
+	stack.push(str[i]);
+	i++;
+	while (i < str.length())
+	{
+		if (str[i] == '[')
+			stack.push(str[i]);
+		if (str[i] == ']')
+			stack.pop();
+		if (stack.empty())
+			break ;
+		i++;
+	}
+	return (i);
+}
+
+void	AST::convert_existing_variable(std::string &str)
+{
+	std::string	front;
+	std::string	back;
+	std::string	variable;
+
+	for (std::map<std::string, std::string>::iterator it = this->_var.begin();
+		it != this->_var.end(); it++)
+	{
+		for (size_t i = 0; i < str.length(); i++)
+		{
+			if (str[str.find(it->first) + it->first.length()] == '(')
+				continue ;
+			front = str.substr(0, str.find(it->first));
+			back = str.substr(str.find(it->first) + it->first.length(), std::string::npos);
+			variable = it->second;
+			for (size_t j = 0; j < variable.size(); j++)
+			{
+				if (variable[j] == '[')
+					j = skip_square_bracket(variable, j);
+				if (variable[j] == '+')
+					variable[j] = OP_ADD;
+				else if (variable[j] == '-')
+					variable[j] = OP_SUB;
+			}
+			str = front + "(" + variable + ")" + back;
+		}
+	}
+}
+
 int	AST::check_str(std::string str)
 {
 	if (check_keyword(str))
 		return (1);
+
+	convert_to_standard_form(str);
+	convert_existing_variable(str);
+	// convert_existing_function(str);
+
+	std::cout << "str: ";
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		if (is_key_of_map(this->_operation, str[i]))
+			std::cout << this->_operation[str[i]];
+		else
+			std::cout << str[i];
+	}
+	std::cout << std::endl;
+	std::cout << "----------------" << std::endl;
+/////////////////////////
+
 	std::string		left_str = str.substr(0, str.find("="));
 	std::string		right_str = str.substr(str.find("=") + 1, std::string::npos);
 
@@ -537,4 +596,79 @@ int	AST::check_str(std::string str)
 //         return std::pow(left_value, right_value);
 //     else
 //         throw std::runtime_error("Unsupported operation: " + op);
+// }
+
+///////////////////////////////////////////////////////////////////////////
+// void	AST::print_variant_value(ValueSet value)
+// {
+// 	if (std::get_if<float>(&value))
+// 		std::cout << *std::get_if<float>(&value);
+// 	else if (std::get_if<Complex<float>>(&value))
+// 		std::cout << *std::get_if<Complex<float>>(&value);
+// 	else if (std::get_if<Matrix<float>>(&value))
+// 		std::cout << *std::get_if<Matrix<float>>(&value);
+// 	else if (std::get_if<Matrix<Complex<float>>>(&value))
+// 		std::cout << *std::get_if<Matrix<Complex<float>>>(&value);
+// 	else if (std::get_if<Vector<float>>(&value))
+// 		std::cout << *std::get_if<Vector<float>>(&value);
+// 	else if (std::get_if<Vector<Complex<float>>>(&value))
+// 		std::cout << *std::get_if<Vector<Complex<float>>>(&value);
+// 	else
+// 	{
+// 		this->_err_msg = "detected unknown type while printing variable list";
+// 		this->_err_msg += ": std::map<std::string, V>";
+// 		this->_err_msg += "(V = std::variant<float, Complex<float>, Matrix<float>, Matrix<Complex<float>>,";
+// 		this->_err_msg += "Vector<float>, Vector<Complex<float>>>)";
+// 		throw (this->_err_msg);
+// 	}
+// }
+// std::string	AST::float_to_string(float value)
+// {
+// 	std::stringstream	ss;
+
+// 	ss << value;
+// 	return (ss.str());
+// }
+
+// std::string	AST::complex_to_string(Complex<float> value)
+// {
+// 	std::string	real = float_to_string(value.real());
+// 	std::string	imag = float_to_string(value.imag());
+// 	std::string	res;
+
+// 	if (real == "0" && imag == "0")
+// 		return ("0");
+// 	imag = imag + "i";
+// 	if (real != "0" && value.imag() > 0)
+// 		imag = "+" + imag;
+// 	if (real == "0")
+// 		real = "";
+// 	if (imag == "0i")
+// 		imag = "";
+// 	return (real + imag);
+// }
+
+// std::string	AST::ValueSet_to_string(ValueSet value)
+// {
+// 	if (std::get_if<float>(&value))
+// 		return (float_to_string(*std::get_if<float>(&value)));
+// 	else if (std::get_if<Complex<float>>(&value))
+// 		return (complex_to_string(*std::get_if<Complex<float>>(&value)));
+// 	else if (std::get_if<Vector<float>>(&value))
+// 	{
+
+// 	}
+// 	else if (std::get_if<Vector<Complex<float>>>(&value))
+// 	{
+
+// 	}
+// 	else if (std::get_if<Matrix<float>>(&value))
+// 	{
+
+// 	}
+// 	else if (std::get_if<Matrix<Complex<float>>>(&value))
+// 	{
+
+// 	}
+// 	return ("");
 // }

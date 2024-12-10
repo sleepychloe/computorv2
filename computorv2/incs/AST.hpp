@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:25 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/10 01:37:57 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/10 15:57:17 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ public:
 	void				start_syntax_checking(std::string &str);
 	
 private:
-	void				print_variant_value(ValueSet value);
 	int				check_keyword(std::string str);
 
 	int				skip_round_bracket(std::string str, size_t i);
@@ -74,23 +73,32 @@ private:
 	NodeType			set_type_of_term(std::string str);
 	int				is_existing_variable(std::string var);
 	int				is_existing_function_name(std::string func);
+
 	NodeType			check_term(std::string &term);
 
 	void				build_tree(std::string str, std::unique_ptr<ASTNode> &root);
-
 	void				visit_ast(ASTNode *node);
+
+	void				convert_to_standard_form(std::string &str);
+	int				skip_square_bracket(std::string str, size_t i);
+	void				convert_existing_variable(std::string &str);
 	int				check_str(std::string str);
 
 	// ValueSet			convert_to_value_set(std::string term_str);
 	// Complex<float>			string_to_complex(std::string nb_str);
 	// void				set_type_vector(std::string &term_str, ValueSet &term_value);
 	// float				calculate_ast(ASTNode *node);
+	///////////////////////////////////////////
+	// void				print_variant_value(ValueSet value);
+	// std::string			float_to_string(float value);
+	// std::string			complex_to_string(Complex<float> value);
+	// std::string			ValueSet_to_string(ValueSet value);
 
 	std::unordered_set<char>		_set_alphabet; // 'a' to 'z'
 	std::unordered_set<char>		_set_number; // '0' to '9', '.', 'i'
 	std::unordered_map<int, std::string>	_operation; // {OP_OPERATOR, "operator"}
 
-	std::map<std::string, ValueSet>		_var;
+	std::map<std::string, std::string>	_var;
 	std::map<std::string, std::string>	_func;
 
 	std::unique_ptr<ASTNode>		_left_root;
