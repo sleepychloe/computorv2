@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:25 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/10 15:57:17 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/11 00:04:08 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,12 @@ private:
 
 	void				convert_to_standard_form(std::string &str);
 	int				skip_square_bracket(std::string str, size_t i);
+	std::vector<std::string>	split_term(std::string str);
+	std::string			convert_operation(std::string str);
 	void				convert_existing_variable(std::string &str);
+	std::string			convert_function(std::string function_name,
+							std::string function_variable);
+	void				convert_existing_function(std::string &str);
 	int				check_str(std::string str);
 
 	// ValueSet			convert_to_value_set(std::string term_str);

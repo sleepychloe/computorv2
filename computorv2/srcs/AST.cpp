@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:22 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/10 16:05:23 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/11 00:59:18 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,16 +52,6 @@ void	AST::start_syntax_checking(std::string &str)
 
 int	AST::check_keyword(std::string str)
 {
-	// test: variable
-	this->_var["a"] = "1.1";
-	this->_var["b"] = "1+1i";
-	this->_var["c"] = "[[1.1,2.2];[3.3,4.4]]";
-	this->_var["d"] = "[[1+1i,2+2i];[3+3i,4+4i]]";
-	this->_var["e"] = "[1.1,2.2,3.3]";
-	this->_var["f"] = "[1+1i,2+2i,3+3i]";
-	// test: function
-	this->_func["f"] = "x^2+1";
-////////////////////////////////////////////
 	if (str == "var" || str == "VAR"
 		|| str == "vriable" || str == "VARIABLE")
 	{
@@ -213,11 +203,10 @@ int	AST::is_number_str(std::string str)
 {
 	size_t	i = 0;
 
-	if (str[i] == '+' || str[i] == '-')
-		i++;
 	while (i < str.length())
 	{
-		if (!is_element_of_set(this->_set_number, str[i]))
+		if (!(is_element_of_set(this->_set_number, str[i])
+			|| str[i] == '+' || str[i] == '-'))
 			return (0);
 		i++;
 	}
@@ -258,7 +247,10 @@ int	AST::is_valid_variable_name(std::string term)
 		i++;
 	if (!is_alpha_str(term.substr(i, std::string::npos)))
 	{
-		this->_err_msg = "variable name should be consisted with letter(s)";
+		if (term.find("[") != std::string::npos)
+			this->_err_msg = "vector and matrix cannot be used with function";
+		else
+			this->_err_msg = "variable name should be consisted with letter(s)";
 		return (0);
 	}
 	return (1);
@@ -284,7 +276,13 @@ int	AST::is_valid_function_name(std::string term)
 
 NodeType	AST::set_type_of_term(std::string term)
 {
-	if (term.find("[") != std::string::npos
+	if (term.find("(") != std::string::npos
+			&& term.find(")") != std::string::npos)
+	{
+		if (is_valid_function_name(term))
+			return (NodeType::TERM_FUNCTION);
+	}
+	else if (term.find("[") != std::string::npos
 			&& term.find("]") != std::string::npos)
 	{
 		if (term.find("[", 1) != std::string::npos)
@@ -292,12 +290,13 @@ NodeType	AST::set_type_of_term(std::string term)
 		else
 			return (NodeType::TERM_VECTOR);
 	}
-	if (is_number_str(term))
-		return (NodeType::TERM_NUMBER);
-	if (is_valid_variable_name(term))
-		return (NodeType::TERM_VARIABLE);
-	if (is_valid_function_name(term))
-		return (NodeType::TERM_FUNCTION);
+	else
+	{
+		if (is_number_str(term))
+			return (NodeType::TERM_NUMBER);
+		if (is_valid_variable_name(term))
+			return (NodeType::TERM_VARIABLE);
+	}
 	return (NodeType::TERM_INVALID);
 }
 
@@ -433,6 +432,26 @@ void	AST::convert_to_standard_form(std::string &str)
 		}
 		i++;
 	}
+
+	i = 0;
+	while (i < str.length())
+	{
+		if (str[i] == '(' && is_part_of_function(str, i))
+		{
+			i++;
+			while (str[i] != ')')
+			{
+				if (is_key_of_map(this->_operation, str[i]))
+				{
+					front = str.substr(0, i);
+					back = str.substr(i + 1, std::string::npos);
+					str = front + this->_operation[str[i]] + back;
+				}
+				i++;
+			}
+		}
+		i++;
+	}
 }
 
 int	AST::skip_square_bracket(std::string str, size_t i)
@@ -454,45 +473,184 @@ int	AST::skip_square_bracket(std::string str, size_t i)
 	return (i);
 }
 
+std::vector<std::string>	AST::split_term(std::string str)
+{
+	std::vector<std::string>	term;
+	size_t	i = 0;
+
+	while (1)
+	{
+		i = 0;
+		while (!(is_key_of_map(this->_operation, str[i])
+			|| str[i] == '?' || str[i] == '\0'))
+			i++;
+		if (str[i] == '\0')
+			break ;
+		if (str.substr(0, i) != "")
+			term.push_back(str.substr(0, i));
+		if (str[i] != '?')
+			term.push_back(std::string(1, str[i]));
+		else
+			term.push_back(std::string(1, str[i]));
+		str = str.substr(i + 1, std::string::npos);
+	}
+	if (str != "")
+		term.push_back(str);
+
+	if (term[term.size() - 1] == "?")
+		term.pop_back();
+	return (term);
+}
+
+std::string	AST::convert_operation(std::string str)
+{
+	std::unordered_map<char, int> op = {{'+', OP_ADD}, {'-', OP_SUB},
+					{'*', OP_MUL}, {'/', OP_DIV},
+					{'%', OP_MODULO}, {'^', OP_POWER}};
+	std::string	new_str = "";
+	size_t		start;
+	size_t		i = 0;
+
+	while (i < str.length())
+	{
+		if (str[i] == '[')
+		{
+			start = i;
+			i = skip_square_bracket(str, i);
+			new_str += str.substr(start, i - start);
+		}
+
+		if (str[i] == '+' || str[i] == '-'
+			|| str[i] == '*' || str[i] == '/' || str[i] == '%' || str[i] == '^')
+		{
+			if (str[i] == '*' && str[i + 1] && str[i + 1] == '*')
+			{
+				new_str += OP_MAT_MUL;
+				i++;
+			}
+			else
+				new_str += op[str[i]];
+		}
+		else
+			new_str += str[i];
+		i++;
+	}
+	return (new_str);
+}
+
 void	AST::convert_existing_variable(std::string &str)
+{
+	std::vector<std::string>	term = split_term(str);
+	std::string			new_str = "";
+
+	for (size_t i = 0; i < term.size(); i++)
+	{
+		for (std::map<std::string, std::string>::iterator it = this->_var.begin();
+			it != this->_var.end(); it++)
+		{
+			// variable
+			if (term[i] == it->first)
+			{
+				term[i] = convert_operation(it->second);
+				term[i] = "(" + term[i] + ")";
+			}
+			// function(variable)
+			else if (term[i].find("(") != std::string::npos
+				&& is_part_of_function(term[i], term[i].find("("))
+				&& get_function_variable(term[i]) == it->first)
+				term[i] = get_function_name(term[i]) + "(" + it->second + ")";
+		}
+	}
+
+	for (size_t i = 0; i < term.size(); i++)
+		new_str += term[i];
+	str = new_str;
+}
+
+std::string	AST::convert_function(std::string function_name,
+						std::string function_variable)
 {
 	std::string	front;
 	std::string	back;
-	std::string	variable;
+	std::string	res;
+	size_t		i = 0;
 
-	for (std::map<std::string, std::string>::iterator it = this->_var.begin();
-		it != this->_var.end(); it++)
+	function_name = convert_operation(this->_func[function_name]);
+	function_variable = convert_operation(function_variable);
+	while (i < function_name.length())
 	{
-		for (size_t i = 0; i < str.length(); i++)
+		if (function_name[i] == 'x')
 		{
-			if (str[str.find(it->first) + it->first.length()] == '(')
-				continue ;
-			front = str.substr(0, str.find(it->first));
-			back = str.substr(str.find(it->first) + it->first.length(), std::string::npos);
-			variable = it->second;
-			for (size_t j = 0; j < variable.size(); j++)
+			front = function_name.substr(0, i);
+			back = function_name.substr(i + 1, std::string::npos);
+			res = front + "(" + function_variable + ")" + back;
+			i = front.length() + function_variable.length() + 2;
+			
+		}
+		else
+			i++;
+	}
+	//handle power with letters
+	return (res);
+}
+
+void	AST::convert_existing_function(std::string &str)
+{
+	std::vector<std::string>	term = split_term(str);
+	std::string			function_name;
+	std::string			function_variable;
+	std::string			new_str = "";
+
+	for (size_t i = 0; i < term.size(); i++)
+	{
+		for (std::map<std::string, std::string>::iterator it = this->_func.begin();
+			it != this->_func.end(); it++)
+		{
+			if (term[i].find("(") != std::string::npos
+				&& is_part_of_function(term[i], term[i].find("("))
+				&& get_function_name(term[i]) == it->first)
 			{
-				if (variable[j] == '[')
-					j = skip_square_bracket(variable, j);
-				if (variable[j] == '+')
-					variable[j] = OP_ADD;
-				else if (variable[j] == '-')
-					variable[j] = OP_SUB;
+				function_name = get_function_name(term[i]);
+				function_variable = get_function_variable(term[i]);
+				term[i] = convert_function(it->first, function_variable);
 			}
-			str = front + "(" + variable + ")" + back;
 		}
 	}
+
+	for (size_t i = 0; i < term.size(); i++)
+		new_str += term[i];
+	str = new_str;
 }
 
 int	AST::check_str(std::string str)
 {
+	// test: variable
+	this->_var["a"] = "1.1";
+	this->_var["b"] = "1+1i";
+	this->_var["c"] = "[[1.1,2.2];[3.3,4.4]]";
+	this->_var["d"] = "[[1+1i,2+2i];[3+3i,4+4i]]";
+	this->_var["e"] = "[1.1,2.2,3.3]";
+	this->_var["f"] = "[1+1i,2+2i,3+3i]";
+	// test: function
+	this->_func["f"] = "x^2+1";
+
 	if (check_keyword(str))
 		return (1);
 
 	convert_to_standard_form(str);
-	convert_existing_variable(str);
-	// convert_existing_function(str);
 
+	std::string		left_str = str.substr(0, str.find("="));
+	std::string		right_str = str.substr(str.find("=") + 1, std::string::npos);
+
+	convert_existing_variable(left_str);
+	convert_existing_variable(right_str);
+	convert_existing_function(left_str);
+	convert_existing_function(right_str);
+	str = left_str + "=" + right_str;
+
+std::cout << "----------------" << std::endl;
+std::cout << "str: " << str << std::endl;
+std::cout << "----------------" << std::endl;
 	std::cout << "str: ";
 	for (size_t i = 0; i < str.length(); i++)
 	{
@@ -504,9 +662,8 @@ int	AST::check_str(std::string str)
 	std::cout << std::endl;
 	std::cout << "----------------" << std::endl;
 /////////////////////////
-
-	std::string		left_str = str.substr(0, str.find("="));
-	std::string		right_str = str.substr(str.find("=") + 1, std::string::npos);
+	left_str = str.substr(0, str.find("="));
+	right_str = str.substr(str.find("=") + 1, std::string::npos);
 
 	this->_left_root = nullptr;
 	this->_right_root = nullptr;

@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:09:01 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/08 08:46:05 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/10 21:43:19 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,12 @@ int	main(int argc, char **argv)
 
 	std::string	input;
 	ReadLine	rl(STDIN_FILENO);
+	AST		ast;
 
 	ignore_all_signal();
 	print_msg(CYAN, "🐣 Welcom to the computorv2 🐣");
 	print_msg(CYAN, "type 'exit' to quit !\n");
+	
 	while (1)
 	{
 		if (rl.read_line("> ", CYAN, input) == -1)
@@ -78,10 +80,8 @@ int	main(int argc, char **argv)
 				std::cerr << RED << "error: invalid input: " << err_msg << BLACK << std::endl;
 				continue ;
 			}
-
 			try
 			{
-				AST	ast;
 				ast.start_syntax_checking(input);
 			}
 			catch(std::string err_msg)
