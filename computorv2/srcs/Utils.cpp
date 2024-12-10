@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 13:48:03 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/06 14:45:23 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/10 01:23:10 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,4 +66,14 @@ int	check_round_brackets(std::string str)
 	if (!stack.empty())
 		return (0);
 	return (cnt);
+}
+
+std::string	get_function_name(std::string term)
+{
+	return (term.substr(0, term.find("(")));
+}
+
+std::string	get_function_variable(std::string term)
+{
+	return (term.substr(term.find("(") + 1, term.length() - term.find("(") - 2));
 }

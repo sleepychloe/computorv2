@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:25 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/09 15:50:16 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/10 01:37:57 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ private:
 	void				build_subtree(std::stack<std::unique_ptr<ASTNode>> &stack_node,
 							std::stack<std::string> &stack_op);
 
-	int				is_part_of_function_expression(std::string str, size_t i);
+	int				is_part_of_function(std::string str, size_t i);
 	int				handle_brackets(std::stack<std::unique_ptr<ASTNode>> &stack_node,
 							std::string str, size_t i);
 	int				handle_operator(std::stack<std::unique_ptr<ASTNode>> &stack_node,
@@ -70,9 +70,10 @@ private:
 	int				is_number_str(std::string str);
 	int				is_alpha_str(std::string str);
 	int				is_valid_variable_name(std::string term);
-	std::string			is_element_of_func(std::string function_name);
 	int				is_valid_function_name(std::string term);
 	NodeType			set_type_of_term(std::string str);
+	int				is_existing_variable(std::string var);
+	int				is_existing_function_name(std::string func);
 	NodeType			check_term(std::string &term);
 
 	void				build_tree(std::string str, std::unique_ptr<ASTNode> &root);

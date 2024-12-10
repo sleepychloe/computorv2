@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/08 09:13:22 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/10 01:29:31 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -690,7 +690,7 @@ int	Parse::check_syntax(std::string &str)
 std::string	Parse::check_str(std::string &str)
 {
 	if (check_keyword(str))
-		return ("");
+		return (str);
 	if (!(is_equation_form(str) && check_invalid_character(str) && check_number(str)))
 		return ("");
 

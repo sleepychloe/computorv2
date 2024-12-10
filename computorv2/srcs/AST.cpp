@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:22 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/09 15:49:17 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/10 01:54:24 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,11 @@ AST::~AST()
 {
 }
 
+void	AST::start_syntax_checking(std::string &str)
+{
+	check_str(str);
+}
+
 void	AST::print_variant_value(ValueSet value)
 {
 	if (std::get_if<float>(&value))
@@ -69,25 +74,22 @@ void	AST::print_variant_value(ValueSet value)
 	}
 }
 
-void	AST::start_syntax_checking(std::string &str)
-{
-	check_str(str);
-}
-
 int	AST::check_keyword(std::string str)
 {
+	// test: variable
+	this->_var["a"] = 1.1f;
+	this->_var["b"] = Complex<float>(1, 1);
+	this->_var["c"] = Matrix<float>({{1.1, 2.2}, {3.3, 4.4}});
+	this->_var["d"] = Matrix<Complex<float>>({{Complex<float>(1, 1), Complex<float>(2, 2)},
+						{Complex<float>(3, 3), Complex<float>(4, 4)}});
+	this->_var["e"] = Vector<float>({1.1, 2.2, 3.3});
+	this->_var["f"] = Vector<Complex<float>>({Complex<float>(1, 1), Complex<float>(2, 2), Complex<float>(3, 3)});
+	// test: function	
+	this->_func["f"] = "x^2+1";
+
 	if (str == "var" || str == "VAR"
 		|| str == "vriable" || str == "VARIABLE")
 	{
-		// //test
-		// this->_var["a"] = 1.1f;
-		// this->_var["b"] = Complex<float>(1, 1);
-		// this->_var["c"] = Matrix<float>({{1.1, 2.2}, {3.3, 4.4}});
-		// this->_var["d"] = Matrix<Complex<float>>({{Complex<float>(1, 1), Complex<float>(2, 2)},
-		// 					{Complex<float>(3, 3), Complex<float>(4, 4)}});
-		// this->_var["e"] = Vector<float>({1.1, 2.2, 3.3});
-		// this->_var["f"] = Vector<Complex<float>>({Complex<float>(1, 1), Complex<float>(2, 2), Complex<float>(3, 3)});
-
 		std::cout << MAGENTA << "╔═════════════════════╗" << BLACK << std::endl;
 		std::cout << MAGENTA << "║    VARIABLE LIST    ║" << BLACK << std::endl;
 		std::cout << MAGENTA << "╚═════════════════════╝" << BLACK << std::endl;
@@ -178,7 +180,7 @@ void	AST::build_subtree(std::stack<std::unique_ptr<ASTNode>> &stack_node,
 	stack_node.push(std::make_unique<ASTNode>(op, std::move(left), std::move(right)));
 }
 
-int	AST::is_part_of_function_expression(std::string str, size_t i)
+int	AST::is_part_of_function(std::string str, size_t i)
 {
 	if (i > 0 && is_element_of_set(this->_set_alphabet, str[i - 1]))
 		return (1);
@@ -222,7 +224,7 @@ std::string	AST::get_term(std::string str, size_t &i)
 	std::string	term;
 
 	while (!(str[i] == '\0' || str[i] == '?'
-		|| (str[i] == '(' && !is_part_of_function_expression(str, i))
+		|| (str[i] == '(' && !is_part_of_function(str, i))
 		|| is_key_of_map(this->_operation, str[i])))
 		i++;
 	term = str.substr(start, i - start);
@@ -281,19 +283,10 @@ int	AST::is_valid_variable_name(std::string term)
 		i++;
 	if (!is_alpha_str(term.substr(i, std::string::npos)))
 	{
-		this->_err_msg = "variable name should be consisted with letter(s)1";
+		this->_err_msg = "variable name should be consisted with letter(s)";
 		return (0);
 	}
 	return (1);
-}
-
-std::string	AST::is_element_of_func(std::string function_name)
-{
-	std::string	value = "";
-
-	if (this->_func.find(function_name) != this->_func.end())
-		value = this->_func[function_name];
-	return (value);
 }
 
 int	AST::is_valid_function_name(std::string term)
@@ -303,33 +296,14 @@ int	AST::is_valid_function_name(std::string term)
 		this->_err_msg = "invalid function name: brackets";
 		return (0);
 	}
-
-	std::string	function_name = term.substr(0, term.find("("));
-	std::string	variable = term.substr(term.find("(") + 1, term.length() - term.find("(") - 2);
-
-	std::cout << "funtion name: " << function_name << std::endl;//
-	std::cout << "variable: " << variable << std::endl;//
-
-	// /* check function name */
-	if (!is_alpha_str(function_name))
+	if (!(is_alpha_str(get_function_name(term))))
 	{
 		this->_err_msg = "function name should be consisted with letter(s)";
 		return (0);
 	}
-	// /* check variable */
-	if (is_number_str(variable) && variable != "i")
-	{
-		if (is_element_of_func(function_name) == "")
-		{
-			this->_err_msg = "function does not exists, cannot assign";
-			return (0);
-		}
-	}
-	else
-	{
-		if (!is_valid_variable_name(variable))
-			return (0);
-	}
+	if (!(is_number_str(get_function_variable(term))
+		|| is_valid_variable_name(get_function_variable(term))))
+		return (0);
 	return (1);
 }
 
@@ -352,6 +326,20 @@ NodeType	AST::set_type_of_term(std::string term)
 	return (NodeType::TERM_INVALID);
 }
 
+int	AST::is_existing_variable(std::string var)
+{
+	if (this->_var.find(var) != this->_var.end())
+		return (1);
+	return (0);
+}
+
+int	AST::is_existing_function_name(std::string func)
+{
+	if (this->_func.find(func) != this->_func.end())
+		return (1);
+	return (0);
+}
+
 NodeType	AST::check_term(std::string &term)
 {
 	NodeType	type;
@@ -364,15 +352,45 @@ NodeType	AST::check_term(std::string &term)
 		throw (this->_err_msg);
 	}
 	if (type == NodeType::TERM_NUMBER)
+	{
 		std::cout << "type: number" << std::endl;//
+	}
 	else if (type == NodeType::TERM_VARIABLE)
+	{
+		if (is_existing_variable(term))
+		{
+			std::cout << "existing variable" << std::endl;
+			// change term, change type
+			// make function ValueSet->str
+		}
 		std::cout << "type: variable" << std::endl;//
+	}
 	else if (type == NodeType::TERM_FUNCTION)
+	{
+		if (is_number_str(get_function_variable(term)))
+		{
+			if (is_existing_function_name(get_function_name(term)))
+			{
+				std::cout << "vairbale is number, existing function name" << std::endl;
+				//change term, chagne type
+				//make calculating function(ex: f(1),...)
+			}
+			else
+			{
+				this->_err_msg = "function has not been defiend";
+				throw (this->_err_msg);
+			}
+		}
 		std::cout << "type: function" << std::endl;//
+	}
 	else if (type == NodeType::TERM_VECTOR)
+	{
 		std::cout << "type: vector" << std::endl;//
+	}
 	else if (type == NodeType::TERM_MATRIX)
+	{
 		std::cout << "type: matrix" << std::endl;//
+	}
 	return (type);
 }
 
@@ -386,7 +404,7 @@ void	AST::build_tree(std::string str, std::unique_ptr<ASTNode> &node)
 
 	while (i < str.length())
 	{
-		if (str[i] == '(' && !is_part_of_function_expression(str, i))
+		if (str[i] == '(' && !is_part_of_function(str, i))
 			i = handle_brackets(stack_node, str, i);
 
 		if (is_key_of_map(this->_operation, str[i]))
@@ -426,6 +444,8 @@ void	AST::visit_ast(ASTNode *node)
 
 int	AST::check_str(std::string str)
 {
+	if (check_keyword(str))
+		return (1);
 	std::string		left_str = str.substr(0, str.find("="));
 	std::string		right_str = str.substr(str.find("=") + 1, std::string::npos);
 
