@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/10 22:47:57 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/11 22:38:19 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,24 @@ Parse&	Parse::operator=(const Parse& parse)
 	this->_set_other = parse._set_other;
 	this->_set_space = parse._set_space;
 	this->_operation = parse._operation;
+	this->_var = parse._var;
+	this->_func = parse._func;
 	this->_err_msg = parse._err_msg;
 	return (*this);
 }
 
 Parse::~Parse()
 {
+}
+
+void	Parse::set_var(std::map<std::string, std::string> var)
+{
+	this->_var = var;
+}
+
+void	Parse::set_func(std::map<std::string, std::string> func)
+{
+	this->_func = func;
 }
 
 std::string	Parse::parse_start(std::string &str)
@@ -367,7 +379,7 @@ int	Parse::check_vector_form(int type, std::string str)
 				|| is_element_of_set(this->_set_number, vector[i][j])))
 			{
 				if (type == VECTOR)
-					this->_err_msg = "invalid syntax: vector form4";
+					this->_err_msg = "invalid syntax: vector form";
 				else
 					this->_err_msg = "invalid syntax: matrix form";
 				throw (this->_err_msg);
@@ -503,6 +515,13 @@ char	Parse::do_convert(std::string str, size_t &i)
 	return (op[str[i]]);
 }
 
+int	Parse::is_part_of_function(std::string str, size_t i)
+{
+	if (i > 0 && is_element_of_set(this->_set_alphabet, str[i - 1]))
+		return (1);
+	return (0);
+}
+
 void	Parse::convert_operator(std::string &str)
 {
 	std::string	new_str = "";
@@ -525,6 +544,11 @@ void	Parse::convert_operator(std::string &str)
 			this->_err_msg = "invalid character exists: ";
 			this->_err_msg += str[i];
 			throw (this->_err_msg);
+		}
+		if (str[i] == '(' && is_part_of_function(str, i))
+		{
+			new_str += str.substr(i, skip_bracket(ROUND_BRACKET, str, i) - i + 1);
+			i = skip_bracket(ROUND_BRACKET,  str, i) + 1;
 		}
 		if (is_element_of_set(this->_set_operation, str[i]))
 			new_str += do_convert(str, i);
@@ -600,13 +624,13 @@ int	Parse::check_operator_round_brackets(std::string str)
 				|| is_key_of_map(this->_operation, front[front.length() - 1])
 				|| is_element_of_set(this->_set_alphabet, front[front.length() - 1])))
 		{
-			this->_err_msg = "invalid syntax: operator near round brackets";
+			this->_err_msg = "invalid syntax: operator near round brackets1";
 			throw (this->_err_msg);
 		}
 		if ((back != "" && back[0] != '\0')
 			&& !(back[0] == ')' || is_key_of_map(this->_operation, back[0])))
 		{
-			this->_err_msg = "invalid syntax: operator near round brackets";
+			this->_err_msg = "invalid syntax: operator near round brackets2";
 			throw (this->_err_msg);
 		}
 		str = front + "1" + back;
@@ -687,6 +711,148 @@ int	Parse::check_syntax(std::string &str)
 	return (1);
 }
 
+void	Parse::convert_to_standard_form(std::string &str)
+{
+	std::string	front;
+	std::string	back;
+	size_t		i = 0;
+
+	// ax to a*x, af(x) to a*f(x)
+	while (i < str.length())
+	{
+		if (is_element_of_set(this->_set_number, str[i])
+			&& str[i + 1]
+			&& !is_element_of_set(this->_set_number, str[i + 1])
+			&& is_element_of_set(this->_set_alphabet, str[i + 1]))
+		{
+			i++;
+			front = str.substr(0, i);
+			back = str.substr(i, std::string::npos);
+			str = front + "*" + back;
+		}
+		i++;
+	}
+}
+
+std::vector<std::string>	Parse::split_term(std::string str)
+{
+	std::vector<std::string>	term;
+	size_t				i = 0;
+	std::string			tmp;
+
+	convert_operator(str);
+	while (1)
+	{
+		i = 0;
+		while (!is_key_of_map(this->_operation, str[i])
+			&& str[i] != '?' && str[i] != '\0')
+			i++;
+		if (str[i] == '\0')
+			break ;
+		if (str.substr(0, i) != "")
+			term.push_back(str.substr(0, i));
+		if (str[i] != '?')
+			term.push_back(std::string(1, str[i]));
+		else
+			term.push_back(std::string(1, str[i]));
+		str = str.substr(i + 1, std::string::npos);
+	}
+	if (str != "")
+		term.push_back(str);
+	return (term);
+}
+
+std::string	Parse::revert_term_to_str(std::vector<std::string> term)
+{
+	std::string	str = "";
+
+	for (size_t i = 0; i < term.size(); i++)
+	{
+		if (is_key_of_map(this->_operation, term[i][0]))
+			str += this->_operation[term[i][0]];
+		else
+			str += term[i];
+	}
+	return (str);
+}
+
+std::string	Parse::convert_function_variable(std::string term,
+				std::map<std::string, std::string>::iterator var)
+{
+	std::string	name = get_function_name(term);
+	std::string	variable = get_function_variable(term);
+	std::string	front;
+	std::string	back;
+
+	if (variable == var->first)
+		term = name + "(" + var->second + ")";
+	else if (variable.find(var->first) != std::string::npos)
+	{
+		front = variable.substr(0, variable.find(var->first));
+		back = variable.substr(variable.find(var->first) + var->first.length(), std::string::npos);
+
+		if ((front == "" || !is_element_of_set(this->_set_alphabet, front[front.length() - 1]))
+			&& !is_element_of_set(this->_set_alphabet, back[0]))
+			term = name + "(" + front + "(" + var->second + ")" + back + ")";
+	}
+	return (term);
+}
+
+std::string	Parse::convert_function(std::string term,
+				std::string func_key, std::string func_value)
+{
+	std::string	function;
+	std::string	front;
+	std::string	back;
+	size_t		i = 0;
+
+	if (get_function_name(term) == func_key)
+	{
+		function = func_value;
+		while (i < function.length())
+		{
+			if (function[i] == 'x')
+			{
+				front = function.substr(0, i);
+				back = function.substr(i + 1, std::string::npos);
+				term = front + "(" + get_function_variable(term) + ")" + back;
+				i = front.length() + get_function_variable(term).length() + 2;
+			}
+			else
+				i++;
+		}
+	}
+	term = "(" + term + ")";
+	return (term);
+}
+
+void	Parse::convert_val_func(std::string &str)
+{
+	std::vector<std::string>	term = split_term(str);
+	std::string	name;
+
+	for(size_t i = 0; i < term.size(); i++)
+	{
+		for (std::map<std::string, std::string>::iterator it = this->_var.begin();
+			it != this->_var.end(); it++)
+		{	
+			if (term[i] == it->first)
+				term[i] = "(" + it->second + ")";
+			else if (term[i].find("(") != std::string::npos
+				&& term[i].find(")") != std::string::npos
+				&& is_part_of_function(term[i], term[i].find("("))
+				&& term[i].find(it->first) != std::string::npos)
+			{
+				term[i] = convert_function_variable(term[i], it);
+				name = get_function_name(term[i]);
+				if (this->_func.find(get_function_name(term[i])) != this->_func.end())
+					term[i] = convert_function(term[i], name, this->_func[name]);
+			}
+		}
+	}
+	str = revert_term_to_str(term);
+}
+
 std::string	Parse::check_str(std::string &str)
 {
 	if (check_keyword(str))
@@ -695,7 +861,51 @@ std::string	Parse::check_str(std::string &str)
 		return ("");
 
 	remove_space(str);
+////////// remove later
+	std::cout << "variable" << std::endl;
+	if (this->_var.size() == 0)
+	{
+		std::cout << MAGENTA
+			<< "there is no variable assigned yet" << BLACK << std::endl;
+	}
+	for (std::map<std::string, std::string>::iterator it = this->_var.begin();
+		it != this->_var.end(); it++)
+	{
+		std::cout << YELLOW << it->first << BLACK << std::endl;
+		std::cout << it->second;
+		std::cout << std::endl
+			<< MAGENTA << "═══════════════════════" << BLACK << std::endl;
+	}
+	std::cout << "function" << std::endl;
+	if (this->_func.size() == 0)
+	{
+		std::cout << MAGENTA
+			<< "there is no function assigned yet" << BLACK << std::endl;
+	}
+	for (std::map<std::string, std::string>::iterator it = this->_func.begin();
+		it != this->_func.end(); it++)
+	{
+		std::cout << YELLOW << it->first << BLACK << std::endl;
+		std::cout << it->second;
+		std::cout << std::endl
+			<< MAGENTA << "═══════════════════════" << BLACK << std::endl;
+	}
+	std::cout << "str before converting: " << str << std::endl;//
+///////////
+
+	convert_to_standard_form(str);
+std::cout << "str standard form: " << str << std::endl;//
+	std::string	left_str = str.substr(0, str.find("="));
+	std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
+
+	convert_val_func(left_str);
+	convert_val_func(right_str);
+	str = left_str + "=" + right_str;
+std::cout << "str after converting: " << str << std::endl;//
+////////////
+
 	if (!check_syntax(str))
 		return ("");
+	std::cout << "---------------------parsing done" << std::endl;
 	return (str);
 }

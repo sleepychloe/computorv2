@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:25 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/11 00:04:08 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/11 16:41:28 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,10 @@ public:
 	AST &operator=(const AST& ast);
 	~AST();
 
+	std::map<std::string,
+		std::string>		get_var(void) const;
+	std::map<std::string,
+		std::string>		get_func(void) const;
 	void				start_syntax_checking(std::string &str);
 	
 private:
@@ -79,14 +83,6 @@ private:
 	void				build_tree(std::string str, std::unique_ptr<ASTNode> &root);
 	void				visit_ast(ASTNode *node);
 
-	void				convert_to_standard_form(std::string &str);
-	int				skip_square_bracket(std::string str, size_t i);
-	std::vector<std::string>	split_term(std::string str);
-	std::string			convert_operation(std::string str);
-	void				convert_existing_variable(std::string &str);
-	std::string			convert_function(std::string function_name,
-							std::string function_variable);
-	void				convert_existing_function(std::string &str);
 	int				check_str(std::string str);
 
 	// ValueSet			convert_to_value_set(std::string term_str);

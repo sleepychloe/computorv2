@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:09:01 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/10 21:43:19 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/11 18:05:27 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,15 @@ int	main(int argc, char **argv)
 
 	std::string	input;
 	ReadLine	rl(STDIN_FILENO);
+	Parse		p;
 	AST		ast;
 
+	//test variable
+	p.set_var({{"a", "1.1"}, {"b", "1+1i"},
+		{"c", "[[1.1,2.2];[3.3,4.4]]"}, {"d", "[[1+1i,2+2i];[3+3i,4+4i]]"},
+		{"e", "[1.1,2.2,3.3]"}, {"f", "[1+1i,2+2i,3+3i]"}});
+	p.set_func({{"f", "x^2+1"}});
+	////
 	ignore_all_signal();
 	print_msg(CYAN, "🐣 Welcom to the computorv2 🐣");
 	print_msg(CYAN, "type 'exit' to quit !\n");
@@ -70,8 +77,8 @@ int	main(int argc, char **argv)
 		{
 			try
 			{
-				Parse	p;
-
+				// p.set_var(ast.get_var());
+				// p.set_func(ast.get_func());
 				input = p.parse_start(input);
 				std::cout << "input: " << input << std::endl;//
 			}
@@ -80,15 +87,15 @@ int	main(int argc, char **argv)
 				std::cerr << RED << "error: invalid input: " << err_msg << BLACK << std::endl;
 				continue ;
 			}
-			try
-			{
-				ast.start_syntax_checking(input);
-			}
-			catch(std::string err_msg)
-			{
-				std::cerr << RED << "error: invalid term: " << err_msg << BLACK << std::endl;
-				continue ;
-			}
+			// try
+			// {
+			// 	ast.start_syntax_checking(input);
+			// }
+			// catch(std::string err_msg)
+			// {
+			// 	std::cerr << RED << "error: invalid term: " << err_msg << BLACK << std::endl;
+			// 	continue ;
+			// }
 		}
 	}
 	return (0);
