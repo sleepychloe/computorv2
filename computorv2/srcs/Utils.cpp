@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 13:48:03 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/11 16:36:56 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/12 00:46:06 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,14 @@ int	is_element_of_set(std::unordered_set<char> set, char c)
 
 int	is_key_of_map(std::unordered_map<int, std::string> map, char c)
 {
-	if (map.count(c))
+	if (map.find(c) != map.end())
+		return (1);
+	return (0);
+}
+
+int	is_key_of_map(std::map<std::string, std::string> map, std::string str)
+{
+	if (map.find(str) != map.end())
 		return (1);
 	return (0);
 }

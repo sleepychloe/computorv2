@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:25 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/11 16:41:28 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/12 00:58:13 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ private:
 	void				build_subtree(std::stack<std::unique_ptr<ASTNode>> &stack_node,
 							std::stack<std::string> &stack_op);
 
-	int				is_part_of_function(std::string str, size_t i);
+	int				is_bracket_for_function(std::string str, size_t bracket_open_idx);
 	int				handle_brackets(std::stack<std::unique_ptr<ASTNode>> &stack_node,
 							std::string str, size_t i);
 	int				handle_operator(std::stack<std::unique_ptr<ASTNode>> &stack_node,

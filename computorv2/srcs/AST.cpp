@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:22 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/11 16:48:16 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/12 00:57:50 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,9 +155,13 @@ void	AST::build_subtree(std::stack<std::unique_ptr<ASTNode>> &stack_node,
 	stack_node.push(std::make_unique<ASTNode>(op, std::move(left), std::move(right)));
 }
 
-int	AST::is_part_of_function(std::string str, size_t i)
+int	AST::is_bracket_for_function(std::string str, size_t bracket_open_idx)
 {
-	if (i > 0 && is_element_of_set(this->_set_alphabet, str[i - 1]))
+	if (str[bracket_open_idx] != '(' || bracket_open_idx == 0)
+		return (0);
+	if (is_element_of_set(this->_set_alphabet, str[bracket_open_idx - 1])
+		&& str.find(')') != std::string::npos
+		&& bracket_open_idx < str.find(")", bracket_open_idx + 1))
 		return (1);
 	return (0);
 }
@@ -199,7 +203,7 @@ std::string	AST::get_term(std::string str, size_t &i)
 	std::string	term;
 
 	while (!(str[i] == '\0' || str[i] == '?'
-		|| (str[i] == '(' && !is_part_of_function(str, i))
+		|| (str[i] == '(' && !is_bracket_for_function(str, i))
 		|| is_key_of_map(this->_operation, str[i])))
 		i++;
 	term = str.substr(start, i - start);
@@ -384,7 +388,7 @@ void	AST::build_tree(std::string str, std::unique_ptr<ASTNode> &node)
 
 	while (i < str.length())
 	{
-		if (str[i] == '(' && !is_part_of_function(str, i))
+		if (str[i] == '(' && !is_bracket_for_function(str, i))
 			i = handle_brackets(stack_node, str, i);
 
 		if (is_key_of_map(this->_operation, str[i]))

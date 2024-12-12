@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/11 22:22:18 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/12 01:37:25 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,33 +62,32 @@ private:
 	int				check_number(std::string str);
 	void				remove_space(std::string &str);
 
+	void				convert_to_standard_form(std::string &str);
+	std::vector<std::string>	split_term(std::string str);
+	std::string			convert_func_variable(std::string term,
+							std::string var_key, std::string var_value);
+	std::string			convert_func_name(std::string term,
+							std::string func_key, std::string func_value);
+	void				convert_func(std::string &term);
+	std::string			revert_term_to_str(std::vector<std::string> term);
+	void				convert_val_func(std::string &str);
+
 	int				check_question_mark(std::string str);
 	int				check_caret(std::string str);
-
 	int				check_brackets(int type, std::string str);
 
 	int				check_vector_form(int type, std::string str);
 	int				check_matrix_form(std::string str);
-
 	int				skip_bracket(int type, std::string str, size_t i);
 	int				skip_vector_matrix(std::string str, std::string &new_str, size_t i);
 	char				do_convert(std::string str, size_t &i);
-	int				is_part_of_function(std::string str, size_t i);
+	int				is_bracket_for_function(std::string str, size_t bracket_open_idx);
 	void				convert_operator(std::string &str);
 
 	int				check_operator(std::string str);
 	int				check_operator_round_brackets(std::string str);
 	int				check_operator_square_brackets(std::string str);
 	int				check_syntax(std::string &str);
-
-	void				convert_to_standard_form(std::string &str);
-	std::vector<std::string>	split_term(std::string str);
-	std::string			convert_function_variable(std::string term,
-							std::map<std::string, std::string>::iterator var);
-	std::string			revert_term_to_str(std::vector<std::string> term);
-	std::string			convert_function(std::string term,
-							std::string func_key, std::string func_value);
-	void				convert_val_func(std::string &str);
 
 	std::string			check_str(std::string &str);
 
