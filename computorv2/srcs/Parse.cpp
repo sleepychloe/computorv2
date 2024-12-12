@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/12 01:48:00 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/12 13:08:12 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ int	Parse::check_keyword(std::string str)
 		return (1);
 	}
 	else if (str == "func" || str == "FUNC"
-		|| str == "function" || str == "function")
+		|| str == "function" || str == "FUNCTION")
 	{
 		return (1);
 	}
@@ -287,6 +287,11 @@ std::vector<std::string>	Parse::split_term(std::string str)
 	return (term);
 }
 
+void	Parse::process_variable_term(std::string &term)
+{
+	term = "(" + this->_var[term] + ")";
+}
+
 std::string	Parse::convert_func_variable(std::string term,
 				std::string var_key, std::string var_value)
 {
@@ -337,7 +342,7 @@ std::string	Parse::convert_func_name(std::string term,
 	return (term);
 }
 
-void	Parse::convert_func(std::string &term)
+void	Parse::process_function_term(std::string &term)
 {
 	std::string			func_name;
 
@@ -375,10 +380,10 @@ void	Parse::convert_val_func(std::string &str)
 	for(size_t i = 0; i < term.size(); i++)
 	{
 		if (is_key_of_map(this->_var, term[i]))
-			term[i] = "(" + this->_var[term[i]] + ")";
+			process_variable_term(term[i]);
 		if (term[i].find("(") != std::string::npos
 			&& is_bracket_for_function(term[i], term[i].find("(")))
-			convert_func(term[i]);
+			process_function_term(term[i]);
 	}
 	str = revert_term_to_str(term);
 }
@@ -725,7 +730,7 @@ int	Parse::check_operator(std::string str)
 	}
 	while (i < str.length())
 	{
-		if (str[i] == '(')
+		if (str[i] == '(' && !is_bracket_for_function(str, i))
 		{
 			std::string sub_str = str.substr(i + 1, skip_bracket(ROUND_BRACKET, str, i) - i - 1);
 			if (!check_operator(sub_str))
@@ -773,15 +778,18 @@ int	Parse::check_operator_round_brackets(std::string str)
 		if ((front != "" && front[front.length() - 1] != '\0')
 			&& !(front[front.length() - 1] == '('
 				|| is_key_of_map(this->_operation, front[front.length() - 1])
+				|| is_element_of_set(this->_set_operation, front[front.length() - 1])
 				|| is_element_of_set(this->_set_alphabet, front[front.length() - 1])))
 		{
-			this->_err_msg = "invalid syntax: operator near round brackets1";
+			this->_err_msg = "invalid syntax: operator near round brackets";
 			throw (this->_err_msg);
 		}
 		if ((back != "" && back[0] != '\0')
-			&& !(back[0] == ')' || is_key_of_map(this->_operation, back[0])))
+			&& !(back[0] == ')'
+				|| is_key_of_map(this->_operation, back[0])
+				|| is_element_of_set(this->_set_operation, back[0])))
 		{
-			this->_err_msg = "invalid syntax: operator near round brackets2";
+			this->_err_msg = "invalid syntax: operator near round brackets";
 			throw (this->_err_msg);
 		}
 		str = front + "1" + back;

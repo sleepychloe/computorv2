@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/12 01:37:25 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/12 11:57:59 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,14 @@ private:
 	void				remove_space(std::string &str);
 
 	void				convert_to_standard_form(std::string &str);
+	
 	std::vector<std::string>	split_term(std::string str);
+	void				process_variable_term(std::string &term);
 	std::string			convert_func_variable(std::string term,
 							std::string var_key, std::string var_value);
 	std::string			convert_func_name(std::string term,
 							std::string func_key, std::string func_value);
-	void				convert_func(std::string &term);
+	void				process_function_term(std::string &term);
 	std::string			revert_term_to_str(std::vector<std::string> term);
 	void				convert_val_func(std::string &str);
 

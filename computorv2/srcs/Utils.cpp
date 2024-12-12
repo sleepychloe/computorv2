@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 13:48:03 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/12 00:46:06 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/12 12:31:59 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,5 +82,7 @@ std::string	get_function_name(std::string term)
 
 std::string	get_function_variable(std::string term)
 {
+	if (term[term.length() - 1] == '\0')
+		term = term.substr(0, term.length() - 1);
 	return (term.substr(term.find("(") + 1, term.length() - term.find("(") - 2));
 }
