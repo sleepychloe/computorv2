@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/13 00:42:33 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/13 21:33:13 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@
 
 # define LEFT_STR		0
 # define RIGHT_STR		1
+# define ELSE			2
 
 typedef struct s_error
 {
@@ -122,15 +123,24 @@ private:
 	int				check_caret(int str_type, std::string str);
 	int				check_brackets(int str_type, int bracket_type, std::string str);
 
+	void				check_vector_str(int type, std::string str, size_t pos);
+	void				check_vector_element(int type, char c, size_t pos);
 	int				check_vector_form(int type, std::string str, size_t pos);
+
+	void				check_matrix_str(std::string str, size_t pos);
+	void				check_matrix_row(std::string row, size_t pos);
+	void				check_matrix_column(std::string row, size_t i, size_t pos);
 	int				check_matrix_form(std::string str, size_t pos);
 	int				skip_vector_matrix(std::string str, std::string &new_str, size_t i, size_t pos);
-	char				do_convert(std::string str, size_t &i);
+
 	int				is_bracket_for_function(std::string str, size_t bracket_open_idx);
 	int				skip_function(std::string str, std::string &new_str, size_t i);
+	int				skip_vector_matrix_function(std::string str,
+							std::string &new_str, size_t i, size_t pos);
+	char				do_convert(std::string str, size_t &i);
 	void				convert_operator(int str_type, std::string &str);
 
-	int				check_operator(std::string str);
+	int				check_operator(int str_type, std::string str);
 	int				check_operator_round_brackets(std::string str);
 	int				check_operator_square_brackets(std::string str);
 	int				check_syntax(std::string &str);

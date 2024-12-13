@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/13 19:20:19 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/13 22:00:18 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -541,33 +541,52 @@ int	Parse::check_brackets(int str_type, int bracket_type, std::string str)
 	return (1);
 }
 
+void	Parse::check_vector_str(int type, std::string str, size_t pos)
+{
+	if (str[0] == ',')
+	{
+		if (type == VECTOR)
+			throw_err_msg("Parse::check_vector_str(int type, std::string str, size_t pos)",
+				"invalid verctor form: invalid use of comma(,)", pos);
+		else
+			throw_err_msg("Parse::check_vector_str(int type, std::string str, size_t pos)",
+				"invalid matrix form: invalid use of comma(,)", pos);
+	}
+	if (str[str.length() - 1] == ',')
+	{
+		if (type == VECTOR)
+			throw_err_msg("Parse::check_vector_str(int type, std::string str, size_t pos)",
+				"invalid verctor form: invalid use of comma(,)", pos + str.length() - 1);
+		else
+			throw_err_msg("Parse::check_vector_str(int type, std::string str, size_t pos)",
+				"invalid matrix form: invalid use of comma(,)", pos + str.length() - 1);
+	}
+}
+
+void	Parse::check_vector_element(int type, char c, size_t pos)
+{
+	if (!(is_element_of_set(this->_set_alphabet, c)
+		|| is_element_of_set(this->_set_number, c)
+		|| is_element_of_set(this->_set_operation, c)))
+	{
+		if (type == VECTOR)
+			throw_err_msg("Parse::check_vector_element(int type, char c, size_t pos)",
+				"invalid vector form: invalid character exists", pos);
+		else
+			throw_err_msg("Parse::check_vector_element(int type, char c, size_t pos)",
+				"invalid matrix form: invalid character exists", pos);
+	}
+}
+
 int	Parse::check_vector_form(int type, std::string str, size_t pos)
 {
 	std::vector<std::string>	vector;
 
 	str = str.substr(1, str.length() - 2);
 	pos++;
+	check_vector_str(type, str, pos);
 
-	if (str[0] == ',')
-	{
-		if (type == VECTOR)
-			throw_err_msg("Parse::check_vector_form(int type, std::string str, size_t pos)",
-				"invalid verctor form: invalid use of comma(,)", pos);
-		else
-			throw_err_msg("Parse::check_vector_form(int type, std::string str, size_t pos)",
-				"invalid matrix form: invalid use of comma(,)", pos);
-	}
-	if (str[str.length() - 1] == ',')
-	{
-		if (type == VECTOR)
-			throw_err_msg("Parse::check_vector_form(int type, std::string str, size_t pos)",
-				"invalid verctor form: invalid use of comma(,)", pos + str.length() - 1);
-		else
-			throw_err_msg("Parse::check_vector_form(int type, std::string str, size_t pos)",
-				"invalid matrix form: invalid use of comma(,)", pos + str.length() - 1);
-	}
 	vector = split(str, ',');
-
 	for (size_t i = 0; i < vector.size(); i++)
 	{
 		if (vector[i] == "")
@@ -580,23 +599,55 @@ int	Parse::check_vector_form(int type, std::string str, size_t pos)
 					"invalid matrix form: invalid use of comma(,)", pos);
 		}
 		for (size_t j = 0; j < vector[i].length(); j++)
-		{
-			if (!(is_element_of_set(this->_set_alphabet, vector[i][j])
-				|| is_element_of_set(this->_set_number, vector[i][j])
-				|| is_element_of_set(this->_set_operation, vector[i][j])))
-			{
-				if (type == VECTOR)
-					throw_err_msg("Parse::check_vector_form(int type, std::string str, size_t pos)",
-						"invalid vector form: invalid character exists", pos + j);
-				else
-					throw_err_msg("Parse::check_vector_form(int type, std::string str, size_t pos)",
-						"invalid matrix form: invalid character exists", pos + j);
-			}
-		}
+			check_vector_element(type, vector[i][j], pos + j);
 		pos += vector[i].length();
 		pos++;
 	}
 	return (vector.size());
+}
+
+void	Parse::check_matrix_str(std::string str, size_t pos)
+{
+	if (str[0] == ';')
+		throw_err_msg("Parse::check_matrix_str(std::string str, size_t pos)",
+			"invalid matrix form: invalid use of semi-colon(;)", pos);
+	if (str[str.length() - 1] == ';')
+		throw_err_msg("Parse::check_matrix_str(std::string str, size_t pos)",
+			"invalid matrix form: invalid use of semi-colon(;)", pos + str.length() - 1);
+}
+
+void	Parse::check_matrix_row(std::string row, size_t pos)
+{
+	if (row[0] != '[')
+		throw_err_msg("Parse::check_matrix_row(std::string row, size_t pos)",
+			"invalid matrix form: invalid character exists", pos);
+	if (row.find("[", 1) != std::string::npos)
+		throw_err_msg("Parse::check_matrix_row(std::string row, size_t pos)",
+			"invalid matrix form: invalid use of bracets", pos + row.find("[", 1));
+
+	if (row[row.length() - 1] != ']')
+		throw_err_msg("Parse::check_matrix_row(std::string row, size_t pos)",
+			"invalid matrix form: invalid character exists", pos + row.length() - 1);
+	if (row.find("]") != row.length() - 1)
+		throw_err_msg("Parse::check_matrix_row(std::string row, size_t pos)",
+			"invalid matrix form: invalid use of bracets", pos + row.find("]"));
+}
+
+void	Parse::check_matrix_column(std::string row, size_t i, size_t pos)
+{
+	int		col_size = 0;
+
+	if (i == 0)
+		col_size = check_vector_form(MATRIX, row, pos);
+	else
+	{
+		if (col_size < 1 || col_size != check_vector_form(MATRIX, row, pos))
+		{
+			throw_err_msg("Parse::check_matrix_column(std::string row, size_t i, size_t pos)",
+				"invalid matrix form: column size of each row should be same",
+				pos + row.length() - 1);
+		}
+	}
 }
 
 int	Parse::check_matrix_form(std::string str, size_t pos)
@@ -605,45 +656,16 @@ int	Parse::check_matrix_form(std::string str, size_t pos)
 
 	str = str.substr(1, str.length() - 2);
 	pos++;
-	if (str[0] == ';')
-		throw_err_msg("Parse::check_matrix_form(std::string str, size_t pos)",
-			"invalid matrix form: invalid use of semi-colon(;)", pos);
-	if (str[str.length() - 1] == ';')
-		throw_err_msg("Parse::check_matrix_form(std::string str, size_t pos)",
-			"invalid matrix form: invalid use of semi-colon(;)", pos + str.length() - 1);
+	check_matrix_str(str, pos);
+
 	row = split(str, ';');
-
-	int		col_size;
-	int		tmp_size;
-
 	for (size_t i = 0; i < row.size();i++)
 	{
-		if (row[i][0] != '[')
+		if (row[i] == "")
 			throw_err_msg("Parse::check_matrix_form(std::string str, size_t pos)",
-				"invalid matrix form: invalid character exists", pos);
-		if (row[i].find("[", 1) != std::string::npos)
-			if (row[i].find("[", 1) != std::string::npos)
-			throw_err_msg("Parse::check_matrix_form(std::string str, size_t pos)",
-				"invalid matrix form: invalid use of bracets", pos + row[i].find("[", 1));
-
-		if (row[i][row[i].length() - 1] != ']')
-			throw_err_msg("Parse::check_matrix_form(std::string str, size_t pos)",
-				"invalid matrix form: invalid character exists", pos + row[i].length() - 1);
-		if (row[i].find("]") != row[i].length() - 1)
-			throw_err_msg("Parse::check_matrix_form(std::string str, size_t pos)",
-				"invalid matrix form: invalid use of bracets", pos + row[i].find("]"));
-
-		if (i == 0)
-			col_size = check_vector_form(MATRIX, row[i], pos);
-		else
-		{
-			tmp_size = check_vector_form(MATRIX, row[i], pos);
-			if (tmp_size != col_size)
-			{
-				throw_err_msg("Parse::check_matrix_form(std::string str, size_t pos)",
-					"invalid matrix form: column size of each row should be same", pos + row[i].length() - 1);
-			}
-		}
+					"invalid matrix form: invalid use of semi-colon(;)", pos);
+		check_matrix_row(row[i], pos);
+		check_matrix_column(row[i], i, pos);
 		pos += row[i].length();
 		pos++;
 	}
@@ -685,6 +707,40 @@ int	Parse::skip_vector_matrix(std::string str, std::string &new_str, size_t i, s
 	return (i++);
 }
 
+int	Parse::is_bracket_for_function(std::string str, size_t bracket_open_idx)
+{
+	if (str[bracket_open_idx] != '(' || bracket_open_idx == 0)
+		return (0);
+	if (is_element_of_set(this->_set_alphabet, str[bracket_open_idx - 1])
+		&& str.find(')') != std::string::npos
+		&& bracket_open_idx < str.find(")", bracket_open_idx + 1))
+		return (1);
+	return (0);
+}
+
+int	Parse::skip_function(std::string str, std::string &new_str, size_t i)
+{
+	new_str += str.substr(i, skip_bracket(ROUND_BRACKET, str, i) - i + 1);
+	i = skip_bracket(ROUND_BRACKET,  str, i) + 1;
+	return (i);
+}
+
+int	Parse::skip_vector_matrix_function(std::string str,
+				std::string &new_str, size_t i, size_t pos)
+{
+	i = skip_vector_matrix(str, new_str, i, pos + i);
+	if (!(is_element_of_set(this->_set_alphabet, str[i])
+		|| is_element_of_set(this->_set_number, str[i])
+		|| is_element_of_set(this->_set_operation, str[i])
+		|| is_element_of_set(this->_set_other, str[i])
+		|| str[i] == '\0'))
+		throw_err_msg("Parse::skip_vector_matrix_function(std::string str, std::string &new_str, size_t i, size_t pos)",
+			"invalid character exists", pos + i);
+	if (str[i] == '(' && is_bracket_for_function(str, i))
+		i = skip_function(str, new_str, i);
+	return (i);
+}
+
 char	Parse::do_convert(std::string str, size_t &i)
 {
 	std::unordered_map<char, int> op = {{'+', OP_ADD}, {'-', OP_SUB},
@@ -708,24 +764,6 @@ char	Parse::do_convert(std::string str, size_t &i)
 	return (op[str[i]]);
 }
 
-int	Parse::is_bracket_for_function(std::string str, size_t bracket_open_idx)
-{
-	if (str[bracket_open_idx] != '(' || bracket_open_idx == 0)
-		return (0);
-	if (is_element_of_set(this->_set_alphabet, str[bracket_open_idx - 1])
-		&& str.find(')') != std::string::npos
-		&& bracket_open_idx < str.find(")", bracket_open_idx + 1))
-		return (1);
-	return (0);
-}
-
-int	Parse::skip_function(std::string str, std::string &new_str, size_t i)
-{
-	new_str += str.substr(i, skip_bracket(ROUND_BRACKET, str, i) - i + 1);
-	i = skip_bracket(ROUND_BRACKET,  str, i) + 1;
-	return (i);
-}
-
 void	Parse::convert_operator(int str_type, std::string &str)
 {
 	std::string	new_str = "";
@@ -739,17 +777,8 @@ void	Parse::convert_operator(int str_type, std::string &str)
 	{
 		if (i == 0 && (str[i] == '+' || str[i] == '-'))
 			new_str += str[i];
-		i = skip_vector_matrix(str, new_str, i, pos + i);
-		if (!(is_element_of_set(this->_set_alphabet, str[i])
-			|| is_element_of_set(this->_set_number, str[i])
-			|| is_element_of_set(this->_set_operation, str[i])
-			|| is_element_of_set(this->_set_other, str[i])
-			|| str[i] == '\0'))
-			throw_err_msg("Parse::convert_operator(std::string &str)",
-				"invalid character exists", pos + i);
-		if (str[i] == '(' && is_bracket_for_function(str, i))
-			i = skip_function(str, new_str, i);
 
+		i = skip_vector_matrix_function(str, new_str, i, pos);
 		if (is_element_of_set(this->_set_operation, str[i]))
 			new_str += do_convert(str, i);
 		else
@@ -759,43 +788,44 @@ void	Parse::convert_operator(int str_type, std::string &str)
 	str = new_str;
 }
 
-// int	Parse::check_operator(std::string str)
-// {
-// 	std::string	sub_str = "";
-// 	size_t		i = 0;
+int	Parse::check_operator(int str_type, std::string str)
+{
+	std::string	sub_str = "";
+	size_t		pos = 0;
+	size_t		i = 0;
 
-// 	if (str[i] == '+' || str[i] == '-')
-// 		i++;
-// 	if (is_key_of_map(this->_operation, str[i])
-// 		|| is_key_of_map(this->_operation, str[str.length() - 1]))
-// 	{
-// 		this->_err_msg = "invalid syntax: operator";
-// 		throw (this->_err_msg);
-// 	}
-// 	while (i < str.length())
-// 	{
-// 		if (str[i] == '(' && !is_bracket_for_function(str, i))
-// 		{
-// 			std::string sub_str = str.substr(i + 1, skip_bracket(ROUND_BRACKET, str, i) - i - 1);
-// 			if (!check_operator(sub_str))
-// 			{
-// 				this->_err_msg = "invalid syntax: operator";
-// 				throw (this->_err_msg);
-// 			}
-// 			i = skip_bracket(ROUND_BRACKET, str, i) + 1;
-// 		}
-// 		else if (is_key_of_map(this->_operation, str[i]))
-// 		{
-// 			if (str[i + 1] && is_key_of_map(this->_operation, str[i + 1]))
-// 			{
-// 				this->_err_msg = "invalid syntax: operator";
-// 				throw (this->_err_msg);
-// 			}
-// 		}
-// 		i++;
-// 	}
-// 	return (1);
-// }
+	if (str_type == RIGHT_STR)
+		pos = this->_str.substr(0, this->_str.find("=")).length() + 1;
+	if (!(str_type == LEFT_STR || str_type == RIGHT_STR))
+		pos = str_type;
+
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (is_key_of_map(this->_operation, str[i]))
+		throw_err_msg("Parse::check_operator(int str_type, std::string str)",
+			"invalid use of operation: expect number before using operation", pos + i);
+	if (is_key_of_map(this->_operation, str[str.length() - 1]))
+		throw_err_msg("Parse::check_operator(int str_type, std::string str)",
+			"invalid use of operation: expect number after using operation", pos + str.length() - 1);
+
+	while (i < str.length())
+	{
+		if (str[i] == '(' && !is_bracket_for_function(str, i))
+		{
+			sub_str = str.substr(i + 1, skip_bracket(ROUND_BRACKET, str, i) - i - 1);
+			check_operator(pos + i + 1, sub_str);
+			i = skip_bracket(ROUND_BRACKET, str, i) + 1;
+		}
+		else if (is_key_of_map(this->_operation, str[i]))
+		{
+			if (str[i + 1] && is_key_of_map(this->_operation, str[i + 1]))
+				throw_err_msg("Parse::check_operator(int str_type, std::string str)",
+					"invalid use of operation: expect number before using operation", pos + i + 1);
+		}
+		i++;
+	}
+	return (1);
+}
 
 // int	Parse::check_operator_round_brackets(std::string str)
 // {
@@ -897,9 +927,10 @@ int	Parse::check_syntax(std::string &str)
 	convert_operator(LEFT_STR, left_str);
 	convert_operator(RIGHT_STR, right_str);
 	str = left_str + "=" + right_str;
-	//this->_str update(?)
 
-	// if (!(check_operator(left_str) && check_operator(right_str)
+	if (!(check_operator(LEFT_STR, left_str) && check_operator(RIGHT_STR, right_str)
+		))
+		return (0);
 	// 	&& check_operator_round_brackets(left_str)
 	// 	&& check_operator_round_brackets(right_str)
 	// 	&& check_operator_square_brackets(left_str)
@@ -912,6 +943,7 @@ int	Parse::check_syntax(std::string &str)
 	// 	str[i] = std::tolower(str[i]);
 	// 	i++;
 	// }
+	//this->_str update
 	return (1);
 }
 
