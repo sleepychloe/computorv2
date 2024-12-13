@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:09:01 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/11 18:05:27 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/12 18:39:45 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,9 +82,14 @@ int	main(int argc, char **argv)
 				input = p.parse_start(input);
 				std::cout << "input: " << input << std::endl;//
 			}
-			catch(std::string err_msg)
+			// catch(std::string err_msg)
+			// {
+			// 	std::cerr << RED << "error: invalid input: " << err_msg << BLACK << std::endl;
+			// 	continue ;
+			// }
+			catch(const Parse::ParseException& e)
 			{
-				std::cerr << RED << "error: invalid input: " << err_msg << BLACK << std::endl;
+				std::cerr << e.what() << std::endl;
 				continue ;
 			}
 			// try

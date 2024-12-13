@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 13:48:03 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/12 12:31:59 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/13 00:22:23 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,29 @@ std::vector<std::string>	split(std::string str, char delimeter)
 	while (std::getline(ss, token, delimeter))
 		res.push_back(token);
 	return (res);
+}
+
+int	skip_bracket(int type, std::string str, size_t i)
+{
+	char			bracket[2];
+	std::stack<char>	stack;
+
+	bracket[OPEN] = (type == SQUARE_BRACKET) ? '[': '(';
+	bracket[CLOSE] = (type == SQUARE_BRACKET) ? ']': ')';
+
+	stack.push(str[i]);
+	i++;
+	while (i < str.length())
+	{
+		if (str[i] == bracket[OPEN])
+			stack.push(str[i]);
+		if (str[i] == bracket[CLOSE])
+			stack.pop();
+		if (stack.empty())
+			break ;
+		i++;
+	}
+	return (i);
 }
 
 int	check_round_brackets(std::string str)
