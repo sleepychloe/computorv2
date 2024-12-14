@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 13:47:38 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/13 00:22:20 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/14 00:48:21 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,10 @@ int				is_key_of_map(std::unordered_map<int, std::string> map, char c);
 int				is_key_of_map(std::map<std::string, std::string> map, std::string str);
 std::vector<std::string>	split(std::string str, char delimeter);
 int				skip_bracket(int type, std::string str, size_t i);
-
-int				check_round_brackets(std::string str);
 std::string			get_function_name(std::string term);
 std::string			get_function_variable(std::string term);
+std::string			get_bracket_str(int type, std::string str);
+
+int				check_round_brackets(std::string str);
 
 #endif
