@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/14 18:11:04 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/14 21:40:05 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ private:
 	int				check_float_point(std::string str);
 	int				check_number(std::string str);
 	void				remove_space(std::string &str);
+	void				convert_to_lower_case(std::string &str);
 
 	void				convert_to_standard_form(std::string &str);
 	
@@ -127,8 +128,9 @@ private:
 
 	void				check_before_open_bracket(std::string str, size_t open_idx, size_t pos);
 	void				check_after_close_bracket(std::string str, size_t close_idx, size_t pos);
-	int				check_for_vector_matrix(std::string str, size_t i, size_t pos);
-	int				check_for_function(std::string str, size_t i, size_t pos);
+	int				check_for_vector_matrix(std::string &str, size_t i, size_t pos);
+	int				check_for_function(std::string &str, size_t i, size_t pos);
+	int				check_for_round_brackets(std::string str, size_t pos);
 	int				check_operator_near_brackets(int str_type, std::string str);
 
 	int				check_syntax(std::string &str);

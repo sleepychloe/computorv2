@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/14 18:33:57 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/14 21:40:58 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -256,6 +256,12 @@ void	Parse::remove_space(std::string &str)
 	str = new_str;
 }
 
+void	Parse::convert_to_lower_case(std::string &str)
+{
+	for (size_t i = 0; i < str.length(); i++)
+		str[i] = std::tolower(str[i]);
+}
+
 void	Parse::convert_to_standard_form(std::string &str)
 {
 	std::string	front;
@@ -263,6 +269,7 @@ void	Parse::convert_to_standard_form(std::string &str)
 	size_t		i = 0;
 
 	remove_space(str);
+	convert_to_lower_case(str);
 
 	// ax to a*x, af(x) to a*f(x)
 	while (i < str.length())
@@ -873,7 +880,7 @@ void	Parse::check_after_close_bracket(std::string str, size_t close_idx, size_t 
 	}
 }
 
-int	Parse::check_for_vector_matrix(std::string str, size_t i, size_t pos)
+int	Parse::check_for_vector_matrix(std::string &str, size_t i, size_t pos)
 {
 	size_t	close = skip_bracket(SQUARE_BRACKET, str, i);
 
@@ -891,7 +898,7 @@ int	Parse::check_for_vector_matrix(std::string str, size_t i, size_t pos)
 	return (close);
 }
 
-int	Parse::check_for_function(std::string str, size_t i, size_t pos)
+int	Parse::check_for_function(std::string &str, size_t i, size_t pos)
 {
 	while (str[i] != ')')
 	{
@@ -902,6 +909,30 @@ int	Parse::check_for_function(std::string str, size_t i, size_t pos)
 	str[i] = ROUND_CLOSE;
 	check_after_close_bracket(str, i, pos + i);
 	return (i);
+}
+
+int	Parse::check_for_round_brackets(std::string str, size_t pos)
+{
+	std::string	front;
+	std::string	back;
+	std::string	bracket;
+
+	while (1)
+	{
+		bracket = get_bracket_str(str);
+		if (bracket == "")
+			return (1) ;
+		front = str.substr(0, str.find(bracket));
+		back = str.substr(str.find(bracket) + bracket.length(), std::string::npos);
+
+		check_before_open_bracket(str, front.length(), pos + front.length());
+		check_after_close_bracket(str, front.length() + bracket.length() - 1, pos + front.length() + bracket.length() - 1);
+
+		str = front + std::string(1, ROUND_OPEN)
+			+ bracket.substr(1, bracket.length() - 2)
+			+ std::string(1, ROUND_CLOSE) + back;
+	}
+	return (1);
 }
 
 int	Parse::check_operator_near_brackets(int str_type, std::string str)
@@ -920,46 +951,7 @@ int	Parse::check_operator_near_brackets(int str_type, std::string str)
 			i = check_for_function(str, i, pos);
 		i++;
 	}
-	std::cout << "\tremoved bracket: " << str << std::endl;//
-
-	// std::cout << "str_type: " << str_type << std::endl;
-	// std::cout << "first round: " << get_bracket_str(str) << "_" << std::endl;
-
-	// while (1)
-	// {
-	// 	if (str.find(")") == std::string::npos)
-	// 		return (1);
-	// 	i = 0;
-	// 	while (str[i] != ')')
-	// 		i++;
-	// 	end = i;
-	// 	while (str[i] != '(')
-	// 		i--;
-	// 	start = i;
-
-	// 	front = str.substr(0, start);
-	// 	back = str.substr(end + 1, std::string::npos);
-	// 	if ((front != "" && front[front.length() - 1] != '\0')
-	// 		&& !(front[front.length() - 1] == '('
-	// 			|| is_key_of_map(this->_operation, front[front.length() - 1])
-	// 			|| is_element_of_set(this->_set_operation, front[front.length() - 1])
-	// 			|| is_element_of_set(this->_set_alphabet, front[front.length() - 1])))
-	// 	{
-	// 		// this->_err_msg = "invalid syntax: operator near round brackets";
-	// 		// throw (this->_err_msg);
-	// 	}
-	// 	if ((back != "" && back[0] != '\0')
-	// 		&& !(back[0] == ')'
-	// 			|| is_key_of_map(this->_operation, back[0])
-	// 			|| is_element_of_set(this->_set_operation, back[0])))
-	// 	{
-	// 		// this->_err_msg = "invalid syntax: operator near round brackets";
-	// 		// throw (this->_err_msg);
-	// 	}
-	// 	str = front + "1" + back;
-	// 	continue ;
-	// }
-	return (1);
+	return (check_for_round_brackets(str, pos));
 }
 
 int	Parse::check_syntax(std::string &str)
@@ -983,14 +975,6 @@ int	Parse::check_syntax(std::string &str)
 		&& check_operator_near_brackets(LEFT_STR, left_str)
 		&& check_operator_near_brackets(RIGHT_STR, right_str)))
 		return (0);
-
-	// size_t	i = 0;
-	// while (i < str.length())
-	// {
-	// 	str[i] = std::tolower(str[i]);
-	// 	i++;
-	// }
-	//this->_str update
 	return (1);
 }
 
@@ -1033,6 +1017,7 @@ std::string	Parse::check_str(std::string &str)
 // 	}
 // 	std::cout << "str before converting: " << str << std::endl;//
 // ///////////
+
 	// std::string	left_str = str.substr(0, str.find("="));
 	// std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
 
