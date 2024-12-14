@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/14 01:43:26 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/14 18:33:57 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -792,10 +792,10 @@ int	Parse::check_first_sign(std::string str, size_t pos)
 		i++;
 	if (is_key_of_map(this->_operation, str[i]))
 		throw_err_msg("Parse::check_operator(int str_type, std::string str)",
-			"invalid use of operation: expect number before using operation", pos + i);
+			"invalid use of operator: expect number before using operator", pos + i);
 	if (is_key_of_map(this->_operation, str[str.length() - 1]))
 		throw_err_msg("Parse::check_operator(int str_type, std::string str)",
-			"invalid use of operation: expect number after using operation", pos + str.length() - 1);
+			"invalid use of operator: expect number after using operator", pos + str.length() - 1);
 	return (i);
 }
 
@@ -829,61 +829,101 @@ int	Parse::check_operator(int str_type, std::string str)
 			i++;
 			if (is_key_of_map(this->_operation, str[i]))
 				throw_err_msg("Parse::check_operator(int str_type, std::string str)",
-					"invalid use of operation: expect number before using operation", pos + i);
+					"invalid use of operator: expect number before using operator", pos + i);
 		}
 		i++;
 	}
 	return (1);
 }
 
-// int	Parse::check_operator_square_brackets(std::string str)
-// {
-// 	std::string	front;
-// 	std::string	back;
-// 	size_t		start;
-// 	size_t		end;
-// 	size_t		i;
+void	Parse::check_before_open_bracket(std::string str, size_t open_idx, size_t pos)
+{
+	if (open_idx > 0)
+	{
+		if (open_idx == 1 && (str[0] == '+' || str[0] == '-'))
+			return ;
+		if (!(str[open_idx - 1] == '('
+			|| is_key_of_map(this->_operation, str[open_idx - 1])))
+		{
+			if (str[open_idx] == '(' || str[open_idx] == ROUND_OPEN)
+				throw_err_msg("Parse::check_before_open_bracket(std::string str, size_t open_idx, size_t pos)",
+					"invalid use of operator: expect operator before opening round bracket", pos - 1);
+			else
+				throw_err_msg("Parse::check_before_open_bracket(std::string str, size_t open_idx, size_t pos)",
+					"invalid use of operator: expect operator before opening square bracket", pos - 1);
+		}
+	}
+}
 
-// 	while (1)
-// 	{
-// 		if (str.find("[") == std::string::npos)
-// 			return (1);
-// 		i = 0;
-// 		while (str[i] != '[')
-// 			i++;
-// 		start = i--;
-// 		end = skip_bracket(SQUARE_BRACKET, str, i + 1);
+void	Parse::check_after_close_bracket(std::string str, size_t close_idx, size_t pos)
+{
+	if (close_idx < str.length() - 1)
+	{
+		if (!(str[close_idx + 1] == '\0'
+			|| str[close_idx + 1] == ')'
+			|| is_key_of_map(this->_operation, str[close_idx + 1])))
+		{
+			if (str[close_idx] == ')' || str[close_idx] == ROUND_CLOSE)
+				throw_err_msg("Parse::check_after_close_bracket(std::string str, size_t close_idx, size_t pos)",
+					"invalid use of operator: expect operator after closing round bracket", pos + 1);
+			else
+				throw_err_msg("Parse::check_after_close_bracket(std::string str, size_t close_idx, size_t pos)",
+					"invalid use of operator: expect operator after closing square bracket", pos + 1);
+		}
+	}
+}
 
-// 		front = str.substr(0, start);
-// 		back = str.substr(end + 1, std::string::npos);
-// 		if ((front != "" && front[front.length() - 1] != '\0')
-// 			&& !(front[front.length() - 1] == '('
-// 				|| is_key_of_map(this->_operation, front[front.length() - 1])))
-// 		{
-// 			this->_err_msg = "invalid syntax: operator near square brackets";
-// 			throw (this->_err_msg);
-// 		}
-// 		if ((back != "" && back[0] != '\0')
-// 			&& !(back[0] == ')' || is_key_of_map(this->_operation, back[0])))
-// 		{
-// 			this->_err_msg = "invalid syntax: operator near square brackets";
-// 			throw (this->_err_msg);
-// 		}
-// 		str = front + "1" + back;
-// 		continue ;
-// 	}
-// 	return (1);
-// }
+int	Parse::check_for_vector_matrix(std::string str, size_t i, size_t pos)
+{
+	size_t	close = skip_bracket(SQUARE_BRACKET, str, i);
+
+	check_before_open_bracket(str, i, pos + i);
+	check_after_close_bracket(str, close, pos + close);
+
+	while (i <= close)
+	{
+		if (str[i] == '[')
+			str[i] = SQUARE_OPEN;
+		if (str[i] == ']')
+			str[i] = SQUARE_CLOSE;
+		i++;
+	}
+	return (close);
+}
+
+int	Parse::check_for_function(std::string str, size_t i, size_t pos)
+{
+	while (str[i] != ')')
+	{
+		if (str[i] == '(')
+			str[i] = ROUND_OPEN;
+		i++;
+	}
+	str[i] = ROUND_CLOSE;
+	check_after_close_bracket(str, i, pos + i);
+	return (i);
+}
 
 int	Parse::check_operator_near_brackets(int str_type, std::string str)
 {
-	// std::string	front;
-	// std::string	back;
-	// size_t		i;
+	size_t		pos = 0;
+	size_t		i = 0;
 
-	std::cout << "str_type: " << str_type << std::endl;
-	std::cout << "first round: " << get_bracket_str(ROUND_BRACKET, str) << "_" << std::endl;
-	std::cout << "first square: " << get_bracket_str(SQUARE_BRACKET, str) << "_" << std::endl;
+	if (str_type == RIGHT_STR)
+		pos = this->_str.substr(0, this->_str.find("=")).length() + 1;
+
+	while (i < str.length())
+	{
+		if (str[i] == '[')
+			i = check_for_vector_matrix(str, i, pos);
+		else if (str[i] == '(' && is_bracket_for_function(str, i))
+			i = check_for_function(str, i, pos);
+		i++;
+	}
+	std::cout << "\tremoved bracket: " << str << std::endl;//
+
+	// std::cout << "str_type: " << str_type << std::endl;
+	// std::cout << "first round: " << get_bracket_str(str) << "_" << std::endl;
 
 	// while (1)
 	// {

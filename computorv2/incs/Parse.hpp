@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/14 01:43:10 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/14 18:11:04 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,27 +23,8 @@
 #include <stack>
 #include <cctype>
 #include "./Utils.hpp"
+#include "./Define.hpp"
 #include "./Color.hpp"
-
-# define ROUND_BRACKET		0
-# define SQUARE_BRACKET		1
-
-# define OPEN			0
-# define CLOSE			1
-
-# define VECTOR			0
-# define MATRIX			1
-
-# define OP_ADD			1 /* + */
-# define OP_SUB			2 /* - */
-# define OP_MUL			3 /* * */
-# define OP_DIV			4 /* / */
-# define OP_MODULO		5 /* % */
-# define OP_POWER		6 /* ^ */
-# define OP_MAT_MUL		7 /* ** */
-
-# define LEFT_STR		0
-# define RIGHT_STR		1
 
 typedef struct s_error
 {
@@ -144,6 +125,10 @@ private:
 	int				check_operator_bracket_str(std::string str, size_t i, size_t pos);
 	int				check_operator(int str_type, std::string str);
 
+	void				check_before_open_bracket(std::string str, size_t open_idx, size_t pos);
+	void				check_after_close_bracket(std::string str, size_t close_idx, size_t pos);
+	int				check_for_vector_matrix(std::string str, size_t i, size_t pos);
+	int				check_for_function(std::string str, size_t i, size_t pos);
 	int				check_operator_near_brackets(int str_type, std::string str);
 
 	int				check_syntax(std::string &str);

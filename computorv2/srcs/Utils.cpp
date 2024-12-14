@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 13:48:03 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/14 01:38:56 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/14 17:12:18 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,24 +70,20 @@ int	skip_bracket(int type, std::string str, size_t i)
 	return (i);
 }
 
-std::string	get_bracket_str(int type, std::string str)
+std::string	get_bracket_str(std::string str)
 {
-	char	bracket[2];
 	size_t	start;
 	size_t	end;
 	size_t	i = 0;
 
-	bracket[OPEN] = (type == SQUARE_BRACKET) ? '[': '(';
-	bracket[CLOSE] = (type == SQUARE_BRACKET) ? ']': ')';
-
-	if (str.find(bracket[OPEN]) == std::string::npos
-		&& str.find(bracket[CLOSE]) == std::string::npos)
+	if (str.find("(") == std::string::npos
+		&& str.find(")") == std::string::npos)
 		return ("");
 
-	while (str[i] != bracket[CLOSE])
+	while (str[i] != ')')
 		i++;
 	end = i;
-	while (str[i] != bracket[OPEN])
+	while (str[i] != '(')
 		i--;
 	start = i;
 	return (str.substr(start, end - start + 1));
