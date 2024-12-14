@@ -6,13 +6,13 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/14 21:40:58 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/15 00:00:12 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/Parse.hpp"
 
-Parse::Parse()//: _err_msg("")
+Parse::Parse()
 {
 	this->_set_alphabet = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j','k', 'l', 'm',
 			'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -271,7 +271,12 @@ void	Parse::convert_to_standard_form(std::string &str)
 	remove_space(str);
 	convert_to_lower_case(str);
 
-	// ax to a*x, af(x) to a*f(x)
+	if (str[i] == '+')
+		str = str.substr(1, std::string::npos);
+	else if (str[i] == '-')
+		str = "-1*" + str.substr(1, std::string::npos);
+
+	/* standard form: ax to a*x, af(x) to a*f(x), a is number */
 	while (i < str.length())
 	{
 		if (is_element_of_set(this->_set_number, str[i])
@@ -288,135 +293,6 @@ void	Parse::convert_to_standard_form(std::string &str)
 	}
 	this->_str = str;
 }
-
-// std::vector<std::string>	Parse::split_term(std::string str)
-// {
-// 	std::vector<std::string>	term;
-// 	size_t				i = 0;
-// 	std::string			tmp;
-
-// 	convert_operator(str);
-// 	while (1)
-// 	{
-// 		i = 0;
-// 		while (!is_key_of_map(this->_operation, str[i])
-// 			&& str[i] != '?' && str[i] != '\0')
-// 			i++;
-// 		if (str[i] == '\0')
-// 			break ;
-// 		if (str.substr(0, i) != "")
-// 			term.push_back(str.substr(0, i));
-// 		if (str[i] != '?')
-// 			term.push_back(std::string(1, str[i]));
-// 		else
-// 			term.push_back(std::string(1, str[i]));
-// 		str = str.substr(i + 1, std::string::npos);
-// 	}
-// 	if (str != "")
-// 		term.push_back(str);
-// 	return (term);
-// }
-
-// void	Parse::process_variable_term(std::string &term)
-// {
-// 	term = "(" + this->_var[term] + ")";
-// }
-
-// std::string	Parse::convert_func_variable(std::string term,
-// 				std::string var_key, std::string var_value)
-// {
-// 	std::string	name = get_function_name(term);
-// 	std::string	variable = get_function_variable(term);
-// 	std::string	front;
-// 	std::string	back;
-
-// 	if (variable == var_key)
-// 		term = name + "(" + var_value + ")";
-// 	else if (variable.find(var_key) != std::string::npos)
-// 	{
-// 		front = variable.substr(0, variable.find(var_key));
-// 		back = variable.substr(variable.find(var_key) + var_key.length(), std::string::npos);
-
-// 		if ((front == "" || !is_element_of_set(this->_set_alphabet, front[front.length() - 1]))
-// 			&& !is_element_of_set(this->_set_alphabet, back[0]))
-// 			term = name + "(" + front + "(" + var_value + ")" + back + ")";
-// 	}
-// 	return (term);
-// }
-
-// std::string	Parse::convert_func_name(std::string term,
-// 				std::string func_key, std::string func_value)
-// {
-// 	std::string	function;
-// 	std::string	front;
-// 	std::string	back;
-// 	size_t		i = 0;
-
-// 	if (get_function_name(term) == func_key)
-// 	{
-// 		function = func_value;
-// 		while (i < function.length())
-// 		{
-// 			if (function[i] == 'x')
-// 			{
-// 				front = function.substr(0, i);
-// 				back = function.substr(i + 1, std::string::npos);
-// 				term = front + "(" + get_function_variable(term) + ")" + back;
-// 				i = front.length() + get_function_variable(term).length() + 2;
-// 			}
-// 			else
-// 				i++;
-// 		}
-// 	}
-// 	term = "(" + term + ")";
-// 	return (term);
-// }
-
-// void	Parse::process_function_term(std::string &term)
-// {
-// 	std::string			func_name;
-
-// 	for (std::map<std::string, std::string>::iterator it = this->_var.begin();
-// 		it != this->_var.end(); it++)
-// 	{
-// 		if (term.find(it->first) != std::string::npos)
-// 		{
-// 			term = convert_func_variable(term, it->first, it->second);
-// 			func_name = get_function_name(term);;
-// 			if (is_key_of_map(this->_func, func_name))
-// 				term = convert_func_name(term, func_name, this->_func[func_name]);
-// 		}
-// 	}
-// }
-
-// std::string	Parse::revert_term_to_str(std::vector<std::string> term)
-// {
-// 	std::string	str = "";
-
-// 	for (size_t i = 0; i < term.size(); i++)
-// 	{
-// 		if (is_key_of_map(this->_operation, term[i][0]))
-// 			str += this->_operation[term[i][0]];
-// 		else
-// 			str += term[i];
-// 	}
-// 	return (str);
-// }
-
-// void	Parse::convert_val_func(std::string &str)
-// {
-// 	std::vector<std::string>	term = split_term(str);
-
-// 	for(size_t i = 0; i < term.size(); i++)
-// 	{
-// 		if (is_key_of_map(this->_var, term[i]))
-// 			process_variable_term(term[i]);
-// 		if (term[i].find("(") != std::string::npos
-// 			&& is_bracket_for_function(term[i], term[i].find("(")))
-// 			process_function_term(term[i]);
-// 	}
-// 	str = revert_term_to_str(term);
-// }
 
 int	Parse::check_question_mark(std::string str)
 {
@@ -978,58 +854,191 @@ int	Parse::check_syntax(std::string &str)
 	return (1);
 }
 
+std::vector<std::string>	Parse::split_term(std::string str)
+{
+	std::vector<std::string>	term;
+	size_t				i = 0;
+	std::string			tmp;
+
+	while (1)
+	{
+		i = 0;
+		while (!is_key_of_map(this->_operation, str[i])
+			&& str[i] != '?' && str[i] != '\0')
+			i++;
+		if (str[i] == '\0')
+			break ;
+		if (str.substr(0, i) != "")
+			term.push_back(str.substr(0, i));
+		if (str[i] != '?')
+			term.push_back(std::string(1, str[i]));
+		else
+			term.push_back(std::string(1, str[i]));
+		str = str.substr(i + 1, std::string::npos);
+	}
+	if (str != "")
+		term.push_back(str);
+	return (term);
+}
+
+void	Parse::process_variable_term(std::string &term)
+{
+	term = "(" + this->_var[term] + ")";
+}
+
+std::string	Parse::convert_func_variable(std::string term,
+				std::string var_key, std::string var_value)
+{
+	std::string	name = get_function_name(term);
+	std::string	variable = get_function_variable(term);
+	std::string	front;
+	std::string	back;
+
+	if (variable == var_key)
+		term = name + "(" + var_value + ")";
+	else if (variable.find(var_key) != std::string::npos)
+	{
+		front = variable.substr(0, variable.find(var_key));
+		back = variable.substr(variable.find(var_key) + var_key.length(), std::string::npos);
+
+		if ((front == "" || !is_element_of_set(this->_set_alphabet, front[front.length() - 1]))
+			&& !is_element_of_set(this->_set_alphabet, back[0]))
+			term = name + "(" + front + "(" + var_value + ")" + back + ")";
+	}
+	return (term);
+}
+
+std::string	Parse::convert_func_name(std::string term,
+				std::string func_key, std::string func_value)
+{
+	std::string	function;
+	std::string	front;
+	std::string	back;
+	size_t		i = 0;
+
+	if (get_function_name(term) == func_key)
+	{
+		function = func_value;
+		while (i < function.length())
+		{
+			if (function[i] == 'x')
+			{
+				front = function.substr(0, i);
+				back = function.substr(i + 1, std::string::npos);
+				term = front + "(" + get_function_variable(term) + ")" + back;
+				i = front.length() + get_function_variable(term).length() + 2;
+			}
+			else
+				i++;
+		}
+	}
+	term = "(" + term + ")";
+	return (term);
+}
+
+void	Parse::process_function_term(std::string &term)
+{
+	std::string			func_name;
+
+	for (std::map<std::string, std::string>::iterator it = this->_var.begin();
+		it != this->_var.end(); it++)
+	{
+		if (term.find(it->first) != std::string::npos)
+		{
+			term = convert_func_variable(term, it->first, it->second);
+			func_name = get_function_name(term);;
+			if (is_key_of_map(this->_func, func_name))
+				term = convert_func_name(term, func_name, this->_func[func_name]);
+		}
+	}
+}
+
+void	Parse::convert_val_func(std::string &str)
+{
+	std::vector<std::string>	term = split_term(str);
+
+	for(size_t i = 0; i < term.size(); i++)
+	{
+		if (is_key_of_map(this->_var, term[i]))
+			process_variable_term(term[i]);
+		if (term[i].find("(") != std::string::npos
+			&& is_bracket_for_function(term[i], term[i].find("(")))
+			process_function_term(term[i]);
+	}
+	str = "";
+	for (size_t i = 0; i < term.size(); i++)
+		str += term[i];
+}
+
+void	Parse::print_info(void) //remove later
+{
+	std::cout << "variable" << std::endl;
+	if (this->_var.size() == 0)
+	{
+		std::cout << MAGENTA
+			<< "there is no variable assigned yet" << BLACK << std::endl;
+	}
+	for (std::map<std::string, std::string>::iterator it = this->_var.begin();
+		it != this->_var.end(); it++)
+	{
+		std::cout << YELLOW << it->first << BLACK << std::endl;
+		std::cout << it->second;
+		std::cout << std::endl
+			<< MAGENTA << "═══════════════════════" << BLACK << std::endl;
+	}
+	std::cout << "=============================================================" << std::endl;
+	std::cout << "function" << std::endl;
+	if (this->_func.size() == 0)
+	{
+		std::cout << MAGENTA
+			<< "there is no function assigned yet" << BLACK << std::endl;
+	}
+	for (std::map<std::string, std::string>::iterator it = this->_func.begin();
+		it != this->_func.end(); it++)
+	{
+		std::cout << YELLOW << it->first << BLACK << std::endl;
+		std::cout << it->second;
+		std::cout << std::endl
+			<< MAGENTA << "═══════════════════════" << BLACK << std::endl;
+	}
+}
+
+void	Parse::print_str(std::string str) //remove later
+{
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		if (is_key_of_map(this->_operation, str[i]))
+			std::cout << this->_operation[str[i]];
+		else
+			std::cout << str[i];
+	}
+}
+
 std::string	Parse::check_str(std::string &str)
 {
 	if (check_keyword(str))
 		return (str);
 	if (!(is_equation_form(str) && check_invalid_character(str) && check_number(str)))
 		return ("");
-
 	convert_to_standard_form(str);
-// ////////// remove later
-// 	std::cout << "variable" << std::endl;
-// 	if (this->_var.size() == 0)
-// 	{
-// 		std::cout << MAGENTA
-// 			<< "there is no variable assigned yet" << BLACK << std::endl;
-// 	}
-// 	for (std::map<std::string, std::string>::iterator it = this->_var.begin();
-// 		it != this->_var.end(); it++)
-// 	{
-// 		std::cout << YELLOW << it->first << BLACK << std::endl;
-// 		std::cout << it->second;
-// 		std::cout << std::endl
-// 			<< MAGENTA << "═══════════════════════" << BLACK << std::endl;
-// 	}
-// 	std::cout << "function" << std::endl;
-// 	if (this->_func.size() == 0)
-// 	{
-// 		std::cout << MAGENTA
-// 			<< "there is no function assigned yet" << BLACK << std::endl;
-// 	}
-// 	for (std::map<std::string, std::string>::iterator it = this->_func.begin();
-// 		it != this->_func.end(); it++)
-// 	{
-// 		std::cout << YELLOW << it->first << BLACK << std::endl;
-// 		std::cout << it->second;
-// 		std::cout << std::endl
-// 			<< MAGENTA << "═══════════════════════" << BLACK << std::endl;
-// 	}
-// 	std::cout << "str before converting: " << str << std::endl;//
-// ///////////
-
-	// std::string	left_str = str.substr(0, str.find("="));
-	// std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
-
-	// convert_val_func(left_str);
-	// convert_val_func(right_str);
-	// //calculate power
-	// str = left_str + "=" + right_str;
-
-// std::cout << "str after converting: " << str << std::endl;//
-
 	if (!check_syntax(str))
 		return ("");
-	// std::cout << "---------------------parsing done" << std::endl;
+
+	print_info();//remove later
+	std::cout << "str before converting: ";//
+	print_str(str);//
+	std::cout << std::endl;//
+
+	std::string	left_str = str.substr(0, str.find("="));
+	std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
+
+	convert_val_func(left_str);
+	convert_val_func(right_str);
+	//calculate power
+	str = left_str + "=" + right_str;
+
+	std::cout << "str after converting: ";//remove later
+	print_str(str);//
+	std::cout << std::endl;//
 	return (str);
 }

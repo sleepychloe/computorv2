@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/14 21:40:05 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/14 23:56:38 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,16 +86,6 @@ private:
 	void				convert_to_lower_case(std::string &str);
 
 	void				convert_to_standard_form(std::string &str);
-	
-	std::vector<std::string>	split_term(std::string str);
-	void				process_variable_term(std::string &term);
-	std::string			convert_func_variable(std::string term,
-							std::string var_key, std::string var_value);
-	std::string			convert_func_name(std::string term,
-							std::string func_key, std::string func_value);
-	void				process_function_term(std::string &term);
-	std::string			revert_term_to_str(std::vector<std::string> term);
-	void				convert_val_func(std::string &str);
 
 	int				check_question_mark(std::string str);
 	int				check_caret_base(std::string str, size_t i, size_t pos);
@@ -134,6 +124,18 @@ private:
 	int				check_operator_near_brackets(int str_type, std::string str);
 
 	int				check_syntax(std::string &str);
+
+	std::vector<std::string>	split_term(std::string str);
+	void				process_variable_term(std::string &term);
+	std::string			convert_func_variable(std::string term,
+							std::string var_key, std::string var_value);
+	std::string			convert_func_name(std::string term,
+							std::string func_key, std::string func_value);
+	void				process_function_term(std::string &term);
+	void				convert_val_func(std::string &str);
+
+	void				print_info(void); //remove later
+	void				print_str(std::string str); //remove later
 	std::string			check_str(std::string &str);
 
 	std::string				_str;
