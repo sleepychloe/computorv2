@@ -6,7 +6,7 @@
 #    By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/28 09:51:42 by yhwang            #+#    #+#              #
-#    Updated: 2024/12/06 16:43:19 by yhwang           ###   ########.fr        #
+#    Updated: 2024/12/16 14:58:49 by yhwang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,6 +26,11 @@ RM = rm -f
 FILES = $(ReadLine_SRC_DIR)ReadLine \
 		$(SRC_DIR)main \
 		$(SRC_DIR)Parse \
+		$(SRC_DIR)InputConvertor \
+		$(SRC_DIR)SyntaxChecker \
+		$(SRC_DIR)OperatorConvertor \
+		$(SRC_DIR)OperatorChecker \
+		$(SRC_DIR)VectorMatrixChecker \
 		$(SRC_DIR)ASTNode \
 		$(SRC_DIR)AST \
 		$(SRC_DIR)Utils

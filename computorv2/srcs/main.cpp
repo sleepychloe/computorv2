@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:09:01 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/12 18:39:45 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/15 13:42:41 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int	main(int argc, char **argv)
 			// 	std::cerr << RED << "error: invalid input: " << err_msg << BLACK << std::endl;
 			// 	continue ;
 			// }
-			catch(const Parse::ParseException& e)
+			catch(const Error::ParseException& e)
 			{
 				std::cerr << e.what() << std::endl;
 				continue ;
