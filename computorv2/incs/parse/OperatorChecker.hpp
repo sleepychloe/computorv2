@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:59:00 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:25:46 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:54:28 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ private:
 	void				throw_err_msg(std::string function, std::string err_msg, size_t pos);
 
 	int				check_first_sign(std::string str, size_t pos);
-	int				is_bracket_for_function(std::string str, size_t bracket_open_idx);
 	int				check_operator_bracket_str(std::string str, size_t i, size_t pos);
 	int				check_operator(int str_type, std::string str);
 

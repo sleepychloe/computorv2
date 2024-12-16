@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 21:59:42 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:25:52 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:54:49 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ private:
 
 	int				skip_vector_matrix(std::string str,
 							std::string &new_str, size_t i, size_t pos);
-	int				is_bracket_for_function(std::string str, size_t bracket_open_idx);
 	int				skip_function(std::string str, std::string &new_str, size_t i);
 	int				skip_vector_matrix_function(std::string str,
 							std::string &new_str, size_t i, size_t pos);

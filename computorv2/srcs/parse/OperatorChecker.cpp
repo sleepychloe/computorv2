@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 15:03:28 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:26:51 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 16:39:36 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,17 +92,6 @@ int	OperatorChecker::check_first_sign(std::string str, size_t pos)
 		throw_err_msg("OperatorChecker::check_operator(int str_type, std::string str)",
 			"invalid use of operator: expect number after using operator", pos + str.length() - 1);
 	return (i);
-}
-
-int	OperatorChecker::is_bracket_for_function(std::string str, size_t bracket_open_idx)
-{
-	if (str[bracket_open_idx] != '(' || bracket_open_idx == 0)
-		return (0);
-	if (is_element_of_set(this->_set_alphabet, str[bracket_open_idx - 1])
-		&& str.find(')') != std::string::npos
-		&& bracket_open_idx < str.find(")", bracket_open_idx + 1))
-		return (1);
-	return (0);
 }
 
 int	OperatorChecker::check_operator_bracket_str(std::string str, size_t i, size_t pos)

@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 13:55:43 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:26:14 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:39:21 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,9 @@ public:
 private:
 	SyntaxChecker();
 
-	int				check_each_str(int str_type, std::string str);
 	void				throw_err_msg(std::string function, std::string err_msg, size_t pos);
+
+	int				check_each_str(int str_type, std::string str);
 
 	int				check_question_mark(int str_type, std::string str);
 

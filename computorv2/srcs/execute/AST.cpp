@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:22 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:29:26 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 16:40:34 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,17 +153,6 @@ void	AST::build_subtree(std::stack<std::unique_ptr<ASTNode>> &stack_node,
 	stack_node.pop();
 
 	stack_node.push(std::make_unique<ASTNode>(op, std::move(left), std::move(right)));
-}
-
-int	AST::is_bracket_for_function(std::string str, size_t bracket_open_idx)
-{
-	if (str[bracket_open_idx] != '(' || bracket_open_idx == 0)
-		return (0);
-	if (is_element_of_set(this->_set_alphabet, str[bracket_open_idx - 1])
-		&& str.find(')') != std::string::npos
-		&& bracket_open_idx < str.find(")", bracket_open_idx + 1))
-		return (1);
-	return (0);
 }
 
 int	AST::handle_brackets(std::stack<std::unique_ptr<ASTNode>> &stack_node,
@@ -357,7 +346,7 @@ NodeType	AST::check_term(std::string &term)
 		{
 			if (is_existing_function_name(get_function_name(term)))
 			{
-				std::cout << "vairbale is number, existing function name" << std::endl;
+				std::cout << "varibale is number, existing function name" << std::endl;
 			}
 			else
 			{

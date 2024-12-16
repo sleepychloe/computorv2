@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 13:47:38 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:23:13 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:53:09 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ int				skip_bracket(int type, std::string str, size_t i);
 std::string			get_function_name(std::string term);
 std::string			get_function_variable(std::string term);
 std::string			get_bracket_str(std::string str);
+int				is_bracket_for_function(std::string str, size_t bracket_open_idx);
 
 int				check_round_brackets(std::string str);
 

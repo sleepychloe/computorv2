@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 13:48:03 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/14 17:12:18 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:54:17 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,17 @@ std::string	get_function_variable(std::string term)
 	if (term[term.length() - 1] == '\0')
 		term = term.substr(0, term.length() - 1);
 	return (term.substr(term.find("(") + 1, term.length() - term.find("(") - 2));
+}
+
+int	is_bracket_for_function(std::string str, size_t bracket_open_idx)
+{
+	if (str[bracket_open_idx] != '(' || bracket_open_idx == 0)
+		return (0);
+	if (('a' <= str[bracket_open_idx - 1] && str[bracket_open_idx - 1] <= 'z')
+		&& str.find(')') != std::string::npos
+		&& bracket_open_idx < str.find(")", bracket_open_idx + 1))
+		return (1);
+	return (0);
 }
 
 ////////////////////////////////AST

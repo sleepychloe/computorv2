@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:04:41 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/04 17:30:52 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 16:20:11 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -422,4 +422,3 @@ bool	operator>=(const Complex<K> &l, Complex<K> &r)
 
 	return (l_square >= r_square);
 }
-

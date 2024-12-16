@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 21:59:54 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:26:58 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:55:13 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,17 +95,6 @@ int	OperatorConvertor::skip_vector_matrix(std::string str,
 	new_str += bracket;
 	i++;
 	return (i);
-}
-
-int	OperatorConvertor::is_bracket_for_function(std::string str, size_t bracket_open_idx)
-{
-	if (str[bracket_open_idx] != '(' || bracket_open_idx == 0)
-		return (0);
-	if (is_element_of_set(this->_set_alphabet, str[bracket_open_idx - 1])
-		&& str.find(')') != std::string::npos
-		&& bracket_open_idx < str.find(")", bracket_open_idx + 1))
-		return (1);
-	return (0);
 }
 
 int	OperatorConvertor::skip_function(std::string str, std::string &new_str, size_t i)
