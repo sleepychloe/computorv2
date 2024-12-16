@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 00:05:32 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:09:37 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:26:23 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@
 #include <string>
 #include "./ParseError.hpp"
 #include "./OperatorConvertor.hpp"
-#include "./Define.hpp"
-#include "./Utils.hpp"
+#include "../Define.hpp"
+#include "../Utils.hpp"
 
 class VectorMatrixChecker
 {

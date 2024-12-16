@@ -6,11 +6,11 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 13:08:15 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 01:04:09 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:26:43 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../incs/InputConvertor.hpp"
+#include "../../incs/parse/InputConvertor.hpp"
 
 InputConvertor::InputConvertor()
 {

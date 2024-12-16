@@ -6,11 +6,11 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 15:03:28 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:19:38 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:26:51 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../incs/OperatorChecker.hpp"
+#include "../../incs/parse/OperatorChecker.hpp"
 
 OperatorChecker::OperatorChecker()
 {

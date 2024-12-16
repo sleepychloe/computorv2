@@ -6,11 +6,11 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 13:55:54 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:16:49 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:34:20 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../incs/SyntaxChecker.hpp"
+#include "../../incs/parse/SyntaxChecker.hpp"
 
 SyntaxChecker::SyntaxChecker()
 {

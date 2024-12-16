@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 12:48:46 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/15 13:52:16 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:26:08 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <string>
 #include <sstream>
 #include <exception>
-#include "./Color.hpp"
+#include "../Color.hpp"
 
 namespace Error
 {

@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 21:59:42 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:09:18 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:25:52 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@
 #include <string>
 #include "./ParseError.hpp"
 #include "./VectorMatrixChecker.hpp"
-#include "./Define.hpp"
-#include "./Utils.hpp"
+#include "../Define.hpp"
+#include "../Utils.hpp"
 
 class OperatorConvertor
 {

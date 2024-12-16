@@ -6,11 +6,11 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 21:59:54 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 07:54:25 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:26:58 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../incs/OperatorConvertor.hpp"
+#include "../../incs/parse/OperatorConvertor.hpp"
 
 OperatorConvertor::OperatorConvertor()
 {

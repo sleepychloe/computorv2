@@ -6,33 +6,41 @@
 #    By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/28 09:51:42 by yhwang            #+#    #+#              #
-#    Updated: 2024/12/16 14:58:49 by yhwang           ###   ########.fr        #
+#    Updated: 2024/12/16 15:32:05 by yhwang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = computorv2
 CPP = c++
 
-ReadLine_SRC_DIR = ./ReadLine/srcs/
-ReadLine_INCS_DIR = ./ReadLine/incs/
+READLINE_SRC_DIR = ./ReadLine/srcs/
+READLINE_INCS_DIR = ./ReadLine/incs/
+
+MATRIX_INCS_DIR = ./matrix/incs/
 
 SRC_DIR = ./srcs/
 INCS_DIR = ./incs/
+SRC_PARSE_DIR = ./srcs/parse/
+INCS_PARSE_DIR = ./incs/parse/
+SRC_EXECUTE_DIR = ./srcs/execute/
+INCS_EXECUTE_DIR = ./incs/execute/
 
-CPPFLAGS = -Wall -Wextra -Werror -std=c++17 -g3 -I$(ReadLine_INCS_DIR) -I$(INCS_DIR)
+CPPFLAGS = -Wall -Wextra -Werror -std=c++17 -g3 \
+		-I$(READLINE_INCS_DIR) -I$(MATRIX_INCS_DIR) \
+		-I$(INCS_DIR) -I$(INCS_PARSE_DIR) -I$(INCS_EXECUTE_DIR)
 
 RM = rm -f
 
-FILES = $(ReadLine_SRC_DIR)ReadLine \
+FILES = $(READLINE_SRC_DIR)ReadLine \
 		$(SRC_DIR)main \
-		$(SRC_DIR)Parse \
-		$(SRC_DIR)InputConvertor \
-		$(SRC_DIR)SyntaxChecker \
-		$(SRC_DIR)OperatorConvertor \
-		$(SRC_DIR)OperatorChecker \
-		$(SRC_DIR)VectorMatrixChecker \
-		$(SRC_DIR)ASTNode \
-		$(SRC_DIR)AST \
+		$(SRC_PARSE_DIR)Parse \
+		$(SRC_PARSE_DIR)InputConvertor \
+		$(SRC_PARSE_DIR)SyntaxChecker \
+		$(SRC_PARSE_DIR)OperatorConvertor \
+		$(SRC_PARSE_DIR)OperatorChecker \
+		$(SRC_PARSE_DIR)VectorMatrixChecker \
+		$(SRC_EXECUTE_DIR)ASTNode \
+		$(SRC_EXECUTE_DIR)AST \
 		$(SRC_DIR)Utils
 
 SRCS = $(addsuffix .cpp, $(FILES))

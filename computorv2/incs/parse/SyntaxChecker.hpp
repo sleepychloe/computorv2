@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 13:55:43 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:13:40 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:26:14 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@
 #include "./ParseError.hpp"
 #include "./OperatorConvertor.hpp"
 #include "./OperatorChecker.hpp"
-#include "./Define.hpp"
-#include "./Utils.hpp"
+#include "../Define.hpp"
+#include "../Utils.hpp"
 
 class SyntaxChecker
 {

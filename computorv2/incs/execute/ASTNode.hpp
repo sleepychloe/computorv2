@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 16:42:13 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/09 15:07:54 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:28:45 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@
 #include <memory>
 #include <utility>
 #include <variant>
-#include "../matrix/incs/Complex.hpp"
-#include "../matrix/incs/Vector.hpp"
-#include "../matrix/incs/Matrix.hpp"
+#include "../../matrix/incs/Complex.hpp"
+#include "../../matrix/incs/Vector.hpp"
+#include "../../matrix/incs/Matrix.hpp"
 
 using	ValueSet = std::variant<float,
 				Complex<float>,

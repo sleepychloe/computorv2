@@ -6,11 +6,11 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 00:13:57 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 07:46:40 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:27:28 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../incs/VectorMatrixChecker.hpp"
+#include "../../incs/parse/VectorMatrixChecker.hpp"
 
 VectorMatrixChecker::VectorMatrixChecker()
 {

@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 13:03:09 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:09:23 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:25:39 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 #include <unordered_set>
 #include <unordered_map>
 #include "./ParseError.hpp"
-#include "./Define.hpp"
-#include "./Utils.hpp"
+#include "../Define.hpp"
+#include "../Utils.hpp"
 
 class InputConvertor
 {

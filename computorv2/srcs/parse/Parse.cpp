@@ -6,11 +6,11 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:13:16 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:27:04 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../incs/Parse.hpp"
+#include "../../incs/parse/Parse.hpp"
 
 Parse::Parse()
 {
@@ -86,24 +86,6 @@ int	Parse::check_keyword(std::string str)
 }
 
 
-
-
-
-// int	Parse::check_syntax(std::string &str)
-// {
-// 	std::string	left_str = str.substr(0, str.find("="));
-// 	std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
-
-// 	convert_operator(LEFT_STR, left_str);
-// 	convert_operator(RIGHT_STR, right_str);
-// 	str = left_str + "=" + right_str;
-
-// 	if (!(check_operator(LEFT_STR, left_str) && check_operator(RIGHT_STR, right_str)
-// 		&& check_operator_near_brackets(LEFT_STR, left_str)
-// 		&& check_operator_near_brackets(RIGHT_STR, right_str)))
-// 		return (0);
-// 	return (1);
-// }
 
 // std::vector<std::string>	Parse::split_term(std::string str)
 // {

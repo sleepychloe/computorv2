@@ -6,13 +6,13 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:09:01 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/15 13:42:41 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:29:49 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../ReadLine/incs/ReadLine.hpp"
-#include "../incs/Parse.hpp"
-#include "../incs/AST.hpp"
+#include "../incs/parse/Parse.hpp"
+#include "../incs/execute/AST.hpp"
 #include "../incs/Color.hpp"
 
 void	ignore_all_signal(void)

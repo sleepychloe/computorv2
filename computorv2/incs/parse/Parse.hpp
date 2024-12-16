@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:12:06 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:29:03 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,9 @@
 #include "./ParseError.hpp"
 #include "./InputConvertor.hpp"
 #include "./SyntaxChecker.hpp"
-
-#include "./Utils.hpp"
-#include "./Define.hpp"
-#include "./Color.hpp"
+#include "../Utils.hpp"
+#include "../Define.hpp"
+#include "../Color.hpp"
 
 class	Parse
 {
@@ -45,9 +44,6 @@ public:
 
 private:
 	int				check_keyword(std::string str);
-
-
-	// int				check_syntax(std::string &str);
 
 	// std::vector<std::string>	split_term(std::string str);
 	// void				process_variable_term(std::string &term);

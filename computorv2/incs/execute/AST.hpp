@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:25 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/12 00:58:13 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:28:35 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,11 @@
 #include <map>
 #include <unordered_set>
 #include "./ASTNode.hpp"
-#include "../matrix/incs/Complex.hpp"
-#include "../matrix/incs/Vector.hpp"
+#include "../../matrix/incs/Complex.hpp"
+#include "../../matrix/incs/Vector.hpp"
 #include "../matrix/incs/Matrix.hpp"
-#include "./Utils.hpp"
-#include "./Color.hpp"
+#include "../Utils.hpp"
+#include "../Color.hpp"
 
 # define OP_ADD			1 /* + */
 # define OP_SUB			2 /* - */
