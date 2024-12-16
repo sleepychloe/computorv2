@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 16:42:13 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:28:45 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 20:54:42 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ using	ValueSet = std::variant<float,
 enum class NodeType
 {
 	OPERATOR = 0,
-
 	TERM_INVALID = 1,
 	TERM_NUMBER = 2,
 	TERM_VARIABLE = 3,

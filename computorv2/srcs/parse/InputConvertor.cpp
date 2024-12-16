@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 13:08:15 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:26:43 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 20:18:44 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void	InputConvertor::throw_err_msg(std::string function, std::string err_msg, si
 	}
 	this->_struct_error.pos_str += "^";
 	this->_struct_error.pos_str += BLACK;
-	throw (Error::ParseException(this->_struct_error));
+	throw (ParseError::ParseException(this->_struct_error));
 }
 
 int	InputConvertor::check_equal_sign(std::string str)

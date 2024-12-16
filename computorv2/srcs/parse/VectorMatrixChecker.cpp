@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 00:13:57 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:27:28 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 20:19:06 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ void	VectorMatrixChecker::throw_err_msg(std::string function, std::string err_ms
 	}
 	this->_struct_error.pos_str += "^";
 	this->_struct_error.pos_str += BLACK;
-	throw (Error::ParseException(this->_struct_error));
+	throw (ParseError::ParseException(this->_struct_error));
 }
 
 void	VectorMatrixChecker::check_vector_str(int type, std::string str, size_t pos)

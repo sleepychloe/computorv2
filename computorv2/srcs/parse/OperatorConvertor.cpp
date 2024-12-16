@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 21:59:54 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:55:13 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 20:18:56 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void	OperatorConvertor::throw_err_msg(std::string function, std::string err_msg,
 	}
 	this->_struct_error.pos_str += "^";
 	this->_struct_error.pos_str += BLACK;
-	throw (Error::ParseException(this->_struct_error));
+	throw (ParseError::ParseException(this->_struct_error));
 }
 
 int	OperatorConvertor::skip_vector_matrix(std::string str,

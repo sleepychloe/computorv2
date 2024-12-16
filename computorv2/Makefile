@@ -6,7 +6,7 @@
 #    By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/28 09:51:42 by yhwang            #+#    #+#              #
-#    Updated: 2024/12/16 15:36:19 by yhwang           ###   ########.fr        #
+#    Updated: 2024/12/16 20:44:37 by yhwang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,6 +40,7 @@ FILES = $(READLINE_SRC_DIR)ReadLine \
 		$(SRC_PARSE_DIR)OperatorChecker \
 		$(SRC_PARSE_DIR)VectorMatrixChecker \
 		$(SRC_PARSE_DIR)VariableConvertor \
+		$(SRC_EXECUTE_DIR)Execute \
 		$(SRC_EXECUTE_DIR)ASTNode \
 		$(SRC_EXECUTE_DIR)AST \
 		$(SRC_DIR)Utils

@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:59:00 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:54:28 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 20:17:50 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ private:
 	std::unordered_set<char>		_set_alphabet; // 'a' to 'z'
 	std::unordered_map<int, std::string>	_operator; // {OP_OPERATOR, "operator"}
 
-	Error::t_error				_struct_error;
+	ParseError::t_error				_struct_error;
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 00:05:32 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:26:23 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 20:18:31 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ private:
 	std::unordered_set<char>	_set_number;
 	std::unordered_set<char>	_set_operator; // '+', '-', '*', '/', '%', '^'
 
-	Error::t_error			_struct_error;
+	ParseError::t_error		_struct_error;
 };
 
 # endif

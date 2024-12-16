@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 13:55:54 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:34:20 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 20:19:00 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void	SyntaxChecker::throw_err_msg(std::string function, std::string err_msg, siz
 	}
 	this->_struct_error.pos_str += "^";
 	this->_struct_error.pos_str += BLACK;
-	throw (Error::ParseException(this->_struct_error));
+	throw (ParseError::ParseException(this->_struct_error));
 }
 
 int	SyntaxChecker::check_question_mark(int str_type, std::string str)

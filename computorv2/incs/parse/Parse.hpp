@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 16:16:35 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 20:41:19 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 #include <iostream>
 #include <string>
-#include <exception>
 #include <map>
 #include <unordered_set>
 #include <unordered_map>
@@ -41,7 +40,7 @@ public:
 
 	void				set_var(std::map<std::string, std::string> var);
 	void				set_func(std::map<std::string, std::string> func);
-	std::string			parse_start(std::string &str);
+	std::string			parse(std::string &str);
 
 private:
 	void				print_var(void);

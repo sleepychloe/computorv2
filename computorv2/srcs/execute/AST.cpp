@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:22 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 16:40:34 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 20:43:30 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,55 +58,6 @@ std::map<std::string, std::string>	AST::get_func(void) const
 void	AST::start_syntax_checking(std::string &str)
 {
 	check_str(str);
-}
-
-int	AST::check_keyword(std::string str)
-{
-	if (str == "var" || str == "VAR"
-		|| str == "vriable" || str == "VARIABLE")
-	{
-		std::cout << MAGENTA << "╔═════════════════════╗" << BLACK << std::endl;
-		std::cout << MAGENTA << "║    VARIABLE LIST    ║" << BLACK << std::endl;
-		std::cout << MAGENTA << "╚═════════════════════╝" << BLACK << std::endl;
-		if (this->_var.size() == 0)
-		{
-			std::cout << MAGENTA
-				<< "there is no variable assigned yet" << BLACK << std::endl;
-			return (1);
-		}
-		for (std::map<std::string, std::string>::iterator it = this->_var.begin();
-			it != this->_var.end(); it++)
-		{
-			std::cout << YELLOW << it->first << BLACK << std::endl;
-			std::cout << it->second;
-			std::cout << std::endl
-				<< MAGENTA << "═══════════════════════" << BLACK << std::endl;
-		}
-		return (1);
-	}
-	else if (str == "func" || str == "FUNC"
-		|| str == "function" || str == "function")
-	{
-		std::cout << MAGENTA << "╔═════════════════════╗" << BLACK << std::endl;
-		std::cout << MAGENTA << "║    FUNCTION LIST    ║" << BLACK << std::endl;
-		std::cout << MAGENTA << "╚═════════════════════╝" << BLACK << std::endl;
-		if (this->_func.size() == 0)
-		{
-			std::cout << MAGENTA
-				<< "there is no function assigned yet" << BLACK << std::endl;
-			return (1);
-		}
-		for (std::map<std::string, std::string>::iterator it = this->_func.begin();
-			it != this->_func.end(); it++)
-		{
-			std::cout << YELLOW << it->first << BLACK << std::endl;
-			std::cout << it->second;
-			std::cout << std::endl
-				<< MAGENTA << "═══════════════════════" << BLACK << std::endl;
-		}
-		return (1);
-	}
-	return (0);
 }
 
 int	AST::skip_round_bracket(std::string str, size_t i)
@@ -417,9 +368,6 @@ void	AST::visit_ast(ASTNode *node)
 
 int	AST::check_str(std::string str)
 {
-	if (check_keyword(str))
-		return (1);
-
 	std::string	left_str = str.substr(0, str.find("="));
 	std::string	right_str = str.substr(str.find("=") + 1, std::string::npos);
 

@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 16:16:46 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 20:30:18 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	Parse::set_func(std::map<std::string, std::string> func)
 	this->_func = func;
 }
 
-std::string	Parse::parse_start(std::string &str)
+std::string	Parse::parse(std::string &str)
 {
 	this->_str = str;
 	return (check_str(str));

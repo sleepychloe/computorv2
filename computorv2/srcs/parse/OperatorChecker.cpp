@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 15:03:28 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 16:39:36 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 20:18:51 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void	OperatorChecker::throw_err_msg(std::string function, std::string err_msg, s
 	}
 	this->_struct_error.pos_str += "^";
 	this->_struct_error.pos_str += BLACK;
-	throw (Error::ParseException(this->_struct_error));
+	throw (ParseError::ParseException(this->_struct_error));
 }
 
 int	OperatorChecker::check_first_sign(std::string str, size_t pos)

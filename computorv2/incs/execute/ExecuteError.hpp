@@ -1,24 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ParseError.hpp                                     :+:      :+:    :+:   */
+/*   ExecuteError.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/15 12:48:46 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 20:17:40 by yhwang           ###   ########.fr       */
+/*   Created: 2024/12/16 20:12:07 by yhwang            #+#    #+#             */
+/*   Updated: 2024/12/16 20:50:38 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSE_ERROR_HPP
-# define PARSE_ERROR_HPP
+#ifndef EXECUTE_ERROR_HPP
+# define EXECUTE_ERROR_HPP
 
 #include <string>
 #include <sstream>
 #include <exception>
 #include "../Color.hpp"
 
-namespace ParseError
+using	ValueSet = std::variant<float,
+				Complex<float>,
+				Matrix<float>,
+				Matrix<Complex<float>>,
+				Vector<float>,
+				Vector<Complex<float>>>;
+
+namespace ExecuteError
 {
 	typedef struct s_error
 	{
@@ -26,14 +33,14 @@ namespace ParseError
 		std::string	cat;
 		std::string	function;
 		std::string	msg;
-		size_t		pos;
-		std::string	pos_str;
+		size_t		term_idx;
+		size_t		term_str;
 	}	t_error;
 
-	class ParseException: public std::exception
+	class ExecuteException: public std::exception
 	{
 	public:
-		ParseException(const t_error &error): _error(error) {}
+		ExecuteException(const t_error &error): _error(error) {}
 
 		virtual const char* what() const throw()
 		{
@@ -43,8 +50,8 @@ namespace ParseError
 				<< this->_error.function << std::endl
 				<< RED << "error: " << this->_error.cat << ": "
 				<< YELLOW << this->_error.msg << ": " << BLACK
-				<< "at position " << this->_error.pos << std::endl
-				<< this->_error.pos_str << std::endl;
+				<< "at term " << this->_error.term_idx << std::endl
+				<< this->_error.term_str << std::endl;
 			this->_what_msg = oss.str();
 			return (_what_msg.c_str());
 		}
@@ -55,4 +62,4 @@ namespace ParseError
 	};
 }
 
-# endif
+#endif

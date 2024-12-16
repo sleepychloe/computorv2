@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 13:03:09 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:25:39 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/16 20:17:44 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ private:
 	std::unordered_set<char>	_set_other; // '(', ')','^', '=', '?'
 	std::unordered_set<char>	_set_space; // ' ', '\t'
 
-	Error::t_error			_struct_error;
+	ParseError::t_error		_struct_error;
 };
 
 #endif
