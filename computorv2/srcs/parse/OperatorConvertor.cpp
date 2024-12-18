@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 21:59:54 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 20:18:56 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 14:27:14 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ OperatorConvertor::OperatorConvertor(std::string str): _str(str)
 	this->_set_alphabet = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j','k', 'l', 'm',
 			'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 	this->_set_number = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', 'i', 'I'};
-	this->_set_operator = {'+', '-', '*', '/', '%', '^'};
+	this->_set_operator = {'+', '-', '*', '/', '%'};
 	this->_set_other = {'(', ')','^', '=', '?'};
 }
 
@@ -124,7 +124,7 @@ char	OperatorConvertor::do_convert(std::string str, size_t &i)
 {
 	std::unordered_map<char, int> op = {{'+', OP_ADD}, {'-', OP_SUB},
 					{'*', OP_MUL}, {'/', OP_DIV},
-					{'%', OP_MODULO}, {'^', OP_POWER}};
+					{'%', OP_MODULO}};
 	if (str[i] == '+' || str[i] == '-')
 	{
 		if (i > 1 && (str[i - 1] == '(' || str[i - 1] == '^' || str[i - 1] == '='

@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 13:55:54 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 20:19:00 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 14:25:46 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ SyntaxChecker::SyntaxChecker(std::string str): _str(str)
 {
 	this->_set_alphabet = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j','k', 'l', 'm',
 			'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
-	this->_set_operator = {'+', '-', '*', '/', '%', '^'};
+	this->_set_operator = {'+', '-', '*', '/', '%'};
 }
 
 SyntaxChecker::SyntaxChecker(const SyntaxChecker& checker)

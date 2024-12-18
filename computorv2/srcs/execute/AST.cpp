@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:22 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 20:43:30 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 14:59:46 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ AST::AST(): _left_root(nullptr), _right_root(nullptr), _err_msg("")
 			'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 	this->_set_number = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', 'i'};
 	this->_operation = {{OP_ADD, "+"}, {OP_SUB, "-"}, {OP_MUL, "*"}, {OP_DIV, "/"},
-				{OP_MODULO, "%"}, {OP_POWER, "^"}, {OP_MAT_MUL, "**"}};
+				{OP_MODULO, "%"}, {OP_MAT_MUL, "**"}};
 }
 
 AST::AST(const AST& ast)
@@ -58,99 +58,6 @@ std::map<std::string, std::string>	AST::get_func(void) const
 void	AST::start_syntax_checking(std::string &str)
 {
 	check_str(str);
-}
-
-int	AST::skip_round_bracket(std::string str, size_t i)
-{
-	std::stack<char>	stack;
-
-	stack.push(str[i]);
-	i++;
-	while (i < str.length())
-	{
-		if (str[i] == '(')
-			stack.push(str[i]);
-		if (str[i] == ')')
-			stack.pop();
-		if (stack.empty())
-			break ;
-		i++;
-	}
-	return (i);
-}
-
-int	AST::precedence(std::string op)
-{
-	if (op == "+" || op == "-")
-		return (1);
-	if (op == "*" || op == "/" || op == "%")
-		return (2);
-	if (op == "**")
-		return (3);
-	if (op == "^")
-		return (4);
-	return (0);
-}
-
-void	AST::build_subtree(std::stack<std::unique_ptr<ASTNode>> &stack_node,
-				std::stack<std::string> &stack_op)
-{
-	std::string	op = stack_op.top();
-	stack_op.pop();
-
-	std::unique_ptr<ASTNode>	right = std::move(stack_node.top());
-	stack_node.pop();
-	std::unique_ptr<ASTNode>	left = std::move(stack_node.top());
-	stack_node.pop();
-
-	stack_node.push(std::make_unique<ASTNode>(op, std::move(left), std::move(right)));
-}
-
-int	AST::handle_brackets(std::stack<std::unique_ptr<ASTNode>> &stack_node,
-				std::string str, size_t i)
-{
-	std::string			str_bracket;
-	std::unique_ptr<ASTNode>	sub_root = nullptr;
-	size_t		end;
-
-	end = skip_round_bracket(str, i);
-	str_bracket = str.substr(i + 1, end - i - 1);
-	build_tree(str_bracket, sub_root);
-	stack_node.push(std::move(sub_root));
-	return (end + 1);
-}
-
-int	AST::handle_operator(std::stack<std::unique_ptr<ASTNode>> &stack_node,
-				std::stack<std::string> &stack_op, char c, size_t i)
-{
-	std::string	op = this->_operation[c];
-
-	if (!precedence(op))
-	{
-		this->_err_msg = "cannot set precedence of operation";
-		throw (this->_err_msg);
-	}
-	while (!stack_op.empty() && precedence(stack_op.top()) >= precedence(op))
-		build_subtree(stack_node, stack_op);
-	stack_op.push(op);
-	std::cout << "op: " << op << std::endl;//
-	return (i + 1);
-}
-
-std::string	AST::get_term(std::string str, size_t &i)
-{
-	size_t		start = i;
-	std::string	term;
-
-	while (!(str[i] == '\0' || str[i] == '?'
-		|| (str[i] == '(' && !is_bracket_for_function(str, i))
-		|| is_key_of_map(this->_operation, str[i])))
-		i++;
-	term = str.substr(start, i - start);
-	if (term == "" || term[0] == '\0' || term == "?")
-		return ("");
-	std::cout << "term: " << term << std::endl;//
-	return (term);
 }
 
 int	AST::is_number_str(std::string str)
@@ -318,54 +225,6 @@ NodeType	AST::check_term(std::string &term)
 	return (type);
 }
 
-void	AST::build_tree(std::string str, std::unique_ptr<ASTNode> &node)
-{
-	std::stack<std::unique_ptr<ASTNode>>	stack_node;
-	std::stack<std::string>			stack_op;
-	std::string	term;
-	NodeType	type;
-	size_t		i = 0;
-
-	while (i < str.length())
-	{
-		if (str[i] == '(' && !is_bracket_for_function(str, i))
-			i = handle_brackets(stack_node, str, i);
-
-		if (is_key_of_map(this->_operation, str[i]))
-			i = handle_operator(stack_node, stack_op, str[i], i);
-		else
-		{
-			term = get_term(str, i);
-			if (term == "")
-				break ;
-			type = check_term(term);
-			stack_node.push(std::make_unique<ASTNode>(ASTNode(term, type)));
-		}
-	}
-	while (!stack_op.empty())
-		build_subtree(stack_node, stack_op);
-
-	if (!stack_node.empty())
-		node = std::move(stack_node.top());
-}
-
-void	AST::visit_ast(ASTNode *node)
-{
-	if (node == nullptr)
-		return ;
-
-	visit_ast(node->get_left());
-	visit_ast(node->get_right());
-
-	//set ValueSet type value in this function
-	if (node->get_type() != NodeType::OPERATOR)
-		std::cout << "TERM: ";
-	else
-		std::cout << "OP: ";
-	
-	std::cout << node->get_value_str() << std::endl;
-}
-
 int	AST::check_str(std::string str)
 {
 	std::string	left_str = str.substr(0, str.find("="));
@@ -373,9 +232,6 @@ int	AST::check_str(std::string str)
 
 	this->_left_root = nullptr;
 	this->_right_root = nullptr;
-
-	build_tree(left_str, this->_left_root);
-	build_tree(right_str, this->_right_root);
 
 	// std::cout << "left AST----------" << std::endl;
 	// visit_ast(this->_left_root.get());

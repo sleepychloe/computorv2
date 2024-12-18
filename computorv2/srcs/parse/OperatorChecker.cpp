@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 15:03:28 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 20:18:51 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 15:25:19 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ OperatorChecker::OperatorChecker(std::string str): _str(str)
 	this->_set_alphabet = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j','k', 'l', 'm',
 			'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 	this->_operator = {{OP_ADD, "+"}, {OP_SUB, "-"}, {OP_MUL, "*"}, {OP_DIV, "/"},
-				{OP_MODULO, "%"}, {OP_POWER, "^"}, {OP_MAT_MUL, "**"}};
+				{OP_MODULO, "%"}, {OP_MAT_MUL, "**"}};
 }
 
 OperatorChecker::OperatorChecker(const OperatorChecker& checker)
@@ -138,7 +138,8 @@ void	OperatorChecker::check_before_open_bracket(std::string str, size_t open_idx
 		if (open_idx == 1 && (str[0] == '+' || str[0] == '-'))
 			return ;
 		if (!(str[open_idx - 1] == '('
-			|| is_key_of_map(this->_operator, str[open_idx - 1])))
+			|| is_key_of_map(this->_operator, str[open_idx - 1])
+			|| str[open_idx - 1] == '^'))
 		{
 			if (str[open_idx] == '(' || str[open_idx] == ROUND_OPEN)
 				throw_err_msg("OperatorChecker::check_before_open_bracket(std::string str, size_t open_idx, size_t pos)",
@@ -156,7 +157,8 @@ void	OperatorChecker::check_after_close_bracket(std::string str, size_t close_id
 	{
 		if (!(str[close_idx + 1] == '\0'
 			|| str[close_idx + 1] == ')'
-			|| is_key_of_map(this->_operator, str[close_idx + 1])))
+			|| is_key_of_map(this->_operator, str[close_idx + 1])
+			|| str[close_idx + 1] == '^'))
 		{
 			if (str[close_idx] == ')' || str[close_idx] == ROUND_CLOSE)
 				throw_err_msg("OperatorChecker::check_after_close_bracket(std::string str, size_t close_idx, size_t pos)",

@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:49 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 20:41:19 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 12:10:58 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,6 @@ private:
 	void				print_var(void);
 	void				print_func(void);
 	int				check_keyword(std::string str);
-
-	void				print_str(std::string str); //remove later
 
 	std::string			check_str(std::string &str);
 

@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 13:08:15 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 20:18:44 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 15:13:57 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ InputConvertor::InputConvertor(std::string str): _str(str)
 			'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 	this->_set_number = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', 'i', 'I'};
 	this->_set_vector_matrix = { '[', ']', ',', ';'};
-	this->_set_operator = {'+', '-', '*', '/', '%', '^'};
+	this->_set_operator = {'+', '-', '*', '/', '%'};
 	this->_set_other = {'(', ')','^', '=', '?'};
 	this->_set_space = {' ', '\t'};
 }

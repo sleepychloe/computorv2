@@ -6,11 +6,12 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 16:42:13 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 20:54:42 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 11:59:30 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef AST_NODE_HPP
+# define AST_NODE_HPP
 
 #include <string>
 #include <memory>

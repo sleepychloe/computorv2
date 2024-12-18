@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/14 16:58:06 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/14 17:10:16 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 14:28:05 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,7 @@
 # define OP_MUL			3 /* * */
 # define OP_DIV			4 /* / */
 # define OP_MODULO		5 /* % */
-# define OP_POWER		6 /* ^ */
-# define OP_MAT_MUL		7 /* ** */
+# define OP_MAT_MUL		6 /* ** */
 
 /* str_type */
 # define LEFT_STR		0

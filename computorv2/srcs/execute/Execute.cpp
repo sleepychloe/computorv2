@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 20:45:43 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 20:59:45 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 12:30:51 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,7 @@ std::map<std::string, std::string>	Execute::get_func(void) const
 void	Execute::execute(std::string str)
 {
 	this->_str = str;
-	/* 
-	1. build ast(left, right seperately)
-	2. term check
-	*/
 
-	//ASTBuilder
+	ASTBuilder	builder;
+	builder.build(str);
 }

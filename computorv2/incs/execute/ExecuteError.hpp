@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 20:12:07 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 20:50:38 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 11:53:24 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,6 @@
 #include <sstream>
 #include <exception>
 #include "../Color.hpp"
-
-using	ValueSet = std::variant<float,
-				Complex<float>,
-				Matrix<float>,
-				Matrix<Complex<float>>,
-				Vector<float>,
-				Vector<Complex<float>>>;
 
 namespace ExecuteError
 {

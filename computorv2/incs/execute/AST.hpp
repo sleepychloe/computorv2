@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 13:46:25 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:54:42 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 14:28:15 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,6 @@
 #include "../Utils.hpp"
 #include "../Color.hpp"
 
-# define OP_ADD			1 /* + */
-# define OP_SUB			2 /* - */
-# define OP_MUL			3 /* * */
-# define OP_DIV			4 /* / */
-# define OP_MODULO		5 /* % */
-# define OP_POWER		6 /* ^ */
-# define OP_MAT_MUL		7 /* ** */
 
 using	ValueSet = std::variant<float,
 				Complex<float>,
@@ -55,19 +48,6 @@ public:
 	void				start_syntax_checking(std::string &str);
 	
 private:
-	int				check_keyword(std::string str);
-
-	int				skip_round_bracket(std::string str, size_t i);
-	int				precedence(std::string op);
-	void				build_subtree(std::stack<std::unique_ptr<ASTNode>> &stack_node,
-							std::stack<std::string> &stack_op);
-	int				handle_brackets(std::stack<std::unique_ptr<ASTNode>> &stack_node,
-							std::string str, size_t i);
-	int				handle_operator(std::stack<std::unique_ptr<ASTNode>> &stack_node,
-							std::stack<std::string> &stack_op,
-							char c, size_t i);
-
-	std::string			get_term(std::string str, size_t &i);
 	int				is_number_str(std::string str);
 	int				is_alpha_str(std::string str);
 	int				is_valid_variable_name(std::string term);
@@ -77,9 +57,6 @@ private:
 	int				is_existing_function_name(std::string func);
 
 	NodeType			check_term(std::string &term);
-
-	void				build_tree(std::string str, std::unique_ptr<ASTNode> &root);
-	void				visit_ast(ASTNode *node);
 
 	int				check_str(std::string str);
 

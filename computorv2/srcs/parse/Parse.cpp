@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 10:08:56 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 20:30:18 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 12:45:46 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,20 +106,6 @@ int	Parse::check_keyword(std::string str)
 	return (0);
 }
 
-void	Parse::print_str(std::string str) //remove later
-{
-	std::unordered_map<int, std::string>	op = {{OP_ADD, "+"}, {OP_SUB, "-"}, {OP_MUL, "*"}, {OP_DIV, "/"},
-				{OP_MODULO, "%"}, {OP_POWER, "^"}, {OP_MAT_MUL, "**"}};
-
-	for (size_t i = 0; i < str.length(); i++)
-	{
-		if (is_key_of_map(op, str[i]))
-			std::cout << op[str[i]];
-		else
-			std::cout << str[i];
-	}
-}
-
 std::string	Parse::check_str(std::string &str)
 {
 	if (check_keyword(str))
@@ -133,15 +119,8 @@ std::string	Parse::check_str(std::string &str)
 	SyntaxChecker	syntax_checker(str);
 	str = syntax_checker.check(str);
 
-	std::cout << "str before converting: ";//remove later
-	print_str(str);//
-	std::cout << std::endl;//
-
 	VariableConvertor	variable_convertor(str_copy, this->_var, this->_func);
 	str = variable_convertor.convert(str);
 
-	std::cout << "str after converting: ";//remove later
-	print_str(str);//
-	std::cout << std::endl;//
 	return (str);
 }

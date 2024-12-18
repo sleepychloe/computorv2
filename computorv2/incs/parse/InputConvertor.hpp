@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 13:03:09 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 20:17:44 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 15:19:07 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ private:
 	std::unordered_set<char>	_set_alphabet; // 'a' to 'z', 'A' to 'Z'
 	std::unordered_set<char>	_set_number; // '0' to '9', '.', 'i', 'I'
 	std::unordered_set<char>	_set_vector_matrix; // '[', ']', ',', ';'
-	std::unordered_set<char>	_set_operator; // '+', '-', '*', '/', '%', '^'
+	std::unordered_set<char>	_set_operator; // '+', '-', '*', '/', '%'
 	std::unordered_set<char>	_set_other; // '(', ')','^', '=', '?'
 	std::unordered_set<char>	_set_space; // ' ', '\t'
 

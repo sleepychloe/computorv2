@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 15:36:34 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:59:23 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 14:33:41 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,9 @@ VariableConvertor::VariableConvertor(std::string str, std::map<std::string,
 {
 	this->_set_alphabet = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j','k', 'l', 'm',
 			'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+	this->_set_operator = {'+', '-', '*', '/', '%'};
 	this->_operator = {{OP_ADD, "+"}, {OP_SUB, "-"}, {OP_MUL, "*"}, {OP_DIV, "/"},
-				{OP_MODULO, "%"}, {OP_POWER, "^"}, {OP_MAT_MUL, "**"}};
+				{OP_MODULO, "%"}, {OP_MAT_MUL, "**"}};
 }
 
 VariableConvertor::VariableConvertor(const VariableConvertor& convertor)
@@ -82,9 +83,67 @@ std::vector<std::string>	VariableConvertor::split_term(std::string str)
 	return (term);
 }
 
+int	VariableConvertor::skip_vector_matrix(std::string str, std::string &new_str, size_t i)
+{
+	if (str[i] != '[')
+		return (i);
+
+	std::string		bracket;
+	size_t			start = i;
+
+	i = skip_bracket(SQUARE_BRACKET, str, i);
+	bracket = str.substr(start, i - start + 1);
+	new_str += bracket;
+	i++;
+	return (i);
+}
+
+char	VariableConvertor::do_convert(std::string str, size_t &i)
+{
+	std::unordered_map<char, int> op = {{'+', OP_ADD}, {'-', OP_SUB},
+					{'*', OP_MUL}, {'/', OP_DIV},
+					{'%', OP_MODULO}};
+	if (str[i] == '+' || str[i] == '-')
+	{
+		if (i > 1 && (str[i - 1] == '(' || str[i - 1] == '^' || str[i - 1] == '='
+					|| str[i - 1] == OP_MUL || str[i - 1] == OP_MAT_MUL
+					|| str[i - 1] == OP_DIV || str[i - 1] == OP_MODULO))
+			return (str[i]);
+	}
+	else if (str[i] == '*')
+	{
+		if (str[i + 1] && str[i + 1] == '*')
+		{
+			i = i + 1;
+			return (OP_MAT_MUL);
+		}
+	}
+	return (op[str[i]]);
+}
+
+std::string	VariableConvertor::convert_operator(std::string str)
+{
+	std::string	new_str = "";
+	size_t		i = 0;
+
+	while (i < str.length())
+	{
+		if (str[i] == '[')
+			i = skip_vector_matrix(str, new_str, i);
+		if (i > str.length() - 1)
+			break ;
+		if (is_element_of_set(this->_set_operator, str[i]))
+			new_str += do_convert(str, i);
+		else
+			new_str += str[i];
+		i++;
+	}
+	return (new_str);
+}
+
 void	VariableConvertor::process_variable_term(std::string &term)
 {
-	term = "(" + this->_var[term] + ")";
+	term = "(" + convert_operator(this->_var[term]) + ")";
 }
 
 std::string	VariableConvertor::convert_func_variable(std::string term,
@@ -133,7 +192,7 @@ std::string	VariableConvertor::convert_func_name(std::string term,
 				i++;
 		}
 	}
-	term = "(" + term + ")";
+	term = "(" + convert_operator(term) + ")";
 	return (term);
 }
 
