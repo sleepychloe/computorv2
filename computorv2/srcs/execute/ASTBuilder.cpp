@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/18 11:39:50 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/18 15:44:24 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 20:53:21 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,55 +49,6 @@ std::cout << "left: " << left_str << std::endl;
 std::cout << "right: " << right_str << std::endl;
 std::cout << "--------------------" << std::endl;
 
-
-	size_t	i = 0;
-	size_t	base;
-	size_t	power;
-	size_t	bracket;
-	while (i < str.length())
-	{
-		bracket = 0;
-		if (str[i] == '^')
-		{
-			std::cout << "FOUND CARET" << std::endl;
-			base = i - 1;
-			if (str[base] != ')')
-			{
-				std::cout << "base: ";
-				while (base && !is_key_of_map(this->_operator, str[base]))
-					base--;
-				std::cout << str.substr(base, i - base) << std::endl;
-			}
-			else
-			{
-				std::cout << "base: ";
-				while (base &&  str[base] != '(')
-				{
-					base--;
-					if (str[base] == ')')
-						bracket++;
-				}
-				while (bracket && base)
-				{
-					base--;
-					if (str[base] == '(')
-						bracket--;
-				}
-				std::cout << str.substr(base, i - base) << std::endl;
-			}
-			std::cout << "power: ";
-			power = i + 1;
-			while (str[power] != is_key_of_map(this->_operator, str[power])
-				&& str[power] != '=' && str[power] != '\0')
-				power++;
-			power --;
-			std::cout << str.substr(i + 1, power - i) << std::endl;
-			i = power + 1;
-		}
-		i++;
-	}
-
-
 	// std::unique_ptr<ASTNode>	left_root = nullptr;
 	// std::unique_ptr<ASTNode>	right_root = nullptr;
 
@@ -111,20 +62,7 @@ std::cout << "--------------------" << std::endl;
 
 void	ASTBuilder::throw_err_msg(std::string function, std::string err_msg, size_t term)
 {
-	std::unordered_map<int, std::string>	op = {{OP_ADD, "+"}, {OP_SUB, "-"}, {OP_MUL, "*"}, {OP_DIV, "/"},
-				{OP_MODULO, "%"}, {OP_MAT_MUL, "**"}};
-	std::string	str_copy = this->_str;
-
-	this->_str = "";
-	for (size_t i = 0; i < str_copy.length(); i ++)
-	{
-		if (is_key_of_map(op, str_copy[i]))
-			this->_str += op[str_copy[i]];
-		else
-			this->_str += str_copy[i];
-	}
-std::cout << "str_copy: " << str_copy << std::endl;//
-std::cout << "this->_str: " << this->_str << std::endl;//
+	this->_str = revert_str(this->_operator, this->_str);
 	this->_struct_error.file_name = "ASTBuilder.cpp";
 	this->_struct_error.cat = "";
 	this->_struct_error.function = function;

@@ -6,7 +6,7 @@
 #    By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/28 09:51:42 by yhwang            #+#    #+#              #
-#    Updated: 2024/12/18 11:39:19 by yhwang           ###   ########.fr        #
+#    Updated: 2024/12/18 20:53:58 by yhwang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,7 +43,7 @@ FILES = $(READLINE_SRC_DIR)ReadLine \
 		$(SRC_EXECUTE_DIR)Execute \
 		$(SRC_EXECUTE_DIR)ASTNode \
 		$(SRC_EXECUTE_DIR)ASTBuilder \
-		$(SRC_EXECUTE_DIR)AST \
+		$(SRC_EXECUTE_DIR)ExponentSimplifier \
 		$(SRC_DIR)Utils
 
 SRCS = $(addsuffix .cpp, $(FILES))

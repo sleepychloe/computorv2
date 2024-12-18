@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 00:05:32 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/18 12:51:29 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 17:35:55 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,8 @@ private:
 	size_t				_pos;
 
 	std::unordered_set<char>	_set_alphabet; // 'a' to 'z'
-	std::unordered_set<char>	_set_number;
-	std::unordered_set<char>	_set_operator; // '+', '-', '*', '/', '%', '^'
+	std::unordered_set<char>	_set_number; // '0' to '9', '.', 'i'
+	std::unordered_set<char>	_set_operator; // '+', '-', '*', '/', '%'
 
 	ParseError::t_error		_struct_error;
 };

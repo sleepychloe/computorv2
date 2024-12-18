@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 20:45:43 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/18 12:30:51 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 20:53:38 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,11 @@ std::map<std::string, std::string>	Execute::get_func(void) const
 void	Execute::execute(std::string str)
 {
 	this->_str = str;
+std::cout << "str: " << str << std::endl;
 
-	ASTBuilder	builder;
-	builder.build(str);
+	ExponentSimplifier	exponentsimplifier;
+	str = exponentsimplifier.calculate(str);
+
+	// ASTBuilder	astbuilder;
+	// astbuilder.build(str);
 }

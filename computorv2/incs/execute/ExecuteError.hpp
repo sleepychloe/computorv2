@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 20:12:07 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/18 11:53:24 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 20:05:03 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ namespace ExecuteError
 		std::string	function;
 		std::string	msg;
 		size_t		term_idx;
-		size_t		term_str;
+		std::string	term_str;
 	}	t_error;
 
 	class ExecuteException: public std::exception

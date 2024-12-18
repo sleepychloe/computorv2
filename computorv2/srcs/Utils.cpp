@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 13:48:03 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/16 15:54:17 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 20:48:57 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,36 +112,16 @@ int	is_bracket_for_function(std::string str, size_t bracket_open_idx)
 	return (0);
 }
 
-////////////////////////////////AST
-int	check_round_brackets(std::string str)
+std::string	revert_str(std::unordered_map<int, std::string> op, std::string str)
 {
-	std::stack<char>	stack;
-	int			cnt = 0;
-	size_t			i = 0;
+	std::string	new_str = "";
 
-	if (str.find(std::string(1, ')')) == std::string::npos
-		&& str.find(std::string(1, '(')) == std::string::npos)
-		return (0);
-
-	while (i < str.length())
+	for (size_t i = 0; i < str.length(); i ++)
 	{
-		if (str[i] == '(')
-		{
-			stack.push(str[i]);
-			cnt++;
-		}
-		if (str[i] == ')')
-		{
-			if ((str[i - 1] && str[i - 1] == '(')
-				|| stack.empty())
-				return (0);
-			stack.pop();
-		}
-		i++;
+		if (is_key_of_map(op, str[i]))
+			new_str += op[str[i]];
+		else
+			new_str += str[i];
 	}
-	if (!stack.empty())
-		return (0);
-	return (cnt);
+	return (new_str);
 }
-
-
