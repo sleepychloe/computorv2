@@ -256,16 +256,16 @@ caret(^):
 - base:
 	* float -> ok
 	* complex<float> -> ok
-	* Vector<float> -> no
-	* Vector<Complex<float>> -> no
-	* Matrix<float> -> no
-	* Matrix<Complex<float>> -> no
+	* Vector<float> -> ok
+	* Vector<Complex<float>> -> ok
+	* Matrix<float> -> ok
+	* Matrix<Complex<float>> -> ok
 - power:
 	* float -> ok
 		: + -> allowed
-		: - -> allowed
+		: - -> no
 		: '0' to '9' -> allowed
-		: only ±int value allowed
+		: only +int value allowed
 	* Complex<float> -> no
 	* Vector<float> -> no
 	* Vector<Complex<float>> -> no

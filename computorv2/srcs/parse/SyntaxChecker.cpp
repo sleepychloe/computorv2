@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 13:55:54 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/18 14:25:46 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/18 23:26:26 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,9 +119,10 @@ int	SyntaxChecker::check_question_mark(int str_type, std::string str)
 int	SyntaxChecker::check_caret_base(std::string str, size_t i, size_t pos)
 {
 	if (i == 0
-		|| !(std::isdigit(str[i - 1])
-		|| is_element_of_set(this->_set_alphabet, str[i - 1])
-		|| str[i - 1] == ')'))
+		// || !(std::isdigit(str[i - 1])
+		// || is_element_of_set(this->_set_alphabet, str[i - 1])
+		// || str[i - 1] == ')'))
+		|| is_element_of_set(this->_set_operator, str[i - 1]))
 		throw_err_msg("SyntaxChecker::check_caret_base(std::string str, size_t i, size_t pos)",
 			"incorrect location of caret(^): base is missed" , pos + i);
 	return (1);

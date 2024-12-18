@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/18 19:35:32 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/18 21:05:28 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/19 00:20:17 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 ExponentSimplifier::ExponentSimplifier()
 {
+	this->_set_vector_matrix = { '[', ']', ',', ';'};
 	this->_operator = {{OP_ADD, "+"}, {OP_SUB, "-"}, {OP_MUL, "*"}, {OP_DIV, "/"},
 				{OP_MODULO, "%"}, {OP_MAT_MUL, "**"}};
 }
@@ -37,7 +38,7 @@ ExponentSimplifier::~ExponentSimplifier()
 
 std::string	ExponentSimplifier::calculate(std::string str)
 {
-	this->_str = revert_str(this->_operator, this->_str);
+	this->_str = revert_str(this->_operator, str);
 
 	str = check_exponent(str);
 	return (str);
@@ -52,6 +53,7 @@ void	ExponentSimplifier::throw_err_msg(std::string function,
 	this->_struct_error.cat = "exponent error";
 	this->_struct_error.function = function;
 	this->_struct_error.msg = err_msg;
+	this->_struct_error.term_idx = pos_start;
 
 	this->_struct_error.term_str = "\t\t  " + this->_str + "\n";
 	this->_struct_error.term_str += "\t\t  ";
@@ -69,44 +71,82 @@ void	ExponentSimplifier::throw_err_msg(std::string function,
 
 std::string	ExponentSimplifier::get_base(std::string str, size_t i)
 {
-	size_t	base = i - 1;
-	size_t	bracket = 0;
+	std::stack<char>	stack;
+	size_t			base = i - 1;
 
 	if (str[base] != ')')
 	{
 		while (base && !is_key_of_map(this->_operator, str[base]))
 			base--;
+		if (is_key_of_map(this->_operator, str[base]))
+			base++;
 	}
 	else
 	{
-		while (base &&  str[base] != '(')
+		stack.push(str[base]);
+		base--;
+		while (base)
 		{
-			base--;
 			if (str[base] == ')')
-				bracket++;
-		}
-		while (bracket && base)
-		{
+				stack.push(str[base]);
+			else if (str[base] == '(')
+				stack.pop();
+
+			if (stack.empty())
+				break ;
 			base--;
-			if (str[base] == '(')
-				bracket--;
 		}
 	}
 	return (str.substr(base, i - base));
 }
 
+std::string	ExponentSimplifier::check_power(std::string power, size_t i)
+{
+	size_t	j = 0;
+
+	while (j < power.length())
+	{
+		if (power[j] == 'i')
+			throw_err_msg("ExponentSimplifier::check_power(std::string power, size_t i)",
+				"invalid number of power: only 0 or positive int value allowed",
+				i - power.length() + 1, i);
+		j++;
+	}
+	return (power);
+}
+
 std::string	ExponentSimplifier::get_power(std::string str, size_t &i)
 {
-	std::string	res;
-	size_t		power = i + 1;
+	std::stack<char>	stack;
+	std::string		res;
+	size_t			power = i + 1;
 
-	while (str[power] != is_key_of_map(this->_operator, str[power])
-		&& str[power] != '=' && str[power] != '\0')
+	if (str[power] != '(')
+	{
+		while (power && !is_key_of_map(this->_operator, str[power])
+			&& str[power] != '=' && str[power] != '\0')
+			power++;
+		power--;
+	}
+	else
+	{
+		stack.push(str[power]);
 		power++;
-	power--;
+		while (str[power] && str[power] != '=' && str[power] != '\0')
+		{
+			if (str[power] == '(')
+				stack.push(str[power]);
+			else if (str[power] == ')')
+				stack.pop();
+
+			if (stack.empty())
+				break ;
+			power++;
+		}
+	}
 	res = str.substr(i + 1, power - i);
-	i = power + 1;
-	return (res);
+	i = power;
+	return (check_power(res, i));
 }
 
 std::string	ExponentSimplifier::check_exponent(std::string str)
@@ -123,7 +163,7 @@ std::string	ExponentSimplifier::check_exponent(std::string str)
 			power = get_power(str, i);
 			std::cout << "base: " << revert_str(this->_operator, base) << std::endl;
 			std::cout << "power: " << revert_str(this->_operator, power) << std::endl;
-			//remove bracket, check base and power
+			//remove brackets, simplify
 		}
 		i++;
 	}

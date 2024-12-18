@@ -6,7 +6,7 @@
 /*   By: yhwang <yhwang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 13:48:03 by yhwang            #+#    #+#             */
-/*   Updated: 2024/12/18 20:48:57 by yhwang           ###   ########.fr       */
+/*   Updated: 2024/12/19 00:10:59 by yhwang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ std::string	revert_str(std::unordered_map<int, std::string> op, std::string str)
 {
 	std::string	new_str = "";
 
-	for (size_t i = 0; i < str.length(); i ++)
+	for (size_t i = 0; i < str.length(); i++)
 	{
 		if (is_key_of_map(op, str[i]))
 			new_str += op[str[i]];
